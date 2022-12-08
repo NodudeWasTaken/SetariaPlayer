@@ -88,3 +88,8 @@ jobs:
       run: dotnet test --no-restore --verbosity normal
     - name: Publish
       run: dotnet publish ${Solution_Name} -c ${{ matrix.configuration }}
+    - name: Upload dotnet build
+      uses: actions/upload-artifact@v3
+      with:
+        name: dotnet-build-${{ github.head_ref }}.${{ github.sha }}
+        path: bin/${{ matrix.configuration }}/net6.0/*
