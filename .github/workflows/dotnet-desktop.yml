@@ -36,7 +36,7 @@
 # For a complete CI/CD sample to get started with GitHub Action workflows for Desktop Applications,
 # refer to https://github.com/microsoft/github-actions-for-desktop-apps
 
-name: .NET Core Desktop
+name: .NET Framework Desktop
 
 on:
   push:
@@ -57,9 +57,6 @@ jobs:
 
     env:
       Solution_Name: ConsoleApp1.csproj                         # Replace with your solution name, i.e. MyWpfApp.sln.
-      Test_Project_Path: your-test-project-path                 # Replace with the path to your test project, i.e. MyWpfApp.Tests\MyWpfApp.Tests.csproj.
-      Wap_Project_Directory: your-wap-project-directory-name    # Replace with the Wap project directory relative to the solution, i.e. MyWpfApp.Package.
-      Wap_Project_Path: your-wap-project-path                   # Replace with the path to your Wap project, i.e. MyWpf.App.Package\MyWpfApp.Package.wapproj.
 
     steps:
     - name: Checkout
@@ -77,9 +74,18 @@ jobs:
     - name: Setup MSBuild.exe
       uses: microsoft/setup-msbuild@v1.0.2
 
+    # Add  Nugget
+    - name: Setup NuGet
+      uses: NuGet/setup-nuget@v1.0.2
+
     - name: Install dependencies
       run: dotnet restore
+    - name: Restore Packages
+      run: nuget restore ${Solution_Name}
     - name: Build
-      run: dotnet build --configuration Release --no-restore
+      run: dotnet build ${Solution_Name} --configuration ${{ matrix.configuration }} --no-restore
     - name: Test
       run: dotnet test --no-restore --verbosity normal
+    - name: Publish
+      run: dotnet publish ${Solution_Name} -c ${{ matrix.configuration }}
+
