@@ -93,4 +93,7 @@ jobs:
       if: ${{ matrix.configuration }} == Release
       with:
         name: dotnet-build${{ github.head_ref }}.${{ github.sha }}
-        path: bin/${{ matrix.configuration }}/net6.0/publish/*
+        path: |
+          bin/${{ matrix.configuration }}/net6.0/publish/*
+          data.csv
+          rec.funscript
