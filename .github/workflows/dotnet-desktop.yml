@@ -81,13 +81,13 @@ jobs:
     - name: Install dependencies
       run: dotnet restore
     - name: Install nuggets
-      run: nuget restore ${{Solution_Name}}
+      run: nuget restore ${Solution_Name}
     - name: Build
-      run: dotnet build ${{Solution_Name}} --configuration ${{ matrix.configuration }} --no-restore
+      run: dotnet build ${Solution_Name} --configuration ${{ matrix.configuration }} --no-restore
     - name: Test
       run: dotnet test --no-restore --verbosity normal
     - name: Publish
-      run: dotnet publish ${{Solution_Name}} -c ${{ matrix.configuration }}
+      run: dotnet publish ${Solution_Name} -c ${{ matrix.configuration }}
     - name: Upload dotnet build
       uses: actions/upload-artifact@v3
       if: ${{ matrix.configuration }} == Release
