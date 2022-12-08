@@ -88,10 +88,10 @@ jobs:
       run: dotnet test --no-restore --verbosity normal
     - name: Publish
       run: dotnet publish ${Solution_Name} -c ${{ matrix.configuration }}
-    - name: Checkout
+    - name: Move scripts
       run: |
-        copy rec.funscript bin\Release\net6.0\publish\rec.funscript
-        copy data.csv bin\Release\net6.0\publish\data.csv
+        copy rec.funscript bin\${{ matrix.configuration }}\net6.0\publish\rec.funscript
+        copy data.csv bin\${{ matrix.configuration }}\net6.0\publish\data.csv
     - name: Upload dotnet build
       uses: actions/upload-artifact@v3
       if: ${{ matrix.configuration }} == Release
