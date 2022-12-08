@@ -70,17 +70,17 @@ jobs:
       with:
         dotnet-version: 6.0.x
 
-    # Add  MSBuild to the PATH: https://github.com/microsoft/setup-msbuild
+    # Add MSBuild to the PATH: https://github.com/microsoft/setup-msbuild
     - name: Setup MSBuild.exe
       uses: microsoft/setup-msbuild@v1.1.3
 
-    # Add  Nugget
-    - name: Setup NuGet
+    # Add Nugget
+    - name: Setup Nugget
       uses: NuGet/setup-nuget@v1.1.1
 
     - name: Install dependencies
       run: dotnet restore
-    - name: Restore Packages
+    - name: Install nuggets
       run: nuget restore ${Solution_Name}
     - name: Build
       run: dotnet build ${Solution_Name} --configuration ${{ matrix.configuration }} --no-restore
@@ -88,4 +88,3 @@ jobs:
       run: dotnet test --no-restore --verbosity normal
     - name: Publish
       run: dotnet publish ${Solution_Name} -c ${{ matrix.configuration }}
-
