@@ -38,39 +38,30 @@ namespace ConsoleApp1
 	{
 		public float hp;
 		public float mp;
-		public InactiveState(ButtplugInt b, ScriptPlayer sp, ScriptParser sr) : base(b, sp, sr)
-		{
+		public InactiveState(ButtplugInt b, ScriptPlayer sp, ScriptParser sr) : base(b, sp, sr) {
 			this.urlPrefix = "/game/player_damage";
 		}
-		public override void Update(HttpListenerRequest r, ref State s)
-		{
+		public override void Update(HttpListenerRequest r, ref State s) {
 			if (r.QueryString.HasKeys()) {
 				foreach (string qs in r.QueryString.AllKeys) {
-					if (qs == "hp") {
+					if (qs == "hp")
 						hp = float.Parse(r.QueryString[qs]);
-					}
-					if (qs == "mp") {
+					if (qs == "mp")
 						mp = float.Parse(r.QueryString[qs]);
-					}
 				}
 			}
 
 			if (r.Url.AbsolutePath.Equals("/game/fire"))
-			{
 				sp.Play(Script.vibrate_strong);
-			}
 			if (r.Url.AbsolutePath.Equals("/game/player_damage"))
-			{
 				sp.Play(Script.vibrate_ultra);
-			}
 			//player_damage2 happens at the end of animations
 			/*if (r.Url.AbsolutePath.Equals("/game/player_damage2"))
 			{
 				Console.WriteLine("How did you trigger this?");
 			}*/
 		}
-		public override void Exit(HttpListenerRequest r, ref State s)
-		{
+		public override void Exit(HttpListenerRequest r, ref State s) {
 			sp.Stop();
 		}
 	}
@@ -93,8 +84,7 @@ namespace ConsoleApp1
 				this.Exit(r, ref s);
 				return;
 			}
-			if (!r.QueryString.HasKeys())
-			{
+			if (!r.QueryString.HasKeys()) {
 				Console.WriteLine("Missing query string!");
 				return;
 			}
@@ -118,33 +108,28 @@ namespace ConsoleApp1
 	Var anim_flag =7
 			*/
 			var script = sr.get(mob, animation_scene);
-			if (script == null)
-			{
+			if (script == null) {
 				Console.WriteLine("Missing script for {0} {1}!", mob, animation_scene);
 				sp.Stop();
 				return;
 			}
 
-			if (curscript != null && curscript.GetId() == script.GetId())
-			{
+			if (curscript != null && curscript.GetId() == script.GetId()) {
 				Console.WriteLine("Already playing {0} {1}!", mob, animation_scene);
 				sp.setTimeScale(animation_speed);
 				return;
 			}
 
 			//If this wasn't a scene-switch, dont delay
-			if (mob != lastmob)
-			{
+			if (mob != lastmob) {
 				transition_time = 0;
 			}
-			if (lastmob != "")
-			{
+			if (lastmob != "") {
 				sp.Stop();
 			}
 			lastmob = mob;
 
-			foreach (var d in b.client.Devices)
-			{
+			foreach (var d in b.client.Devices) {
 				Console.WriteLine("Device name: " + d.Name);
 			}
 
@@ -153,8 +138,7 @@ namespace ConsoleApp1
 			sp.setTimeScale(animation_speed);
 			curscript = script;
 		}
-		public override void Exit(HttpListenerRequest r, ref State s)
-		{
+		public override void Exit(HttpListenerRequest r, ref State s) {
 			sp.Stop();
 			s = State.Inactive;
 			lastmob = "";

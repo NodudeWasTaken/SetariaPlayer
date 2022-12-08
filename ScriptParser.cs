@@ -22,8 +22,14 @@ namespace ConsoleApp1
 		public long End { get; set; }
 		public bool Loop { get; set; }
 		public List<(long, int)> Actions { get; set; }
-		public Data(string Name, string Scene, long Start, long End, bool Loop, List<(long, int)> Actions)
-		{
+		public Data(
+			string Name, 
+			string Scene, 
+			long Start, 
+			long End, 
+			bool Loop, 
+			List<(long, int)> Actions
+		) {
 			this.Name = Name;
 			this.Scene = Scene;
 			this.Start = Start;
@@ -31,8 +37,7 @@ namespace ConsoleApp1
 			this.Loop = Loop;
 			this.Actions = Actions;
 		}
-		public string GetId()
-		{
+		public string GetId() {
 			return $"{Name}_{Scene}";
 		}
 	}
@@ -47,8 +52,7 @@ namespace ConsoleApp1
 	class ScriptParser
 	{
 		private List<Data> records;
-		public ScriptParser()
-		{
+		public ScriptParser() {
 #if DEBUG
 			string datapath = "../../../../data.csv";
 			string recordpath = "../../../../rec.funscript";
@@ -58,17 +62,14 @@ namespace ConsoleApp1
 #endif
 			records = new List<Data>();
 			using (var reader = new StreamReader(datapath))
-			using (TextFieldParser parser = new TextFieldParser(reader))
-			{
+			using (TextFieldParser parser = new TextFieldParser(reader)) {
 				parser.TextFieldType = FieldType.Delimited;
 				parser.SetDelimiters(",");
-				while (!parser.EndOfData)
-				{
+				while (!parser.EndOfData) {
 					//Process row
 					string[] fields = parser.ReadFields();
-					if (fields[0] == "Name") {
+					if (fields[0] == "Name")
 						continue;
-					}
 					//TODO: Find a better builtin method
 					records.Add(new Data(
 						fields[0],
@@ -81,11 +82,9 @@ namespace ConsoleApp1
 				}
 			}
 
-			using (var reader = new StreamReader(recordpath))
-			{
+			using (var reader = new StreamReader(recordpath)) {
 				Funscript data = JsonSerializer.Deserialize<Funscript>(reader.ReadToEnd());
-				foreach (var rec in this.records)
-				{
+				foreach (var rec in this.records) {
 					var actions = data.actions
 						.FindAll((d) => rec.Start <= d["at"] && d["at"] <= rec.End)
 						.Select((d) => ((long)d["at"], (int)d["pos"]))
@@ -101,8 +100,7 @@ namespace ConsoleApp1
 				}
 			}
 		}
-		public Data get(string Name, string Scene)
-		{
+		public Data get(string Name, string Scene) {
 			return this.records.Find((r) => r.Name == Name && r.Scene == Scene);
 		}
 	}

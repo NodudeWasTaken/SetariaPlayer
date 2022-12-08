@@ -8,57 +8,52 @@ using System.Collections.Specialized;
 namespace ConsoleApp1
 {
 	class HttpServer
-    {
-        private HttpListener listener;
-        private Task listenTask;
-        private bool enabled = true;
-        private Func<HttpListenerRequest, string> hook;
+	{
+		private HttpListener listener;
+		private Task listenTask;
+		private bool enabled = true;
+		private Func<HttpListenerRequest, string> hook;
 
-        public HttpServer(string url)
-		{
+		public HttpServer(string url) {
 			listener = new HttpListener();
 			listener.Prefixes.Add(url);
 
 		}
-        public async Task HandleIncomingConnections()
-        {
-            while (enabled)
-            {
-                try
-                {
-                    HttpListenerContext ctx = await listener.GetContextAsync();
-                    HttpListenerRequest req = ctx.Request;
-                    HttpListenerResponse resp = ctx.Response;
+		public async Task HandleIncomingConnections() {
+			while (enabled) {
+				HttpListenerContext ctx = await listener.GetContextAsync();
+				HttpListenerRequest req = ctx.Request;
+				HttpListenerResponse resp = ctx.Response;
 
-                    string responseString = hook.Invoke(req);
-                    byte[] data = System.Text.Encoding.UTF8.GetBytes(responseString);
+				string responseString = "Internal Error";
 
-                    await resp.OutputStream.WriteAsync(data, 0, data.Length);
-                    resp.Close();
-                } catch (Exception ex)
-                {
-                    Console.WriteLine("HttpServer.Error {0}", ex.Message);
-                }
-            }
-        }
+				try {
+					responseString = hook.Invoke(req);
+				} catch (Exception ex) {
+					Console.WriteLine("HttpServer.Error {0}", ex.Message);
+				}
 
-        public void Start()
-        {
-            listener.Start();
+				byte[] data = System.Text.Encoding.UTF8.GetBytes(responseString);
+				await resp.OutputStream.WriteAsync(data, 0, data.Length);
+				resp.Close();
+			}
+		}
+
+		public void Start() {
+			listener.Start();
 
 			// Handle requests
 			listenTask = HandleIncomingConnections();
 		}
-		public void Hook(Func<HttpListenerRequest, string> hook)
-        {
-            this.hook = hook;
-        }
-        public void Stop()
-        {
-            enabled = false;
+		public void Hook(Func<HttpListenerRequest, string> hook) {
+			this.hook = hook;
+		}
+		public void Stop() {
+			enabled = false;
+			listenTask.Wait();
 
-            // Close the listener
-            listener.Close();
-        }
-    }
+			// Close the listener
+			listener.Close();
+		}
+	}
 }

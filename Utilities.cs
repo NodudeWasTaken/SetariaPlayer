@@ -9,12 +9,10 @@ namespace ConsoleApp1
 {
 	class Utilities
 	{
-		public static long curtime()
-		{
+		public static long curtime() {
 			return ((DateTimeOffset)DateTime.Now).ToUnixTimeMilliseconds();
 		}
-		public static double diff(double b, double n)
-		{
+		public static double diff(double b, double n) {
 			return Math.Abs(n - b) / b;
 		}
 	}

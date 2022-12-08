@@ -35,8 +35,7 @@ namespace ConsoleApp1
 
 		//TODO: Compile scripts
 	}
-	class ScriptPlayer
-	{
+	class ScriptPlayer {
 		private Task playTask;
 		private CancellationTokenSource playTaskTS;
 		private ButtplugInt butt;
@@ -50,11 +49,9 @@ namespace ConsoleApp1
 		/*
 		 * Converts a list of (Time,Position) to (Duration,Position) by previous index
 		 */
-		private IEnumerable<(int, double)> buttConverter(List<(long, int)> ac)
-		{
+		private IEnumerable<(int, double)> buttConverter(List<(long, int)> ac) {
 			long rt = 0;
-			foreach (var a in ac)
-			{
+			foreach (var a in ac) {
 				yield return (
 					(int)(a.Item1 - rt),
 					(double)(a.Item2 / 100.0)
@@ -66,10 +63,8 @@ namespace ConsoleApp1
 		/*
 		 * Converts a list of (Time,Position) to (Duration,Position) by timing
 		 */
-		private IEnumerable<(int, double)> buttTimer(List<(long, int)> ac, long time, Func<long> curtime)
-		{
-			foreach (var a in ac)
-			{
+		private IEnumerable<(int, double)> buttTimer(List<(long, int)> ac, long time, Func<long> curtime) {
+			foreach (var a in ac) {
 				long idx = a.Item1;
 				int dur = (int)((idx + time) - curtime());
 				double pos = (double)(a.Item2 / 100.0);
@@ -81,8 +76,7 @@ namespace ConsoleApp1
 		public void setTimeScale(double scale) {
 			time.setScale(scale);
 		}
-		public void Play(Data current_script, bool? loopOverride=null, int offset=0)
-		{
+		public void Play(Data current_script, bool? loopOverride=null, int offset=0) {
 			//TODO: Offset support
 			long current_time =Utilities.curtime();
 			time.reset();
@@ -125,8 +119,7 @@ namespace ConsoleApp1
 							if (dur < 50)
 								continue;
 
-							if (device.AllowedMessages.ContainsKey(MessageAttributeType.LinearCmd))
-							{
+							if (device.AllowedMessages.ContainsKey(MessageAttributeType.LinearCmd)) {
 								device.SendLinearCmd((uint)dur, pos);
 							}
 							else if (device.AllowedMessages.ContainsKey(MessageAttributeType.VibrateCmd))
@@ -141,10 +134,9 @@ namespace ConsoleApp1
 							Console.WriteLine("DEBUG Vibrate: {0} {1}", dur, intensity);
 #endif
 							long taken = Utilities.curtime() + dur;
-							while (taken > Utilities.curtime() || paused)
-							{
+							while (taken > Utilities.curtime() || paused) {
 								Thread.Sleep(1);
-								if (ct.IsCancellationRequested) { return; }
+								if (ct.IsCancellationRequested) return;
 								//TODO: Fucks up if multiple devices
 								if (paused) { 
 									taken += 1; 
@@ -182,8 +174,7 @@ namespace ConsoleApp1
 		public void Resume() { 
 			paused = false; 
 		}
-		public void Stop()
-		{
+		public void Stop() {
 			if (playTaskTS != null)
 				playTaskTS.Cancel();
 			foreach (var i in butt.client.Devices)

@@ -53,8 +53,7 @@ namespace ConsoleApp1
 			this.m_offset = this.m_time;
 			this.m_scale = 1.0;
 		}
-		public void test()
-		{
+		public void test() {
 			TimeStretcher t = new TimeStretcher();
 			Console.WriteLine("t0 {0}", Utilities.curtime() - t.get());
 			t.setScale(0.5);

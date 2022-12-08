@@ -12,8 +12,7 @@ namespace ConsoleApp1
 			public int vibrationBufferDuration = 5000;
 			public double vibrationDiff = 0.2;
 			public double vibrationMaxSpeed = 2;
-			public ConfigInt()
-			{
+			public ConfigInt() {
 				//TODO: Load or create config file
 			}
 		}
