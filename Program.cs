@@ -5,7 +5,7 @@ using System.Globalization;
 using System.Net;
 using System.Text;
 
-string version = "InDev Build 7";
+string version = "InDev Build 8";
 ButtplugInt b = new ButtplugInt();
 HttpServer h = new HttpServer("http://127.0.0.1:5050/");
 ScriptPlayer sp = new ScriptPlayer(b);

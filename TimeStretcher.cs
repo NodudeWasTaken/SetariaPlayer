@@ -33,6 +33,12 @@ namespace ConsoleApp1
 			this.m_scale = scale;
 		}
 		/*
+		 * Get the timescale
+		 */
+		public double getScale() {
+			return this.m_scale;
+		}
+		/*
 		 * Calculates the time since last update in realtime
 		 */
 		private long diff() {

@@ -54,8 +54,8 @@ namespace ConsoleApp1
 		private List<Data> records;
 		public ScriptParser() {
 #if DEBUG
-			string datapath = "../../../../data.csv";
-			string recordpath = "../../../../rec.funscript";
+			string datapath = "../../../data.csv";
+			string recordpath = "../../../rec.funscript";
 #else
 			string datapath = "./data.csv";
 			string recordpath = "./rec.funscript";
