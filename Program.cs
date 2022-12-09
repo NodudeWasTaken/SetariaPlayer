@@ -76,3 +76,4 @@ Console.WriteLine("Press enter to exit!");
 Console.ReadLine();
 h.Stop();
 b.Stop();
+sp.Stop();

@@ -110,6 +110,7 @@ namespace ConsoleApp1
 			var script = sr.get(mob, animation_scene);
 			if (script == null) {
 				Console.WriteLine("Missing script for {0} {1}!", mob, animation_scene);
+				//TODO: Filler?
 				sp.Stop();
 				return;
 			}
@@ -134,6 +135,8 @@ namespace ConsoleApp1
 			}
 
 			int shift = (int)(transition_time * 1000.0);
+			//TODO: ?
+			shift = 0;
 			sp.Play(script, null, shift);
 			sp.setTimeScale(animation_speed);
 			curscript = script;
