@@ -90,11 +90,11 @@ jobs:
       run: dotnet publish ${Solution_Name} -c ${{ matrix.configuration }}
     - name: Move scripts
       run: |
-        copy rec.funscript bin\${{ matrix.configuration }}\net6.0-windows\publish\rec.funscript
-        copy data.csv bin\${{ matrix.configuration }}\net6.0-windows\publish\data.csv
+        copy rec.funscript bin\${{ matrix.configuration }}\net6.0-windows\rec.funscript
+        copy data.csv bin\${{ matrix.configuration }}\net6.0-windows\data.csv
     - name: Upload dotnet build
       uses: actions/upload-artifact@v3
       if: ${{ matrix.configuration }} == Release
       with:
         name: dotnet-build-${{ matrix.configuration }}${{ github.head_ref }}.${{ github.sha }}
-        path: bin/${{ matrix.configuration }}/net6.0/publish*
+        path: bin/${{ matrix.configuration }}/net6.0/*
