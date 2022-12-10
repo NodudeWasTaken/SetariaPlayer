@@ -87,14 +87,14 @@ jobs:
     - name: Test
       run: dotnet test --no-restore --verbosity normal
     - name: Publish
-      run: dotnet publish ${Solution_Name} /p:PublishProfile=FolderProfile --no-restore
+      run: dotnet publish ${Solution_Name} /p:PublishProfile=FolderProfile
     - name: Move scripts
       run: |
-        copy rec.funscript bin\${{ matrix.configuration }}\net6.0-windows\publish\rec.funscript
-        copy data.csv bin\${{ matrix.configuration }}\net6.0-windows\publish\data.csv
+        copy rec.funscript bin\${{ matrix.configuration }}\net6.0-windows\publish\win-x64\rec.funscript
+        copy data.csv bin\${{ matrix.configuration }}\net6.0-windows\publish\win-x64\data.csv
     - name: Upload dotnet build
       uses: actions/upload-artifact@v3
       if: ${{ matrix.configuration }} == Release
       with:
         name: dotnet-build-${{ matrix.configuration }}${{ github.head_ref }}.${{ github.sha }}
-        path: bin/${{ matrix.configuration }}/net6.0-windows/publish/*
+        path: bin/${{ matrix.configuration }}/net6.0-windows/publish/win-x64/*
