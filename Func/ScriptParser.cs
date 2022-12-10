@@ -11,8 +11,9 @@ using System.Threading.Tasks;
 using static System.Formats.Asn1.AsnWriter;
 using System.Xml.Linq;
 using Microsoft.VisualBasic.FileIO;
+using System.IO;
 
-namespace ConsoleApp1
+namespace SetariaPlayer
 {
 	public class Data
 	{

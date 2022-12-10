@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.4.33110.190
+VisualStudioVersion = 17.4.33122.133
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApp1", "ConsoleApp1.csproj", "{680A2374-72A8-49F4-AFCB-8DED41A0B719}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SetariaPlayer", "SetariaPlayer.csproj", "{61600A0D-4B7B-4BEC-89B0-7FE1695B065B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,15 +11,15 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{680A2374-72A8-49F4-AFCB-8DED41A0B719}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{680A2374-72A8-49F4-AFCB-8DED41A0B719}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{680A2374-72A8-49F4-AFCB-8DED41A0B719}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{680A2374-72A8-49F4-AFCB-8DED41A0B719}.Release|Any CPU.Build.0 = Release|Any CPU
+		{61600A0D-4B7B-4BEC-89B0-7FE1695B065B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{61600A0D-4B7B-4BEC-89B0-7FE1695B065B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{61600A0D-4B7B-4BEC-89B0-7FE1695B065B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{61600A0D-4B7B-4BEC-89B0-7FE1695B065B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {2422429A-74C8-4C22-9FA5-AD1B18A797A1}
+		SolutionGuid = {CE8EAE33-930F-4AD7-8FCE-0A1F5E90A74D}
 	EndGlobalSection
 EndGlobal

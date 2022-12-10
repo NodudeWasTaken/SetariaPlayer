@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
-namespace ConsoleApp1
+namespace SetariaPlayer
 {
 	class TimeStretcher
 	{
@@ -61,19 +63,19 @@ namespace ConsoleApp1
 		}
 		public void test() {
 			TimeStretcher t = new TimeStretcher();
-			Console.WriteLine("t0 {0}", Utilities.curtime() - t.get());
+			Debug.WriteLine("t0 {0}", Utilities.curtime() - t.get());
 			t.setScale(0.5);
 			Thread.Sleep(1000);
-			Console.WriteLine("t1 {0}", Utilities.curtime() - t.get());
+			Debug.WriteLine("t1 {0}", Utilities.curtime() - t.get());
 			t.setScale(1);
 			Thread.Sleep(1000);
-			Console.WriteLine("t2 {0}", Utilities.curtime() - t.get());
+			Debug.WriteLine("t2 {0}", Utilities.curtime() - t.get());
 			t.setScale(1.5);
 			Thread.Sleep(1000);
-			Console.WriteLine("t3 {0}", Utilities.curtime() - t.get());
+			Debug.WriteLine("t3 {0}", Utilities.curtime() - t.get());
 			t.setScale(1);
 			Thread.Sleep(1000);
-			Console.WriteLine("t4 {0}", Utilities.curtime() - t.get());
+			Debug.WriteLine("t4 {0}", Utilities.curtime() - t.get());
 		}
 	}
 }

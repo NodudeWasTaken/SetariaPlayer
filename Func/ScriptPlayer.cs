@@ -6,10 +6,11 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using static Buttplug.ServerMessage.Types;
 
-namespace ConsoleApp1
+namespace SetariaPlayer
 {
 	class Script {
 		//Some example actions
@@ -148,7 +149,7 @@ namespace ConsoleApp1
 							double intensity = buttvib.Get();
 
 #if DEBUG
-							Console.WriteLine("DEBUG Action: {0} {1}", dur, pos);
+							Debug.WriteLine("DEBUG Action: {0} {1}", dur, pos);
 #endif
 							//If the action is too fast, ignore
 							if (dur < 50)
@@ -160,15 +161,15 @@ namespace ConsoleApp1
 							}
 							else if (device.AllowedMessages.ContainsKey(MessageAttributeType.VibrateCmd))
 							{
-								//Only update vibration if difference is bigger than 20%
-								if (Utilities.diff(oldIntensity, intensity) > 0.2) { 
+								//Only update vibration if difference is bigger than x%
+								if (Utilities.diff(oldIntensity, intensity) > Config.cfg.vibrationDiff) { 
 									device.SendVibrateCmd(intensity);
 									oldIntensity = intensity;
 								}
 							}
 #if DEBUG
-							Console.WriteLine("DEBUG Linear: {0} {1}", dur, pos);
-							Console.WriteLine("DEBUG Vibrate: {0} {1}", dur, intensity);
+							Debug.WriteLine("DEBUG Linear: {0} {1}", dur, pos);
+							Debug.WriteLine("DEBUG Vibrate: {0} {1}", dur, intensity);
 #endif
 							//Wait until the action should be done
 							long taken = Utilities.curtime() + dur;

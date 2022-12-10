@@ -4,8 +4,11 @@ using System.Text;
 using System.Net;
 using System.Threading.Tasks;
 using System.Collections.Specialized;
+using System.Diagnostics;
+using System.ComponentModel;
+using System.Threading;
 
-namespace ConsoleApp1
+namespace SetariaPlayer
 {
 	class HttpServer
 	{
@@ -30,7 +33,7 @@ namespace ConsoleApp1
 				try {
 					responseString = hook.Invoke(req);
 				} catch (Exception ex) {
-					Console.WriteLine("HttpServer.Error {0}", ex.Message);
+					Debug.WriteLine("HttpServer.Error {0}", ex.Message);
 				}
 
 				byte[] data = System.Text.Encoding.UTF8.GetBytes(responseString);
@@ -50,10 +53,13 @@ namespace ConsoleApp1
 		}
 		public void Stop() {
 			enabled = false;
-			listenTask.Wait();
 
 			// Close the listener
+			listener.Stop();
 			listener.Close();
+
+			//TODO: Cannot stop
+			//listenTask.Wait();
 		}
 	}
 }

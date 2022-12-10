@@ -2,12 +2,13 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ConsoleApp1
+namespace SetariaPlayer
 {
 	class ButtplugInt
 	{
@@ -44,7 +45,7 @@ namespace ConsoleApp1
                 }
             }
             */
-			Console.WriteLine("killing log?");
+			Debug.WriteLine("killing log?");
 			ButtplugFFILog.SetLogOptions(ButtplugLogLevel.Off, true);
 			client.Dispose();
 			client = null;
@@ -52,42 +53,42 @@ namespace ConsoleApp1
 
 		private async Task HandleButtplug()
 		{
-			//ButtplugFFILog.LogMessage += (aObj, aMsg) => { Console.WriteLine($"LOG: {aMsg}"); };
+			//ButtplugFFILog.LogMessage += (aObj, aMsg) => { Debug.WriteLine($"LOG: {aMsg}"); };
 			//ButtplugFFILog.SetLogOptions(ButtplugLogLevel.Info, true);
 			client = new ButtplugClient("Setaria Plugin");
 			client.DeviceAdded += (obj, args) =>
 			{
 				var device = args.Device;
-				Console.WriteLine($"Device Added: {device.Name}");
+				Debug.WriteLine($"Device Added: {device.Name}");
 				foreach (var msg in args.Device.AllowedMessages)
 				{
-					Console.WriteLine($"{msg.Key} {msg.Value}");
+					Debug.WriteLine($"{msg.Key} {msg.Value}");
 					/*foreach (PropertyDescriptor descriptor in TypeDescriptor.GetProperties(msg.Value))
 					{
 						string name = descriptor.Name;
 						object value = descriptor.GetValue(obj);
-						Console.WriteLine("{0}={1}", name, value);
+						Debug.WriteLine("{0}={1}", name, value);
 					}*/
 				}
 				//await device.SendVibrateCmd(1.0);
 			};
 			client.DeviceRemoved += (obj, args) =>
 			{
-				Console.WriteLine($"Device removed: {args.Device.Name}");
+				Debug.WriteLine($"Device removed: {args.Device.Name}");
 			};
 			client.ScanningFinished += (obj, args) =>
 			{
-				Console.WriteLine("Scanning finished.");
+				Debug.WriteLine("Scanning finished.");
 			};
 			client.ServerDisconnect += (obj, args) =>
 			{
-				Console.WriteLine("Server disconnected.");
+				Debug.WriteLine("Server disconnected.");
 			};
 			ButtplugEmbeddedConnectorOptions options = null;
 			//options.AllowRawMessages = true;
 			await client.ConnectAsync(options).ConfigureAwait(false);
 			await client.StartScanningAsync().ConfigureAwait(false);
-			Console.WriteLine($"Is Scanning: {client.IsScanning}");
+			Debug.WriteLine($"Is Scanning: {client.IsScanning}");
 		}
 	}
 }

@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ConsoleApp1
+namespace SetariaPlayer
 {
 	enum State
 	{
@@ -85,7 +86,7 @@ namespace ConsoleApp1
 				return;
 			}
 			if (!r.QueryString.HasKeys()) {
-				Console.WriteLine("Missing query string!");
+				Debug.WriteLine("Missing query string!");
 				return;
 			}
 
@@ -109,14 +110,14 @@ namespace ConsoleApp1
 			*/
 			var script = sr.get(mob, animation_scene);
 			if (script == null) {
-				Console.WriteLine("Missing script for {0} {1}!", mob, animation_scene);
+				Debug.WriteLine("Missing script for {0} {1}!", mob, animation_scene);
 				//TODO: Filler?
 				sp.Stop();
 				return;
 			}
 
 			if (curscript != null && curscript.GetId() == script.GetId()) {
-				Console.WriteLine("Already playing {0} {1}!", mob, animation_scene);
+				Debug.WriteLine("Already playing {0} {1}!", mob, animation_scene);
 				sp.setTimeScale(animation_speed);
 				return;
 			}
@@ -131,7 +132,7 @@ namespace ConsoleApp1
 			lastmob = mob;
 
 			foreach (var d in b.client.Devices) {
-				Console.WriteLine("Device name: " + d.Name);
+				Debug.WriteLine("Device name: " + d.Name);
 			}
 
 			int shift = (int)(transition_time * 1000.0);
