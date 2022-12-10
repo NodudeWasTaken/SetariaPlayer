@@ -20,8 +20,8 @@
     <PackageReference Include="Buttplug" Version="2.0.6" />
   </ItemGroup>
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(BuildingInsideVisualStudio)' == 'true'">
-    <Exec Command="copy /Y rec.funscript bin\Release\net6.0\win-x64\rec.funscript&#xD;&#xA;copy /Y data.csv bin\Release\net6.0\win-x64\data.csv&#xD;&#xA;" />
-  </Target>
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(BuildingInsideVisualStudio)' == 'true'">
+		<Exec Command="copy /Y rec.funscript bin\Release\net6.0-windows\rec.funscript&#xD;&#xA;copy /Y data.csv bin\Release\net6.0-windows\data.csv&#xD;&#xA;" />
+	</Target>
 
 </Project>

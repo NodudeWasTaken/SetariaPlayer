@@ -91,7 +91,7 @@ namespace SetariaPlayer
 
 			this.h.Hook(HttpHookCallback);
 
-			BufferVal.Value = Config.cfg.vibrationBufferDuration;
+			BufferVal.Value = Config.cfg.vibrationBufferDuration / 1000;
 			DiffVal.Value = Config.cfg.vibrationDiff * 100;
 			SpeedVal.Value = Config.cfg.vibrationMaxSpeed;
 
@@ -101,7 +101,7 @@ namespace SetariaPlayer
 		{
 			if (BufferLabel != null) {
 				BufferLabel.Content = string.Format("{0:0.#}s", e.NewValue);
-				Config.cfg.vibrationBufferDuration = (int)e.NewValue;
+				Config.cfg.vibrationBufferDuration = (int)(e.NewValue * 1000);
 			}
 		}
 
