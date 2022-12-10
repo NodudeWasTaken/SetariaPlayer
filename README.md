@@ -7,7 +7,7 @@ If you dont have .NET 6.0
 	Go to the .NET Runtime section
 	Download and install .NET for your OS of choice.
 
-Download the game: https://mega.nz/fm/fkw0QYaQ
+Download the game: [mega folder](https://mega.nz/folder/D1hVxDTK#M-Yn5yxW9O_L5Qjmq1PKLQ)
 
 Run the ConsoleApp1.exe from the app folder.
 
