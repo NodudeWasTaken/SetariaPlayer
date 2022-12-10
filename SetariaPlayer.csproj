@@ -8,15 +8,20 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DebugType>none</DebugType>
+    <DebugType>portable</DebugType>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DebugType>none</DebugType>
+    <Optimize>true</Optimize>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Buttplug" Version="2.0.6" />
   </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(BuildingInsideVisualStudio)' == 'true'">
+    <Exec Command="copy /Y rec.funscript bin\Release\net6.0\win-x64\rec.funscript&#xD;&#xA;copy /Y data.csv bin\Release\net6.0\win-x64\data.csv&#xD;&#xA;" />
+  </Target>
 
 </Project>
