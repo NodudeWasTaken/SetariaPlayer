@@ -68,11 +68,13 @@ jobs:
     - name: Install .NET Core
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: 6.0.x
+        dotnet-version: 6.0.11
 
     # Add MSBuild to the PATH: https://github.com/microsoft/setup-msbuild
     - name: Setup MSBuild.exe
       uses: microsoft/setup-msbuild@v1
+      with:
+        vs-version: '[17.4'
 
     # Add Nugget
     - name: Setup Nugget

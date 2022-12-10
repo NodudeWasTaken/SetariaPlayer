@@ -6,20 +6,21 @@
         xmlns:local="clr-namespace:SetariaPlayer"
         mc:Ignorable="d"
 		ResizeMode="NoResize"
-        Title="Setaria Player" Height="282" Width="541">
+        Title="Setaria Player" Height="208" Width="541">
 	<Grid>
-		<Button x:Name="StartButton" Content="Start" Margin="10,211,405,10" Click="Button_Click"/>
+		<Button x:Name="StartButton" Content="Start" Margin="10,129,405,10" Click="Button_Click"/>
 		<Label Content="Connected devices:" HorizontalAlignment="Left" Margin="345,10,0,0" VerticalAlignment="Top" Height="31" Width="139"/>
 		<ListBox x:Name="DeviceList" Margin="345,41,10,10"/>
-		<Label Content="Buffer duration:" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="101"/>
-		<Slider x:Name="BufferVal" HorizontalAlignment="Left" Margin="179,14,0,0" VerticalAlignment="Top" Width="120" Minimum="0.1" Maximum="30" AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0" ValueChanged="Slider_ValueChanged"/>
-		<Label Content="Minimum % diff:" HorizontalAlignment="Left" Margin="10,41,0,0" VerticalAlignment="Top" Width="101"/>
-		<Slider x:Name="DiffVal" HorizontalAlignment="Left" Margin="179,45,0,0" VerticalAlignment="Top" Width="120" Minimum="0" Maximum="100" AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0" ValueChanged="Slider_ValueChanged_1"/>
-		<Label Content="Max speed:" HorizontalAlignment="Left" Margin="10,72,0,0" VerticalAlignment="Top"/>
-		<Slider x:Name="SpeedVal" HorizontalAlignment="Left" Margin="179,76,0,0" VerticalAlignment="Top" Width="120" Minimum="0.1" Maximum="10" AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0" ValueChanged="Slider_ValueChanged_2"/>
-		<Label x:Name="BufferLabel" Content="Label" HorizontalAlignment="Left" Margin="126,10,0,0" VerticalAlignment="Top"/>
-		<Label x:Name="DiffLabel" Content="Label" HorizontalAlignment="Left" Margin="126,41,0,0" VerticalAlignment="Top"/>
-		<Label x:Name="SpeedLabel" Content="Label" HorizontalAlignment="Left" Margin="126,72,0,0" VerticalAlignment="Top"/>
+		<Label Content="Buffer duration:" HorizontalAlignment="Left" Margin="14,36,0,0" VerticalAlignment="Top" Width="101"/>
+		<Slider x:Name="BufferVal" HorizontalAlignment="Left" Margin="183,40,0,0" VerticalAlignment="Top" Width="120" Minimum="0.1" Maximum="30" AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0" ValueChanged="Slider_ValueChanged"/>
+		<Label Content="Minimum % diff:" HorizontalAlignment="Left" Margin="14,67,0,0" VerticalAlignment="Top" Width="101"/>
+		<Slider x:Name="DiffVal" HorizontalAlignment="Left" Margin="183,71,0,0" VerticalAlignment="Top" Width="120" Minimum="0" Maximum="100" AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0" ValueChanged="Slider_ValueChanged_1"/>
+		<Label Content="Max speed:" HorizontalAlignment="Left" Margin="14,98,0,0" VerticalAlignment="Top"/>
+		<Slider x:Name="SpeedVal" HorizontalAlignment="Left" Margin="183,102,0,0" VerticalAlignment="Top" Width="120" Minimum="0.1" Maximum="10" AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0" ValueChanged="Slider_ValueChanged_2"/>
+		<Label x:Name="BufferLabel" Content="Label" HorizontalAlignment="Left" Margin="130,36,0,0" VerticalAlignment="Top"/>
+		<Label x:Name="DiffLabel" Content="Label" HorizontalAlignment="Left" Margin="130,67,0,0" VerticalAlignment="Top"/>
+		<Label x:Name="SpeedLabel" Content="Label" HorizontalAlignment="Left" Margin="130,98,0,0" VerticalAlignment="Top"/>
+		<Label Content="Vibration converter settings:" HorizontalAlignment="Left" Margin="14,10,0,0" VerticalAlignment="Top"/>
 
 	</Grid>
 </Window>
