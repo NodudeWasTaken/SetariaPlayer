@@ -67,7 +67,7 @@ namespace SetariaPlayer
 			//Enables us to react to local changes
 			double lastElem = result.Last();
 			for (int i = result.Count-1; i > 0; i--) {
-				if (Utilities.diff(lastElem, result[i]) > Config.cfg.vibrationDiff) {
+				if (Utilities.diff(lastElem, result[i]) > Config.cfg.vibrationCalcDiff) {
 					result = result.GetRange(i, result.Count - i);
 					break;
 				}

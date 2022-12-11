@@ -25,7 +25,7 @@ namespace SetariaPlayer
 	/// </summary>
 	public partial class MainWindow : Window
 	{
-		private string version = "InDev Build 8";
+		private string version = "InDev Build 9";
 		private ButtplugInt b;
 		private ScriptParser sr;
 		private HttpServer h;
@@ -92,7 +92,8 @@ namespace SetariaPlayer
 			this.h.Hook(HttpHookCallback);
 
 			BufferVal.Value = Config.cfg.vibrationBufferDuration / 1000;
-			DiffVal.Value = Config.cfg.vibrationDiff * 100;
+			DiffVal.Value = Config.cfg.vibrationUpdateDiff * 100;
+			DiffVal_Copy.Value = Config.cfg.vibrationCalcDiff * 100;
 			SpeedVal.Value = Config.cfg.vibrationMaxSpeed;
 
 			Title += $" ({version})";
@@ -104,19 +105,23 @@ namespace SetariaPlayer
 				Config.cfg.vibrationBufferDuration = (int)(e.NewValue * 1000);
 			}
 		}
-
 		private void Slider_ValueChanged_1(object sender, RoutedPropertyChangedEventArgs<double> e)
 		{
 			if (DiffLabel != null) {
 				DiffLabel.Content = string.Format("{0:0}%", e.NewValue);
-				Config.cfg.vibrationDiff = e.NewValue / 100.0;
+				Config.cfg.vibrationUpdateDiff = e.NewValue / 100.0;
 			}
 		}
-
 		private void Slider_ValueChanged_2(object sender, RoutedPropertyChangedEventArgs<double> e) {
 			if (SpeedLabel != null) {
 				SpeedLabel.Content = string.Format("{0:0.00}m/s", e.NewValue);
 				Config.cfg.vibrationMaxSpeed = e.NewValue;
+			}
+		}
+		private void Slider_ValueChanged_3(object sender, RoutedPropertyChangedEventArgs<double> e) {
+			if (DiffVal_Copy != null) {
+				DiffLabel_Copy.Content = string.Format("{0:0}%", e.NewValue);
+				Config.cfg.vibrationCalcDiff = e.NewValue / 100.0;
 			}
 		}
 
@@ -124,6 +129,7 @@ namespace SetariaPlayer
 		{
 			Debug.WriteLine(StartButton.Content.ToString());
 			if (StartButton.Content.ToString() == "Stop") {
+				//TODO: Use some force-stop mechanism instead?
 				h.Stop();
 				sp.Stop();
 				StartButton.Content = "Start";

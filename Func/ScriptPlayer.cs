@@ -162,7 +162,7 @@ namespace SetariaPlayer
 							else if (device.AllowedMessages.ContainsKey(MessageAttributeType.VibrateCmd))
 							{
 								//Only update vibration if difference is bigger than x%
-								if (Utilities.diff(oldIntensity, intensity) > Config.cfg.vibrationDiff) { 
+								if (Utilities.diff(oldIntensity, intensity) > Config.cfg.vibrationUpdateDiff) { 
 									device.SendVibrateCmd(intensity);
 									oldIntensity = intensity;
 								}
