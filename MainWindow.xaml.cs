@@ -25,7 +25,7 @@ namespace SetariaPlayer
 	/// </summary>
 	public partial class MainWindow : Window
 	{
-		private string version = "InDev Build 9";
+		private string version = "InDev Build 10";
 		private ButtplugInt b;
 		private ScriptParser sr;
 		private HttpServer h;
@@ -60,9 +60,15 @@ namespace SetariaPlayer
 				return $"{current}{mid}{next}";
 			});
 		}
+		private void LogIt() {
+			Trace.Listeners.Add(new TextWriterTraceListener("SetariaPlayer.log"));
+			Trace.AutoFlush = true;
+			Trace.Indent();
+			Trace.WriteLine("Entering Main");
+		}
 
-		public MainWindow()
-		{
+		public MainWindow() {
+			LogIt();
 			InitializeComponent();
 			this.DataContext = this;
 
@@ -137,6 +143,10 @@ namespace SetariaPlayer
 				h.Start();
 				StartButton.Content = "Stop";
 			}
+		}
+		private void Button2_Click(object sender, RoutedEventArgs e) {
+			Debug.WriteLine("Config save");
+			Config.cfg.save();
 		}
 		private string HttpHookCallback(HttpListenerRequest r)
 		{

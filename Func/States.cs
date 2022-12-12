@@ -86,7 +86,7 @@ namespace SetariaPlayer
 				return;
 			}
 			if (!r.QueryString.HasKeys()) {
-				Debug.WriteLine("Missing query string!");
+				Trace.WriteLine("Missing query string!");
 				return;
 			}
 
@@ -110,14 +110,14 @@ namespace SetariaPlayer
 			*/
 			var script = sr.get(mob, animation_scene);
 			if (script == null) {
-				Debug.WriteLine("Missing script for {0} {1}!", mob, animation_scene);
+				Trace.WriteLine($"Missing script for {mob} {animation_scene}!");
 				//TODO: Filler?
 				sp.Stop();
 				return;
 			}
 
 			if (curscript != null && curscript.GetId() == script.GetId()) {
-				Debug.WriteLine("Already playing {0} {1}!", mob, animation_scene);
+				Trace.WriteLine($"Already playing {mob} {animation_scene}!");
 				sp.setTimeScale(animation_speed);
 				return;
 			}
@@ -132,7 +132,7 @@ namespace SetariaPlayer
 			lastmob = mob;
 
 			foreach (var d in b.client.Devices) {
-				Debug.WriteLine("Device name: " + d.Name);
+				Trace.WriteLine($"Device name: {d.Name}");
 			}
 
 			int shift = (int)(transition_time * 1000.0);

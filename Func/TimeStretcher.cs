@@ -63,19 +63,19 @@ namespace SetariaPlayer
 		}
 		public void test() {
 			TimeStretcher t = new TimeStretcher();
-			Debug.WriteLine("t0 {0}", Utilities.curtime() - t.get());
+			Trace.WriteLine(string.Format("t0 {0}", Utilities.curtime() - t.get()));
 			t.setScale(0.5);
 			Thread.Sleep(1000);
-			Debug.WriteLine("t1 {0}", Utilities.curtime() - t.get());
+			Trace.WriteLine(string.Format("t1 {0}", Utilities.curtime() - t.get()));
 			t.setScale(1);
 			Thread.Sleep(1000);
-			Debug.WriteLine("t2 {0}", Utilities.curtime() - t.get());
+			Trace.WriteLine(string.Format("t2 {0}", Utilities.curtime() - t.get()));
 			t.setScale(1.5);
 			Thread.Sleep(1000);
-			Debug.WriteLine("t3 {0}", Utilities.curtime() - t.get());
+			Trace.WriteLine(string.Format("t3 {0}", Utilities.curtime() - t.get()));
 			t.setScale(1);
 			Thread.Sleep(1000);
-			Debug.WriteLine("t4 {0}", Utilities.curtime() - t.get());
+			Trace.WriteLine(string.Format("t4 {0}", Utilities.curtime() - t.get()));
 		}
 	}
 }

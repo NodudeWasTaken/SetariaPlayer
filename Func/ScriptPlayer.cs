@@ -149,7 +149,7 @@ namespace SetariaPlayer
 							double intensity = buttvib.Get();
 
 #if DEBUG
-							Debug.WriteLine("DEBUG Action: {0} {1}", dur, pos);
+							Trace.WriteLine($"DEBUG Action: {dur} {pos}");
 #endif
 							//If the action is too fast, ignore
 							if (dur < 50)
@@ -168,8 +168,8 @@ namespace SetariaPlayer
 								}
 							}
 #if DEBUG
-							Debug.WriteLine("DEBUG Linear: {0} {1}", dur, pos);
-							Debug.WriteLine("DEBUG Vibrate: {0} {1}", dur, intensity);
+							Trace.WriteLine($"DEBUG Linear: {dur} {pos}");
+							Trace.WriteLine($"DEBUG Vibrate: {dur} {intensity}");
 #endif
 							//Wait until the action should be done
 							long taken = Utilities.curtime() + dur;

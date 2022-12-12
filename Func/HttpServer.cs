@@ -33,7 +33,7 @@ namespace SetariaPlayer
 				try {
 					responseString = hook.Invoke(req);
 				} catch (Exception ex) {
-					Debug.WriteLine("HttpServer.Error {0}", ex.Message);
+					Trace.WriteLine($"HttpServer.Error {ex.Message}");
 				}
 
 				byte[] data = System.Text.Encoding.UTF8.GetBytes(responseString);

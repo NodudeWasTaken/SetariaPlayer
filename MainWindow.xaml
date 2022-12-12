@@ -52,6 +52,7 @@
 		<Label x:Name="SpeedLabel" Content="Label" HorizontalAlignment="Left" Margin="156,134,0,0" VerticalAlignment="Top"/>
 		<Label Content="Vibration converter settings:" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
 		<Label x:Name="DiffLabel_Copy" Content="Label" HorizontalAlignment="Left" Margin="156,103,0,0" VerticalAlignment="Top"/>
+		<Button x:Name="SaveButton" Content="Save" Margin="147,173,335,10" Click="Button2_Click"/>
 
 	</Grid>
 </Window>

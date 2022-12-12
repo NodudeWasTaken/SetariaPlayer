@@ -45,7 +45,7 @@ namespace SetariaPlayer
                 }
             }
             */
-			Debug.WriteLine("killing log?");
+			Trace.WriteLine("killing log?");
 			ButtplugFFILog.SetLogOptions(ButtplugLogLevel.Off, true);
 			client.Dispose();
 			client = null;
@@ -53,42 +53,42 @@ namespace SetariaPlayer
 
 		private async Task HandleButtplug()
 		{
-			//ButtplugFFILog.LogMessage += (aObj, aMsg) => { Debug.WriteLine($"LOG: {aMsg}"); };
+			//ButtplugFFILog.LogMessage += (aObj, aMsg) => { Trace.WriteLine($"LOG: {aMsg}"); };
 			//ButtplugFFILog.SetLogOptions(ButtplugLogLevel.Info, true);
 			client = new ButtplugClient("Setaria Plugin");
 			client.DeviceAdded += (obj, args) =>
 			{
 				var device = args.Device;
-				Debug.WriteLine($"Device Added: {device.Name}");
+				Trace.WriteLine($"Device Added: {device.Name}");
 				foreach (var msg in args.Device.AllowedMessages)
 				{
-					Debug.WriteLine($"{msg.Key} {msg.Value}");
+					Trace.WriteLine($"{msg.Key} {msg.Value}");
 					/*foreach (PropertyDescriptor descriptor in TypeDescriptor.GetProperties(msg.Value))
 					{
 						string name = descriptor.Name;
 						object value = descriptor.GetValue(obj);
-						Debug.WriteLine("{0}={1}", name, value);
+						Trace.WriteLine("{0}={1}", name, value);
 					}*/
 				}
 				//await device.SendVibrateCmd(1.0);
 			};
 			client.DeviceRemoved += (obj, args) =>
 			{
-				Debug.WriteLine($"Device removed: {args.Device.Name}");
+				Trace.WriteLine($"Device removed: {args.Device.Name}");
 			};
 			client.ScanningFinished += (obj, args) =>
 			{
-				Debug.WriteLine("Scanning finished.");
+				Trace.WriteLine("Scanning finished.");
 			};
 			client.ServerDisconnect += (obj, args) =>
 			{
-				Debug.WriteLine("Server disconnected.");
+				Trace.WriteLine("Server disconnected.");
 			};
 			ButtplugEmbeddedConnectorOptions options = null;
 			//options.AllowRawMessages = true;
 			await client.ConnectAsync(options).ConfigureAwait(false);
 			await client.StartScanningAsync().ConfigureAwait(false);
-			Debug.WriteLine($"Is Scanning: {client.IsScanning}");
+			Trace.WriteLine($"Is Scanning: {client.IsScanning}");
 		}
 	}
 }
