@@ -136,8 +136,6 @@ namespace SetariaPlayer
 			}
 
 			int shift = (int)(transition_time * 1000.0);
-			//TODO: ?
-			shift = 0;
 			sp.Play(script, null, shift);
 			sp.setTimeScale(animation_speed);
 			curscript = script;

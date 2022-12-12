@@ -6,9 +6,9 @@
         xmlns:local="clr-namespace:SetariaPlayer"
         mc:Ignorable="d"
 		ResizeMode="NoResize"
-        Title="Setaria Player" Height="264" Width="496">
+        Title="Setaria Player" Height="264" Width="547">
 	<Grid>
-		<Button x:Name="StartButton" Content="Start" Margin="10,200,405,10" Click="Button_Click"/>
+		<Button x:Name="StartButton" Content="Start" Margin="10,173,405,10" Click="Button_Click"/>
 		<Label Content="Connected devices:" HorizontalAlignment="Left" Margin="356,10,0,0" VerticalAlignment="Top" Height="31" Width="130"/>
 		<ListBox x:Name="DeviceList" Margin="356,41,10,10"/>
 		<Label 
