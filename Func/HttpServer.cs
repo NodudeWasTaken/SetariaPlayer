@@ -33,6 +33,9 @@ namespace SetariaPlayer
 				try {
 					responseString = hook.Invoke(req);
 				} catch (Exception ex) {
+#if DEBUG
+					throw;
+#endif
 					Trace.WriteLine($"HttpServer.Error {ex.Message}");
 				}
 

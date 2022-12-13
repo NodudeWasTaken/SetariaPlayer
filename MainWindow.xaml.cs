@@ -25,7 +25,7 @@ namespace SetariaPlayer
 	/// </summary>
 	public partial class MainWindow : Window
 	{
-		private string version = "InDev Build 10";
+		private string version = "InDev Build 11";
 		private ButtplugInt b;
 		private ScriptParser sr;
 		private HttpServer h;
@@ -133,7 +133,7 @@ namespace SetariaPlayer
 
 		private void Button_Click(object sender, RoutedEventArgs e)
 		{
-			Debug.WriteLine(StartButton.Content.ToString());
+			Trace.WriteLine(StartButton.Content.ToString());
 			if (StartButton.Content.ToString() == "Stop") {
 				//TODO: Use some force-stop mechanism instead?
 				h.Stop();
@@ -145,18 +145,18 @@ namespace SetariaPlayer
 			}
 		}
 		private void Button2_Click(object sender, RoutedEventArgs e) {
-			Debug.WriteLine("Config save");
+			Trace.WriteLine("Config save");
 			Config.cfg.save();
 		}
 		private string HttpHookCallback(HttpListenerRequest r)
 		{
 			if (r.HttpMethod == "POST")
 			{
-				Debug.WriteLine("Url: {0}", r.Url.AbsolutePath);
+				Trace.WriteLine($"Url: {r.Url.AbsolutePath}");
 				//TODO: HttpServer.Error Value cannot be null. (Parameter 's')
 				if (r.QueryString.HasKeys()) {
 					foreach (string s in r.QueryString.AllKeys) {
-						Debug.WriteLine("Var {0,-10}={1}", s, r.QueryString[s]);
+						Trace.WriteLine($"Var {s}={r.QueryString[s]}");
 					}
 				}
 
@@ -182,7 +182,7 @@ namespace SetariaPlayer
 						//TODO: This isn't an entirely nice way to do this
 						if (s.shouldEnter(r)) {
 							s.Enter(r, ref state);
-							Debug.WriteLine("Enter State: ", state.GetType().Name);
+							Trace.WriteLine($"Enter State: {state.GetType().Name}");
 							activeState = s;
 							return "OK";
 						}

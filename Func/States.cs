@@ -92,7 +92,9 @@ namespace SetariaPlayer
 
 			string mob = r.QueryString["anim_name"];
 			string animation_scene = r.QueryString["anim_scene"];
-			float transition_time = float.Parse(r.QueryString["anim_dur"], CultureInfo.InvariantCulture);
+			float transition_time = 0;
+			if (r.QueryString.AllKeys.Contains("anim_dur"))
+				transition_time = float.Parse(r.QueryString["anim_dur"], CultureInfo.InvariantCulture);
 			float animation_speed = float.Parse(r.QueryString["anim_speed"], CultureInfo.InvariantCulture);
 			/*
 	Var enemy_id  =302
@@ -136,6 +138,8 @@ namespace SetariaPlayer
 			}
 
 			int shift = (int)(transition_time * 1000.0);
+			//TODO: Fix
+			shift = 0;
 			sp.Play(script, null, shift);
 			sp.setTimeScale(animation_speed);
 			curscript = script;
