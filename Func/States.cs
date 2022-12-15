@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SetariaPlayer.Func;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
@@ -6,6 +7,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using static Buttplug.DeviceMessage.Types;
 
 namespace SetariaPlayer
 {
@@ -31,6 +33,7 @@ namespace SetariaPlayer
 			return r.Url.AbsolutePath.Equals(this.urlPrefix);
 		}
 		public virtual void Update(HttpListenerRequest r, ref State s) { }
+		public virtual void Update() { }
 		public virtual void Pause() { sp.Pause(); }
 		public virtual void Resume() { sp.Resume(); }
 		public virtual void Exit(HttpListenerRequest r, ref State s) { }
@@ -39,10 +42,31 @@ namespace SetariaPlayer
 	{
 		public float hp;
 		public float mp;
+		private Filler fi;
+
 		public InactiveState(ButtplugInt b, ScriptPlayer sp, ScriptParser sr) : base(b, sp, sr) {
 			this.urlPrefix = "/game/player_damage";
+			fi = new Filler(sp);
+		}
+		public override void Enter(HttpListenerRequest r, ref State s) {
+			base.Enter(r, ref s);
+			if (Config.cfg.filler)
+				fi.Start();
+		}
+		public override void Update() {
+			base.Update();
+
+			if (!Config.cfg.filler) {
+				if (fi.Running())
+					fi.Stop();
+			} else {
+				if (!fi.Running())
+					fi.Start();
+			}
 		}
 		public override void Update(HttpListenerRequest r, ref State s) {
+			base.Update(r, ref s);
+			this.Update();
 			if (r.QueryString.HasKeys()) {
 				foreach (string qs in r.QueryString.AllKeys) {
 					if (qs == "hp")
@@ -52,17 +76,39 @@ namespace SetariaPlayer
 				}
 			}
 
-			if (r.Url.AbsolutePath.Equals("/game/fire"))
-				sp.Play(Script.vibrate_strong);
-			if (r.Url.AbsolutePath.Equals("/game/player_damage"))
-				sp.Play(Script.vibrate_ultra);
-			//player_damage2 happens at the end of animations
-			/*if (r.Url.AbsolutePath.Equals("/game/player_damage2"))
-			{
-				Console.WriteLine("How did you trigger this?");
-			}*/
+			if (!Config.cfg.filler) {
+				if (r.Url.AbsolutePath.Equals("/game/fire"))
+					sp.Play(Script.vibrate_strong);
+				if (r.Url.AbsolutePath.Equals("/game/fire_lazer"))
+					sp.Play(Script.vibrate_ultra);
+				if (r.Url.AbsolutePath.Equals("/game/player_damage"))
+					sp.Play(Script.vibrate_ultra);
+				//player_damage2 happens at the end of animations
+				/*
+				if (r.Url.AbsolutePath.Equals("/game/player_damage2"))
+					Console.WriteLine("How did you trigger this?");
+				*/
+			} else {
+				if (r.Url.AbsolutePath.Equals("/game/fire"))
+					fi.Fire();
+				if (r.Url.AbsolutePath.Equals("/game/fire_lazer"))
+					fi.Lazer();
+				if (r.Url.AbsolutePath.Equals("/game/player_damage"))
+					fi.Damage();
+			}
+		}
+		public override void Pause() {
+			base.Pause();
+			fi.Stop();
+		}
+		public override void Resume() {
+			base.Resume();
+			if (Config.cfg.filler)
+				fi.Start();
 		}
 		public override void Exit(HttpListenerRequest r, ref State s) {
+			base.Exit(r, ref s);
+			fi.Stop();
 			sp.Stop();
 		}
 	}
@@ -74,11 +120,13 @@ namespace SetariaPlayer
 			this.urlPrefix = "/game/gallery";
 		}
 		public override void Enter(HttpListenerRequest r, ref State s) {
+			base.Enter(r, ref s);
 			s = State.ScenePlaying;
 			lastmob = "";
 			this.Update(r,ref s);
 		}
 		public override void Update(HttpListenerRequest r, ref State s) {
+			base.Update(r, ref s);
 			if (r.Url.AbsolutePath.Equals("/game/gallery_stop") || 
 				(!r.Url.AbsolutePath.StartsWith("/game/gallery") && !r.Url.AbsolutePath.StartsWith("/game/player_damage2"))
 			) {
@@ -145,6 +193,7 @@ namespace SetariaPlayer
 			curscript = script;
 		}
 		public override void Exit(HttpListenerRequest r, ref State s) {
+			base.Exit(r, ref s);
 			sp.Stop();
 			s = State.Inactive;
 			lastmob = "";

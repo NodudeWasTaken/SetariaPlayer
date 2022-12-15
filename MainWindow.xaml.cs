@@ -25,7 +25,8 @@ namespace SetariaPlayer
 	/// </summary>
 	public partial class MainWindow : Window
 	{
-		private string version = "InDev Build 11";
+		private string version = "InDev Build 12.2";
+		public static bool started = false;
 		private ButtplugInt b;
 		private ScriptParser sr;
 		private HttpServer h;
@@ -94,21 +95,32 @@ namespace SetariaPlayer
 			this.states.Add(new SceneState(b, sp, sr));
 			this.state = State.Inactive;
 			this.activeState = inactive;
+			sp.Pause();
 
 			this.h.Hook(HttpHookCallback);
+			h.Start();
 
 			BufferVal.Value = Config.cfg.vibrationBufferDuration / 1000;
 			DiffVal.Value = Config.cfg.vibrationUpdateDiff * 100;
 			DiffVal_Copy.Value = Config.cfg.vibrationCalcDiff * 100;
 			SpeedVal.Value = Config.cfg.vibrationMaxSpeed;
+			FillerCheckbox.IsChecked = Config.cfg.filler;
+			FillerDuration.Value = Config.cfg.fillerDur;
+			FillerHeight.Value = Config.cfg.fillerHeight;
 
 			Title += $" ({version})";
+		}
+		private void ImDying() {
+			if (this.activeState != null) {
+				this.activeState.Update();
+			}
 		}
 		private void Slider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
 		{
 			if (BufferLabel != null) {
 				BufferLabel.Content = string.Format("{0:0.#}s", e.NewValue);
 				Config.cfg.vibrationBufferDuration = (int)(e.NewValue * 1000);
+				ImDying();
 			}
 		}
 		private void Slider_ValueChanged_1(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -116,18 +128,21 @@ namespace SetariaPlayer
 			if (DiffLabel != null) {
 				DiffLabel.Content = string.Format("{0:0}%", e.NewValue);
 				Config.cfg.vibrationUpdateDiff = e.NewValue / 100.0;
+				ImDying();
 			}
 		}
 		private void Slider_ValueChanged_2(object sender, RoutedPropertyChangedEventArgs<double> e) {
 			if (SpeedLabel != null) {
 				SpeedLabel.Content = string.Format("{0:0.00}m/s", e.NewValue);
 				Config.cfg.vibrationMaxSpeed = e.NewValue;
+				ImDying();
 			}
 		}
 		private void Slider_ValueChanged_3(object sender, RoutedPropertyChangedEventArgs<double> e) {
 			if (DiffVal_Copy != null) {
 				DiffLabel_Copy.Content = string.Format("{0:0}%", e.NewValue);
 				Config.cfg.vibrationCalcDiff = e.NewValue / 100.0;
+				ImDying();
 			}
 		}
 
@@ -136,11 +151,12 @@ namespace SetariaPlayer
 			Trace.WriteLine(StartButton.Content.ToString());
 			if (StartButton.Content.ToString() == "Stop") {
 				//TODO: Use some force-stop mechanism instead?
-				h.Stop();
-				sp.Stop();
+				started = false;
+				//sp.Pause();
 				StartButton.Content = "Start";
 			} else {
-				h.Start();
+				started = true;
+				//sp.Resume();
 				StartButton.Content = "Stop";
 			}
 		}
@@ -160,10 +176,6 @@ namespace SetariaPlayer
 					}
 				}
 
-				if (state == State.Inactive) {
-					activeState = inactive;
-				}
-
 				if (r.Url.AbsolutePath.Equals("/game/pause")) {
 					activeState.Pause();
 					return "OK";
@@ -172,24 +184,59 @@ namespace SetariaPlayer
 					return "OK";
 				}
 
+				State oldstate = state;
 				activeState.Update(r, ref state);
+				if (oldstate != State.Inactive && state == State.Inactive) {
+					Trace.WriteLine($"Exit State: {oldstate.GetType().Name}");
+					activeState = inactive;
+					activeState.Enter(r, ref state);
+				}
 
 				//If it didn't exit
 				if (state != State.Inactive) {
 					return "OK";
 				} else {
-					foreach (var s in states) { 
+					foreach (var st in states) { 
 						//TODO: This isn't an entirely nice way to do this
-						if (s.shouldEnter(r)) {
-							s.Enter(r, ref state);
+						if (st.shouldEnter(r)) {
+							activeState.Exit(r, ref state);
+							st.Enter(r, ref state);
 							Trace.WriteLine($"Enter State: {state.GetType().Name}");
-							activeState = s;
+							activeState = st;
 							return "OK";
 						}
 					}
 				}
 			}
 			return "KO";
+		}
+
+		private void CheckBox_Checked(object sender, RoutedEventArgs e) {
+			if (DiffVal_Copy != null) {
+				Config.cfg.filler = FillerCheckbox.IsChecked == true;
+				ImDying();
+			}
+		}
+
+		private void FillerDuration_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) {
+			if (DiffVal_Copy != null) {
+				Config.cfg.fillerDur = (int)FillerDuration.Value;
+				ImDying();
+			}
+		}
+
+		private void FillerHeight_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) {
+			if (DiffVal_Copy != null) {
+				Config.cfg.fillerHeight = (int)FillerHeight.Value;
+				ImDying();
+			}
+		}
+
+		private void Button_Click_1(object sender, RoutedEventArgs e) {
+			new Task(async () => {
+				await this.b.client.StopScanningAsync();
+				await this.b.client.StartScanningAsync();
+			}).Start();
 		}
 	}
 }

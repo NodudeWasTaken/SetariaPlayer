@@ -17,12 +17,12 @@ namespace SetariaPlayer
 {
 	public class Data
 	{
-		public string Name { get; set; }
-		public string Scene { get; set; }
-		public long Start { get; set; }
-		public long End { get; set; }
-		public bool Loop { get; set; }
-		public List<(long, int)> Actions { get; set; }
+		public virtual string Name { get; set; }
+		public virtual string Scene { get; set; }
+		public virtual long Start { get; set; }
+		public virtual long End { get; set; }
+		public virtual bool Loop { get; set; }
+		public virtual List<(long, int)> Actions { get; set; }
 		public Data(
 			string Name, 
 			string Scene, 
@@ -40,6 +40,9 @@ namespace SetariaPlayer
 		}
 		public string GetId() {
 			return $"{Name}_{Scene}";
+		}
+		public long Duration() {
+			return this.End - this.Start;
 		}
 	}
 	public class Funscript

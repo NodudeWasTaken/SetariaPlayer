@@ -18,6 +18,9 @@ namespace SetariaPlayer
 			public double vibrationUpdateDiff { get; set; } = 0.2;
 			public double vibrationCalcDiff { get; set; } = 0.15;
 			public double vibrationMaxSpeed { get; set; } = 2;
+			public bool filler { get; set; } = false;
+			public int fillerDur { get; set; } = 300;
+			public int fillerHeight { get; set; } = 15;
 			public void save() {
 				Trace.WriteLine("Config save!");
 				string output = JsonSerializer.Serialize(this); ;

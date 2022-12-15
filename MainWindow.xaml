@@ -8,19 +8,25 @@
 		ResizeMode="NoResize"
         Title="Setaria Player" Height="264" Width="547">
 	<Grid>
-		<Button x:Name="StartButton" Content="Start" Margin="10,173,405,10" Click="Button_Click"/>
-		<Label Content="Connected devices:" HorizontalAlignment="Left" Margin="356,10,0,0" VerticalAlignment="Top" Height="31" Width="130"/>
-		<ListBox x:Name="DeviceList" Margin="356,41,10,10"/>
-		<Label 
-			Content="Buffer duration:" 
-			HorizontalAlignment="Left" 
-			Margin="10,41,0,0" 
-			VerticalAlignment="Top" 
-			Width="145"
-			ToolTip="How long the vibration converter's buffer is in seconds"
-		/>
-		<Slider x:Name="BufferVal" HorizontalAlignment="Left" Margin="218,45,0,0" VerticalAlignment="Top" Width="120" Minimum="0.1" Maximum="30" AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0" ValueChanged="Slider_ValueChanged"/>
-		<Label 
+		<TabControl>
+			<TabItem Header="Main">
+				<Grid Background="White">
+
+					<Button x:Name="StartButton" Content="Start" Margin="10,155,405,10" Click="Button_Click"/>
+					<Label Content="Connected devices:" HorizontalAlignment="Left" Margin="356,10,0,0" VerticalAlignment="Top" Height="31" Width="114"/>
+					<ListBox x:Name="DeviceList" Margin="356,41,10,10"/>
+					<Button x:Name="SaveButton" Content="Save" Margin="141,155,337,10" Click="Button2_Click"/>
+					<CheckBox x:Name="FillerCheckbox" Content="Filler" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Checked="CheckBox_Checked" Unchecked="CheckBox_Checked"/>
+					<Slider x:Name="FillerDuration" ToolTip="The filler duration" HorizontalAlignment="Left" Margin="60,8,0,0" VerticalAlignment="Top" Width="120" Minimum="50" Maximum="1000" AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0" ValueChanged="FillerDuration_ValueChanged"/>
+					<Slider x:Name="FillerHeight" ToolTip="The filler height" HorizontalAlignment="Left" Margin="185,7,0,0" VerticalAlignment="Top" Width="120" Minimum="1" Maximum="100" AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0" ValueChanged="FillerHeight_ValueChanged"/>
+					<Button Content="↻" Margin="475,10,10,0" VerticalAlignment="Top" Click="Button_Click_1" Height="26" FontSize="16" BorderBrush="#FF707070" Background="#FFE8E8E8"/>
+				</Grid>
+			</TabItem>
+			<TabItem Header="Vibration settings">
+				<Grid Background="White">
+
+					<Slider x:Name="BufferVal" HorizontalAlignment="Left" Margin="218,45,0,0" VerticalAlignment="Top" Width="120" Minimum="0.1" Maximum="30" AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0" ValueChanged="Slider_ValueChanged"/>
+					<Label 
 			Content="Minimum update % diff:" 
 			HorizontalAlignment="Left" 
 			Margin="10,72,0,0" 
@@ -28,8 +34,8 @@
 			Width="145"
 			ToolTip="Minimum percentage difference for a intensity update to be sent to vibration devices"
 		/>
-		<Slider x:Name="DiffVal" HorizontalAlignment="Left" Margin="218,76,0,0" VerticalAlignment="Top" Width="120" Minimum="0" Maximum="100" AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0" ValueChanged="Slider_ValueChanged_1"/>
-		<Label 
+					<Slider x:Name="DiffVal" HorizontalAlignment="Left" Margin="218,76,0,0" VerticalAlignment="Top" Width="120" Minimum="0" Maximum="100" AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0" ValueChanged="Slider_ValueChanged_1"/>
+					<Label 
 			Content="Max speed:" 
 			HorizontalAlignment="Left" 
 			Margin="10,134,0,0" 
@@ -37,8 +43,8 @@
 			Width="101"
 			ToolTip="Maximum assumed speed in a funscript which will result in 100% intensity in a vibration device"
 		/>
-		<Slider x:Name="SpeedVal" HorizontalAlignment="Left" Margin="218,138,0,0" VerticalAlignment="Top" Width="120" Minimum="0.1" Maximum="10" AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0" ValueChanged="Slider_ValueChanged_2"/>
-		<Label 
+					<Slider x:Name="SpeedVal" HorizontalAlignment="Left" Margin="218,138,0,0" VerticalAlignment="Top" Width="120" Minimum="0.1" Maximum="10" AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0" ValueChanged="Slider_ValueChanged_2"/>
+					<Label 
 			Content="Maximum calc % diff:" 
 			HorizontalAlignment="Left" 
 			Margin="10,103,0,0" 
@@ -46,13 +52,48 @@
 			Width="145"
 			ToolTip="Maximum speed difference to include when calculating average (calculated from newest to oldest) for vibration devices"
 		/>
-		<Slider x:Name="DiffVal_Copy" HorizontalAlignment="Left" Margin="218,107,0,0" VerticalAlignment="Top" Width="120" Minimum="0" Maximum="100" AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0" ValueChanged="Slider_ValueChanged_3"/>
-		<Label x:Name="BufferLabel" Content="Label" HorizontalAlignment="Left" Margin="156,41,0,0" VerticalAlignment="Top"/>
-		<Label x:Name="DiffLabel" Content="Label" HorizontalAlignment="Left" Margin="156,72,0,0" VerticalAlignment="Top"/>
-		<Label x:Name="SpeedLabel" Content="Label" HorizontalAlignment="Left" Margin="156,134,0,0" VerticalAlignment="Top"/>
-		<Label Content="Vibration converter settings:" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
-		<Label x:Name="DiffLabel_Copy" Content="Label" HorizontalAlignment="Left" Margin="156,103,0,0" VerticalAlignment="Top"/>
-		<Button x:Name="SaveButton" Content="Save" Margin="147,173,335,10" Click="Button2_Click"/>
+					<Slider x:Name="DiffVal_Copy" HorizontalAlignment="Left" Margin="218,107,0,0" VerticalAlignment="Top" Width="120" Minimum="0" Maximum="100" AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0" ValueChanged="Slider_ValueChanged_3"/>
+
+					<Label 
+			Content="Buffer duration:" 
+			HorizontalAlignment="Left" 
+			Margin="10,41,0,0" 
+			VerticalAlignment="Top" 
+			Width="145"
+			ToolTip="How long the vibration converter's buffer is in seconds"
+		/>
+					<Label x:Name="BufferLabel" Content="Label" HorizontalAlignment="Left" Margin="156,41,0,0" VerticalAlignment="Top"/>
+					<Label x:Name="DiffLabel" Content="Label" HorizontalAlignment="Left" Margin="156,72,0,0" VerticalAlignment="Top"/>
+					<Label x:Name="SpeedLabel" Content="Label" HorizontalAlignment="Left" Margin="156,134,0,0" VerticalAlignment="Top"/>
+					<Label Content="Vibration converter settings:" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
+					<Label x:Name="DiffLabel_Copy" Content="Label" HorizontalAlignment="Left" Margin="156,103,0,0" VerticalAlignment="Top"/>
+				</Grid>
+			</TabItem>
+
+			<TabItem Header="About">
+				<Grid Background="White">
+					<TextBlock HorizontalAlignment="Center" TextWrapping="Wrap" Text="" VerticalAlignment="Center" Height="200" Width="521">
+						<Run Text="Thanks to:"/>
+						<LineBreak/>
+						<Run Text="99DM for scripting the entire game!"/>
+						<LineBreak/>
+						<Run Text="Dimnogro for helping with the project!"/>
+						<LineBreak/>
+						<Run Text="Funscriptguy for testing!"/>
+						<LineBreak/>
+						<LineBreak/>
+						<LineBreak/>
+						<LineBreak/>
+						<LineBreak/>
+						<LineBreak/>
+						<LineBreak/>
+						<Run Text="Kind regards"/>
+						<LineBreak/>
+						<Run Text="Nodude"/>
+					</TextBlock>
+				</Grid>
+			</TabItem>
+		</TabControl>
 
 	</Grid>
 </Window>

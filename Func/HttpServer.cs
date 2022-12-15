@@ -24,24 +24,24 @@ namespace SetariaPlayer
 		}
 		public async Task HandleIncomingConnections() {
 			while (enabled) {
-				HttpListenerContext ctx = await listener.GetContextAsync();
-				HttpListenerRequest req = ctx.Request;
-				HttpListenerResponse resp = ctx.Response;
-
-				string responseString = "Internal Error";
-
 				try {
+					HttpListenerContext ctx = await listener.GetContextAsync();
+					HttpListenerRequest req = ctx.Request;
+					HttpListenerResponse resp = ctx.Response;
+
+					string responseString = "Internal Error";
+
 					responseString = hook.Invoke(req);
-				} catch (Exception ex) {
+
+					byte[] data = System.Text.Encoding.UTF8.GetBytes(responseString);
+					await resp.OutputStream.WriteAsync(data, 0, data.Length);
+					resp.Close();
+				} catch (HttpListenerException ex) {
 #if DEBUG
 					throw;
 #endif
 					Trace.WriteLine($"HttpServer.Error {ex.Message}");
 				}
-
-				byte[] data = System.Text.Encoding.UTF8.GetBytes(responseString);
-				await resp.OutputStream.WriteAsync(data, 0, data.Length);
-				resp.Close();
 			}
 		}
 
@@ -59,7 +59,6 @@ namespace SetariaPlayer
 
 			// Close the listener
 			listener.Stop();
-			listener.Close();
 
 			//TODO: Cannot stop
 			//listenTask.Wait();

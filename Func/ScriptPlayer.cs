@@ -14,22 +14,22 @@ namespace SetariaPlayer
 {
 	class Script {
 		//Some example actions
-		public static Data vibrate_weak = new Data("vibrate","weak",0,0,false, 
+		public static Data vibrate_weak = new Data("vibrate","weak",0,700,false, 
 		new List<(long, int)> {
 			(350, 10),
 			(700, 0),
 		});
-		public static Data vibrate_mid = new Data("vibrate", "mid", 0, 0, false,
+		public static Data vibrate_mid = new Data("vibrate", "mid", 0, 500, false,
 		new List<(long, int)> {
 			(250, 10),
 			(500, 0),
 		});
-		public static Data vibrate_strong = new Data("vibrate", "strong", 0, 0, false,
+		public static Data vibrate_strong = new Data("vibrate", "strong", 0, 200, false,
 		new List<(long, int)> {
 			(100, 10),
 			(200, 0),
 		});
-		public static Data vibrate_ultra = new Data("vibrate", "ultra", 0, 0, false,
+		public static Data vibrate_ultra = new Data("vibrate", "ultra", 0, 140, false,
 		new List<(long, int)> {
 			(70, 10),
 			(140, 0),
@@ -48,7 +48,8 @@ namespace SetariaPlayer
 		//A timer with scale support
 		private TimeStretcher time = new TimeStretcher();
 		//.
-		private bool paused = false;
+		public bool paused = false;
+		public bool playing = false;
 
 		public ScriptPlayer(ButtplugInt bp) {
 			butt = bp;
@@ -57,7 +58,7 @@ namespace SetariaPlayer
 		/*
 		 * Converts a list of (Time,Position) to (Duration,Position) by previous index
 		 */
-		private IEnumerable<(int, double)> buttConverter(List<(long, int)> ac) {
+		/*private IEnumerable<(int, double)> buttConverter(List<(long, int)> ac) {
 			long rt = 0;
 			foreach (var a in ac) {
 				yield return (
@@ -66,13 +67,15 @@ namespace SetariaPlayer
 				);
 				rt = a.Item1;
 			}
-		}
+		}*/
 
 		/*
 		 * Converts a list of (Time,Position) to (Duration,Position) by timing
 		 */
 		private IEnumerable<(int, double)> buttTimer(List<(long, int)> ac, long stime) {
-			foreach (var a in ac) {
+			for (var i=0; i<ac.Count; i++) {
+				var a = ac[i];
+
 				//Get the time index
 				long idx = a.Item1;
 				//Get the scaling factor
@@ -91,6 +94,10 @@ namespace SetariaPlayer
 		//Does what it says
 		public void setTimeScale(double scale) {
 			time.setScale(scale);
+		}
+		private void StopSig(ButtplugClientDevice device) {
+			device.SendStopDeviceCmd();
+			playing = false;
 		}
 		/*
 		 * Plays a given script with optional arguments
@@ -126,9 +133,12 @@ namespace SetariaPlayer
 			playTaskTS = new CancellationTokenSource();
 			playTask = Task.Run(() => {
 				//For all connected devices
+				CancellationToken ct = playTaskTS.Token;
+				playing = true;
+				while (butt.client.Devices.Length <= 0 && !ct.IsCancellationRequested) {
+					Thread.Sleep(1);
+				}
 				butt.client.Devices.AsParallel().ForAll(device => {
-					CancellationToken ct = playTaskTS.Token;
-
 					//Remember the old intensity, for reducing updates
 					double oldIntensity = 0;
 					//The globals should only be updated by 1 instance
@@ -149,34 +159,34 @@ namespace SetariaPlayer
 							double intensity = buttvib.Get();
 
 #if DEBUG
-							Trace.WriteLine($"DEBUG Action: {dur} {pos}");
+							//Trace.WriteLine($"DEBUG Action: {dur} {pos}");
 #endif
 							//If the action is too fast, ignore
-							if (dur < 50)
+							if (dur < 10)
 								continue;
 
-							//Play action
-							if (device.AllowedMessages.ContainsKey(MessageAttributeType.LinearCmd)) {
-								device.SendLinearCmd((uint)dur, pos);
-							}
-							else if (device.AllowedMessages.ContainsKey(MessageAttributeType.VibrateCmd))
-							{
-								//Only update vibration if difference is bigger than x%
-								if (Utilities.diff(oldIntensity, intensity) > Config.cfg.vibrationUpdateDiff) { 
-									device.SendVibrateCmd(intensity);
-									oldIntensity = intensity;
+							if (MainWindow.started) {
+								//Play action
+								if (device.AllowedMessages.ContainsKey(MessageAttributeType.LinearCmd)) {
+									device.SendLinearCmd((uint)dur, pos);
+								} else if (device.AllowedMessages.ContainsKey(MessageAttributeType.VibrateCmd)) {
+									//Only update vibration if difference is bigger than x%
+									if (Utilities.diff(oldIntensity, intensity) > Config.cfg.vibrationUpdateDiff) {
+										device.SendVibrateCmd(intensity);
+										oldIntensity = intensity;
+									}
 								}
 							}
 #if DEBUG
-							Trace.WriteLine($"DEBUG Linear: {dur} {pos}");
-							Trace.WriteLine($"DEBUG Vibrate: {dur} {intensity}");
+							//Trace.WriteLine($"DEBUG Linear: {dur} {pos}");
+							//Trace.WriteLine($"DEBUG Vibrate: {dur} {intensity}");
 #endif
 							//Wait until the action should be done
 							long taken = Utilities.curtime() + dur;
 							while (taken > Utilities.curtime() || paused) {
 								Thread.Sleep(1);
 								//If we should exit
-								if (ct.IsCancellationRequested) return;
+								if (ct.IsCancellationRequested) { StopSig(device); return; };
 								//If we paused (cannot happen in Setaria)
 								if (paused) { 
 									taken += 1; 
@@ -193,20 +203,24 @@ namespace SetariaPlayer
 
 						//If user choose if should loop
 						if (loopOverride == null) {
-							if (!current_script.Loop)
+							if (!current_script.Loop) { 
+								StopSig(device);
 								return;
+							}
 						} else {
-							if (loopOverride == false)
+							if (loopOverride == false) { 
+								StopSig(device);
 								return;
+							}
 						}
 
 						//If we are the main process, update the time
 						if (ismaster)
-							current_time += current_script.End - current_script.Start;
+							current_time += current_script.Duration();
 					}
 
 					//Make vibration devices stop
-					device.SendStopDeviceCmd();
+					StopSig(device);
 				});
 			});
 		}
@@ -223,7 +237,7 @@ namespace SetariaPlayer
 			if (playTaskTS != null)
 				playTaskTS.Cancel();
 			foreach (var i in butt.client.Devices)
-				i.SendStopDeviceCmd();
+				StopSig(i);
 			buttvib.Clear();
 		}
 	}
