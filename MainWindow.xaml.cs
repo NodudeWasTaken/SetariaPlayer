@@ -25,8 +25,9 @@ namespace SetariaPlayer
 	/// </summary>
 	public partial class MainWindow : Window
 	{
-		private string version = "InDev Build 12.2";
+		private string version = "InDev Build 13";
 		public static bool started = false;
+		private bool ready = false;
 		private ButtplugInt b;
 		private ScriptParser sr;
 		private HttpServer h;
@@ -93,6 +94,7 @@ namespace SetariaPlayer
 
 			this.inactive = new InactiveState(b, sp, sr);
 			this.states.Add(new SceneState(b, sp, sr));
+			this.states.Add(new Fairy1State(b, sp, sr));
 			this.state = State.Inactive;
 			this.activeState = inactive;
 			sp.Pause();
@@ -100,6 +102,11 @@ namespace SetariaPlayer
 			this.h.Hook(HttpHookCallback);
 			h.Start();
 
+
+			Title += $" ({version})";
+		}
+		private async void Window_Loaded(object sender, RoutedEventArgs e) {
+			Config.cfg = Config.load();
 			BufferVal.Value = Config.cfg.vibrationBufferDuration / 1000;
 			DiffVal.Value = Config.cfg.vibrationUpdateDiff * 100;
 			DiffVal_Copy.Value = Config.cfg.vibrationCalcDiff * 100;
@@ -107,8 +114,8 @@ namespace SetariaPlayer
 			FillerCheckbox.IsChecked = Config.cfg.filler;
 			FillerDuration.Value = Config.cfg.fillerDur;
 			FillerHeight.Value = Config.cfg.fillerHeight;
-
-			Title += $" ({version})";
+			//Trace.Listeners.Add(new MyTraceListener(Logs));
+			ready = true;
 		}
 		private void ImDying() {
 			if (this.activeState != null) {
@@ -117,30 +124,26 @@ namespace SetariaPlayer
 		}
 		private void Slider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
 		{
-			if (BufferLabel != null) {
-				BufferLabel.Content = string.Format("{0:0.#}s", e.NewValue);
+			if (ready) {
 				Config.cfg.vibrationBufferDuration = (int)(e.NewValue * 1000);
 				ImDying();
 			}
 		}
 		private void Slider_ValueChanged_1(object sender, RoutedPropertyChangedEventArgs<double> e)
 		{
-			if (DiffLabel != null) {
-				DiffLabel.Content = string.Format("{0:0}%", e.NewValue);
+			if (ready) {
 				Config.cfg.vibrationUpdateDiff = e.NewValue / 100.0;
 				ImDying();
 			}
 		}
 		private void Slider_ValueChanged_2(object sender, RoutedPropertyChangedEventArgs<double> e) {
-			if (SpeedLabel != null) {
-				SpeedLabel.Content = string.Format("{0:0.00}m/s", e.NewValue);
+			if (ready) {
 				Config.cfg.vibrationMaxSpeed = e.NewValue;
 				ImDying();
 			}
 		}
 		private void Slider_ValueChanged_3(object sender, RoutedPropertyChangedEventArgs<double> e) {
-			if (DiffVal_Copy != null) {
-				DiffLabel_Copy.Content = string.Format("{0:0}%", e.NewValue);
+			if (ready) {
 				Config.cfg.vibrationCalcDiff = e.NewValue / 100.0;
 				ImDying();
 			}
@@ -187,7 +190,9 @@ namespace SetariaPlayer
 				State oldstate = state;
 				activeState.Update(r, ref state);
 				if (oldstate != State.Inactive && state == State.Inactive) {
-					Trace.WriteLine($"Exit State: {oldstate.GetType().Name}");
+					Trace.WriteLine($"Exit State: {activeState.name}");
+					sp.Stop();
+					//activeState.Exit(r, ref state);
 					activeState = inactive;
 					activeState.Enter(r, ref state);
 				}
@@ -201,7 +206,7 @@ namespace SetariaPlayer
 						if (st.shouldEnter(r)) {
 							activeState.Exit(r, ref state);
 							st.Enter(r, ref state);
-							Trace.WriteLine($"Enter State: {state.GetType().Name}");
+							Trace.WriteLine($"Enter State: {st.name}");
 							activeState = st;
 							return "OK";
 						}
@@ -212,21 +217,21 @@ namespace SetariaPlayer
 		}
 
 		private void CheckBox_Checked(object sender, RoutedEventArgs e) {
-			if (DiffVal_Copy != null) {
+			if (ready) {
 				Config.cfg.filler = FillerCheckbox.IsChecked == true;
 				ImDying();
 			}
 		}
 
 		private void FillerDuration_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) {
-			if (DiffVal_Copy != null) {
+			if (ready) {
 				Config.cfg.fillerDur = (int)FillerDuration.Value;
 				ImDying();
 			}
 		}
 
 		private void FillerHeight_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) {
-			if (DiffVal_Copy != null) {
+			if (ready) {
 				Config.cfg.fillerHeight = (int)FillerHeight.Value;
 				ImDying();
 			}

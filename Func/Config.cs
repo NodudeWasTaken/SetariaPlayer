@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -21,6 +22,13 @@ namespace SetariaPlayer
 			public bool filler { get; set; } = false;
 			public int fillerDur { get; set; } = 300;
 			public int fillerHeight { get; set; } = 15;
+			public int fillerModTime { get; set; } = 850;
+			public double fillerModFireSpeed { get; set; } = 1.25;
+			public double fillerModFireHeight { get; set; } = 1.25;
+			public double fillerModLazerSpeed { get; set; } = 1.5;
+			public double fillerModLazerHeight { get; set; } = 1.30;
+			public double fillerModDamageSpeed { get; set; } = 1.5;
+			public double fillerModDamageHeight { get; set; } = 1.45;
 			public void save() {
 				Trace.WriteLine("Config save!");
 				string output = JsonSerializer.Serialize(this); ;
@@ -43,6 +51,6 @@ namespace SetariaPlayer
 			}
 		}
 
-		public static ConfigInt cfg = Config.load();
+		public static ConfigInt cfg;
 	}
 }

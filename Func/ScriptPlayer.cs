@@ -165,7 +165,7 @@ namespace SetariaPlayer
 							if (dur < 10)
 								continue;
 
-							if (MainWindow.started) {
+							if (MainWindow.started && !this.paused) {
 								//Play action
 								if (device.AllowedMessages.ContainsKey(MessageAttributeType.LinearCmd)) {
 									device.SendLinearCmd((uint)dur, pos);

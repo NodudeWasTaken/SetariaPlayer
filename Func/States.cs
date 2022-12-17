@@ -8,6 +8,7 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using static Buttplug.DeviceMessage.Types;
+using static Buttplug.ServerMessage.Types;
 
 namespace SetariaPlayer
 {
@@ -18,6 +19,7 @@ namespace SetariaPlayer
 	};
 	class StateInt
 	{
+		public string name;
 		public string urlPrefix;
 		protected ButtplugInt b;
 		protected ScriptPlayer sp;
@@ -45,6 +47,7 @@ namespace SetariaPlayer
 		private Filler fi;
 
 		public InactiveState(ButtplugInt b, ScriptPlayer sp, ScriptParser sr) : base(b, sp, sr) {
+			this.name = "Inactive";
 			this.urlPrefix = "/game/player_damage";
 			fi = new Filler(sp);
 		}
@@ -112,11 +115,68 @@ namespace SetariaPlayer
 			sp.Stop();
 		}
 	}
-	class SceneState : StateInt
-	{
+	class Fairy1State : StateInt {
+		private float max = -569;
+		private float min = -469;
+		private long time = 0;
+		public Fairy1State(ButtplugInt b, ScriptPlayer sp, ScriptParser sr) : base(b, sp, sr) {
+			this.name = "Fairy1 player";
+			this.urlPrefix = "/game/custom_HFairy1";
+	}
+		public override void Enter(HttpListenerRequest r, ref State s) {
+			base.Enter(r, ref s);
+			this.Update(r, ref s);
+			sp.Play(sr.get("sHFairy1", "start"), false);
+		}
+		public override void Update(HttpListenerRequest r, ref State s) {
+			base.Update(r, ref s);
+			if (r.Url.AbsolutePath.Equals("/game/custom_HFairy1_stop") || r.Url.AbsolutePath.Equals("/game/gallery_stop")) {
+				this.Exit(r, ref s);
+				return;
+			}
+
+			if (r.Url.AbsolutePath.Equals("/game/custom_HFairy1_finish")) {
+				sp.Play(sr.get("sHFairy1", "finish"), false);
+				return;
+			}
+
+			/*if (!r.QueryString.HasKeys()) {
+				Trace.WriteLine("Missing query string!");
+				return;
+			}*/
+
+			if (r.Url.AbsolutePath.Equals("/game/custom_HFairy1_action")) {
+				float bonepos = float.Parse(r.QueryString["bone_pos_y"], CultureInfo.InvariantCulture);
+				max = Math.Min(max, bonepos);
+				min = Math.Max(min, bonepos);
+
+				float p = 1-Math.Abs((bonepos - min) / (max - min));
+
+				//Max update time is 1/4 a second
+				if (time + 100 < Utilities.curtime()) {
+					this.b.client.Devices.AsParallel().ForAll(device => {
+						if (device.AllowedMessages.ContainsKey(MessageAttributeType.LinearCmd)) {
+							Trace.WriteLine($"HFairy1 action {p}");
+							//TODO: We can probably calculate accceleration
+							device.SendLinearCmd(150, p);
+						} else if (device.AllowedMessages.ContainsKey(MessageAttributeType.VibrateCmd)) {
+							device.SendVibrateCmd(p);
+						}
+					});
+					time = Utilities.curtime();
+				}
+			}
+		}
+		public override void Exit(HttpListenerRequest r, ref State s) {
+			base.Exit(r, ref s);
+			sp.Stop();
+		}
+	}
+	class SceneState : StateInt {
 		private string lastmob = "";
 		private Data curscript = null;
 		public SceneState(ButtplugInt b, ScriptPlayer sp, ScriptParser sr) : base(b,sp,sr) {
+			this.name = "Scene player";
 			this.urlPrefix = "/game/gallery";
 		}
 		public override void Enter(HttpListenerRequest r, ref State s) {

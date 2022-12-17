@@ -51,7 +51,8 @@ namespace SetariaPlayer.Func {
 
 			watcher = new Task(() => {
 				while (running) {
-					long durfix = Math.Max(850, filler.Duration());
+					//long durfix = Math.Max(850, filler.Duration());
+					long durfix = Config.cfg.fillerModTime;
 					if (last != null && Utilities.curtime() > last + durfix) {
 						sp.setTimeScale(1.0);
 						fillerMod = 1.0;
@@ -77,18 +78,18 @@ namespace SetariaPlayer.Func {
 			return (150, height);
 		}
 		public void Fire() {
-			sp.setTimeScale(1.25);
-			fillerMod = 1.25;
+			sp.setTimeScale(Config.cfg.fillerModFireSpeed);
+			fillerMod = Config.cfg.fillerModFireHeight;
 			last = Utilities.curtime();
 		}
 		public void Lazer() {
-			sp.setTimeScale(1.5);
-			fillerMod = 1.30;
+			sp.setTimeScale(Config.cfg.fillerModLazerSpeed);
+			fillerMod = Config.cfg.fillerModLazerHeight;
 			last = Utilities.curtime();
 		}
 		public void Damage() {
-			sp.setTimeScale(1.5);
-			fillerMod = 1.45;
+			sp.setTimeScale(Config.cfg.fillerModDamageSpeed);
+			fillerMod = Config.cfg.fillerModDamageHeight;
 			last = Utilities.curtime();
 		}
 	}
