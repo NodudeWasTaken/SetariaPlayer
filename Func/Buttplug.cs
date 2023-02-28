@@ -84,9 +84,16 @@ namespace SetariaPlayer
 			{
 				Trace.WriteLine("Server disconnected.");
 			};
-			ButtplugEmbeddedConnectorOptions options = null;
-			//options.AllowRawMessages = true;
-			await client.ConnectAsync(options).ConfigureAwait(false);
+			if (Config.cfg.intifaceUrl != null && !String.IsNullOrEmpty(Config.cfg.intifaceUrl)) {
+				Uri fuck = new Uri(Config.cfg.intifaceUrl);
+				ButtplugWebsocketConnectorOptions options = new ButtplugWebsocketConnectorOptions(fuck);
+				//TODO: Detect errors
+				await client.ConnectAsync(options).ConfigureAwait(false);
+			} else {
+				ButtplugEmbeddedConnectorOptions options = null;
+				//options.AllowRawMessages = true;
+				await client.ConnectAsync(options).ConfigureAwait(false);
+			}
 			await client.StartScanningAsync().ConfigureAwait(false);
 			Trace.WriteLine($"Is Scanning: {client.IsScanning}");
 		}

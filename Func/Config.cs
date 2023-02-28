@@ -15,6 +15,8 @@ namespace SetariaPlayer
 		private static string dataf = "config.json";
 
 		public class ConfigInt {
+			public string intifaceUrl { get; set; } = "";
+			public string scriptPath { get; set; } = "rec.funscript";
 			public int vibrationBufferDuration { get; set; } = 5000;
 			public double vibrationUpdateDiff { get; set; } = 0.2;
 			public double vibrationCalcDiff { get; set; } = 0.15;
@@ -22,7 +24,7 @@ namespace SetariaPlayer
 			public bool filler { get; set; } = false;
 			public int fillerDur { get; set; } = 300;
 			public int fillerHeight { get; set; } = 15;
-			public int fillerModTime { get; set; } = 850;
+			public int fillerModTime { get; set; } = 650;
 			public double fillerModFireSpeed { get; set; } = 1.25;
 			public double fillerModFireHeight { get; set; } = 1.25;
 			public double fillerModLazerSpeed { get; set; } = 1.5;

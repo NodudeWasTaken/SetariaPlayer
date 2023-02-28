@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -16,6 +17,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Xml.Linq;
 using static Buttplug.ServerMessage.Types;
 
 namespace SetariaPlayer
@@ -25,7 +27,7 @@ namespace SetariaPlayer
 	/// </summary>
 	public partial class MainWindow : Window
 	{
-		private string version = "InDev Build 13";
+		private string version = "InDev Build 16";
 		public static bool started = false;
 		private bool ready = false;
 		private ButtplugInt b;
@@ -74,6 +76,8 @@ namespace SetariaPlayer
 			InitializeComponent();
 			this.DataContext = this;
 
+			Config.cfg = Config.load();
+
 			this.b = new ButtplugInt();
 			b.Start();
 
@@ -102,11 +106,11 @@ namespace SetariaPlayer
 			this.h.Hook(HttpHookCallback);
 			h.Start();
 
-
 			Title += $" ({version})";
 		}
-		private async void Window_Loaded(object sender, RoutedEventArgs e) {
-			Config.cfg = Config.load();
+		private void Window_Loaded(object sender, RoutedEventArgs e) {
+			Trace.WriteLine("Window_Loaded");
+
 			BufferVal.Value = Config.cfg.vibrationBufferDuration / 1000;
 			DiffVal.Value = Config.cfg.vibrationUpdateDiff * 100;
 			DiffVal_Copy.Value = Config.cfg.vibrationCalcDiff * 100;
@@ -115,6 +119,15 @@ namespace SetariaPlayer
 			FillerDuration.Value = Config.cfg.fillerDur;
 			FillerHeight.Value = Config.cfg.fillerHeight;
 			//Trace.Listeners.Add(new MyTraceListener(Logs));
+
+			foreach (var f in Directory.GetFiles(".", "*.funscript"))
+			{
+				ListBoxItem itm = new ListBoxItem();
+				itm.Content = f;
+				Scripts.Items.Add(itm);
+			}
+
+
 			ready = true;
 		}
 		private void ImDying() {
@@ -242,6 +255,20 @@ namespace SetariaPlayer
 				await this.b.client.StopScanningAsync();
 				await this.b.client.StartScanningAsync();
 			}).Start();
+		}
+
+		private void Scripts_MouseDown(object sender, MouseButtonEventArgs e) {
+			var item = ItemsControl.ContainerFromElement(sender as ListBox, e.OriginalSource as DependencyObject) as ListBoxItem;
+			if (item != null) {
+				string script = (string)item.Content;
+				Trace.WriteLine($"Load script: {script}");
+				Config.cfg.scriptPath = script;
+				this.sr.Load(script);
+			}
+		}
+
+		private void ConnectionURL_TextChanged(object sender, TextChangedEventArgs e) {
+			Config.cfg.intifaceUrl = ConnectionURL.Text;
 		}
 	}
 }

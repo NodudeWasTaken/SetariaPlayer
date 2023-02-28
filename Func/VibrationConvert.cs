@@ -39,6 +39,17 @@ namespace SetariaPlayer
 			FilterDist(timestep);
 			pos.Add(timestep);
 		}
+		public static double ActionSpeed((long, double) o, (long, double) c) {
+			//Distance over 20cm (0.2m, approx height of handy)
+			double d1 = 0.2 * o.Item2;
+			double d2 = 0.2 * c.Item2;
+			//Speed in m pr second
+			double m = Math.Abs(d1 - d2);
+			double s = Math.Abs(o.Item1 - c.Item1) / 1000.0;
+			//TODO: Fix divide by zero
+			double ms = m / s;
+			return ms;
+		}
 		public double Get()
 		{
 			if (pos.Count < 2) {
@@ -52,15 +63,7 @@ namespace SetariaPlayer
 			for (int i=1; i<pos.Count; i++) {
 				var o = pos[i-1];
 				var c = pos[i];
-				//Distance over 20cm (0.2m, approx height of handy)
-				double d1 = 0.2 * o.Item2;
-				double d2 = 0.2 * c.Item2;
-				//Speed in m pr second
-				double m = Math.Abs(d1 - d2);
-				double s = Math.Abs(o.Item1 - c.Item1) / 1000.0;
-				//TODO: Fix divide by zero
-				double ms = m / s;
-				result.Add(ms);
+				result.Add(VibrationConvert.ActionSpeed(o,c));
 			}
 
 			//Filter if too different

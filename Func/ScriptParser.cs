@@ -12,6 +12,7 @@ using static System.Formats.Asn1.AsnWriter;
 using System.Xml.Linq;
 using Microsoft.VisualBasic.FileIO;
 using System.IO;
+using System.Diagnostics;
 
 namespace SetariaPlayer
 {
@@ -55,16 +56,31 @@ namespace SetariaPlayer
 	}
 	class ScriptParser
 	{
-		private List<Data> records;
+		private List<Data> records = new List<Data>();
 		public ScriptParser() {
 #if DEBUG
-			string datapath = "../../../data.csv";
 			string recordpath = "../../../rec.funscript";
 #else
-			string datapath = "./data.csv";
-			string recordpath = "./rec.funscript";
+			string recordpath = Config.cfg.scriptPath;
 #endif
-			records = new List<Data>();
+			this.Load(recordpath);
+		}
+
+		public void Load(string name) {
+			string recordpath = name;
+			string datapath = Path.ChangeExtension(recordpath, ".csv"); ;
+
+			records.Clear();
+
+			if (!File.Exists(recordpath)) {
+				Trace.WriteLine("Funscript missing!");
+				return;
+			}
+			if (!File.Exists(datapath)) {
+				Trace.WriteLine("Funscript records missing!");
+				return;
+			}
+
 			using (var reader = new StreamReader(datapath))
 			using (TextFieldParser parser = new TextFieldParser(reader)) {
 				parser.TextFieldType = FieldType.Delimited;
@@ -95,8 +111,7 @@ namespace SetariaPlayer
 						.ToList();
 
 					long offset = rec.Start;
-					for (var i = 0; i < actions.Count; i++)
-					{
+					for (var i = 0; i < actions.Count; i++) {
 						actions[i] = (actions[i].Item1 - offset, actions[i].Item2);
 					}
 

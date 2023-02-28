@@ -73,9 +73,9 @@ namespace SetariaPlayer
 			if (r.QueryString.HasKeys()) {
 				foreach (string qs in r.QueryString.AllKeys) {
 					if (qs == "hp")
-						hp = float.Parse(r.QueryString[qs]);
+						hp = float.Parse(r.QueryString[qs], CultureInfo.InvariantCulture);
 					if (qs == "mp")
-						mp = float.Parse(r.QueryString[qs]);
+						mp = float.Parse(r.QueryString[qs], CultureInfo.InvariantCulture);
 				}
 			}
 
@@ -152,7 +152,7 @@ namespace SetariaPlayer
 
 				float p = 1-Math.Abs((bonepos - min) / (max - min));
 
-				//Max update time is 1/4 a second
+				//Max update time is 1/10 a second
 				if (time + 100 < Utilities.curtime()) {
 					this.b.client.Devices.AsParallel().ForAll(device => {
 						if (device.AllowedMessages.ContainsKey(MessageAttributeType.LinearCmd)) {
@@ -190,6 +190,7 @@ namespace SetariaPlayer
 			if (r.Url.AbsolutePath.Equals("/game/gallery_stop") || 
 				(!r.Url.AbsolutePath.StartsWith("/game/gallery") && !r.Url.AbsolutePath.StartsWith("/game/player_damage2"))
 			) {
+				//player_damage2 is end animation damage
 				this.Exit(r, ref s);
 				return;
 			}
@@ -218,10 +219,21 @@ namespace SetariaPlayer
 	Var armor_state=3
 	Var anim_flag =7
 			*/
+
+			/*
+			 * Sandwitch trap hotfix
+			 * It slows down the animation speed instead of having a finish scene
+			 * So we here detect this and overwrite it.
+			 */
+			if (mob == "sHSandWitchTrap" && r.QueryString["enemy_skin"] == "finish") {
+				mob = "sHSandWitchTrap;enemy_skin=finish";
+				animation_scene = "scene1";
+				animation_speed = 1f;
+			}
+
 			var script = sr.get(mob, animation_scene);
 			if (script == null) {
 				Trace.WriteLine($"Missing script for {mob} {animation_scene}!");
-				//TODO: Filler?
 				sp.Stop();
 				return;
 			}

@@ -8,11 +8,11 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DebugType>portable</DebugType>
+    <DebugType>none</DebugType>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DebugType>portable</DebugType>
+    <DebugType>none</DebugType>
     <Optimize>true</Optimize>
   </PropertyGroup>
 
@@ -21,7 +21,7 @@
   </ItemGroup>
 
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(BuildingInsideVisualStudio)' == 'true'">
-		<Exec Command="copy /Y rec.funscript bin\Release\net6.0-windows\rec.funscript&#xD;&#xA;copy /Y data.csv bin\Release\net6.0-windows\data.csv&#xD;&#xA;" />
+		<Exec Command="copy /Y rec.funscript bin\Release\net6.0-windows\rec.funscript&#xD;&#xA;copy /Y rec.csv bin\Release\net6.0-windows\rec.csv&#xD;&#xA;" />
 	</Target>
 
 </Project>

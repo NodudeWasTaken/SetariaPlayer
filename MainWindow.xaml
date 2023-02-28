@@ -18,6 +18,7 @@
 					<ListBox x:Name="DeviceList" Margin="356,41,10,10"/>
 					<Button x:Name="SaveButton" Content="Save" Margin="141,155,337,10" Click="Button2_Click"/>
 					<Button Content="↻" Margin="475,10,10,0" VerticalAlignment="Top" Click="Button_Click_1" Height="26" FontSize="16" BorderBrush="#FF707070" Background="#FFE8E8E8"/>
+					<TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Welcome to SetariaPlayer!&#10;Here you can checkout:&#10;* The filler tab for filler script settings&#10;* The vibration tab for vibration device settings&#10;* The script tab for script selection&#10;* The intiface tab if your device needs intiface connectivity&#10;* The about tab for credits" VerticalAlignment="Top" Height="140" Width="341"/>
 				</Grid>
 			</TabItem>
 
@@ -48,6 +49,7 @@
 
 				</Grid>
 			</TabItem>
+
 			<TabItem Header="Vibration">
 				<Grid Background="White">
 					<Grid.ColumnDefinitions>
@@ -126,6 +128,22 @@
 				</Grid>
 			</TabItem>-->
 
+			<TabItem Header="Script">
+				<Grid Background="White">
+					<ListBox x:Name="Scripts" PreviewMouseDown="Scripts_MouseDown"/>
+				</Grid>
+			</TabItem>
+
+			<TabItem Header="Intiface">
+				<Grid Background="White">
+					<TextBox x:Name="ConnectionURL" HorizontalAlignment="Left" Margin="55,49,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="172" TextChanged="ConnectionURL_TextChanged"/>
+					<Label Content="URL:" HorizontalAlignment="Left" Margin="12,45,0,0" VerticalAlignment="Top" Width="38" Height="26"/>
+					<TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="This is optional&#x0a;Buttplug's library has embedded compatibility with most devices" VerticalAlignment="Top"/>
+					<TextBlock HorizontalAlignment="Left" Margin="10,72,0,0" TextWrapping="Wrap" Text="This requires a restart and will crash if it fails" VerticalAlignment="Top"/>
+				</Grid>
+			</TabItem>
+
+
 			<TabItem Header="About">
 				<Grid Background="White">
 					<TextBlock HorizontalAlignment="Center" TextWrapping="Wrap" Text="" VerticalAlignment="Center" Height="200" Width="521">
@@ -139,7 +157,7 @@
 						<LineBreak/>
 						<Run Text="abrakadabra for testing!"/>
 						<LineBreak/>
-						<Run Text="MKN for testing!"/>
+						<Run Text="MKN for hardmode and testing!"/>
 						<LineBreak/>
 						<LineBreak/>
 						<LineBreak/>

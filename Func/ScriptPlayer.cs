@@ -35,7 +35,7 @@ namespace SetariaPlayer
 			(140, 0),
 		});
 
-		//TODO: Compile scripts
+		//TODO: Move to funscript
 	}
 	class ScriptPlayer {
 		//The current worker task
@@ -127,7 +127,6 @@ namespace SetariaPlayer
 
 			//You cannot be paused if you want to play a script
 			paused = false;
-			//long pausefix = 0;
 
 			//Start our task
 			playTaskTS = new CancellationTokenSource();
@@ -138,35 +137,34 @@ namespace SetariaPlayer
 				while (butt.client.Devices.Length <= 0 && !ct.IsCancellationRequested) {
 					Thread.Sleep(1);
 				}
-				butt.client.Devices.AsParallel().ForAll(device => {
-					//Remember the old intensity, for reducing updates
-					double oldIntensity = 0;
-					//The globals should only be updated by 1 instance
-					//In this case the first one
-					bool ismaster = device.Index == butt.client.Devices[0].Index;
 
-					//While should run
-					while (!ct.IsCancellationRequested)
+				//Remember the old intensity, for reducing updates
+				double oldIntensity = 0;
+
+				//While should run
+				while (!ct.IsCancellationRequested && playing)
+				{
+					//For each action in the script
+					foreach (var a in buttTimer(current_script.Actions, current_time + offset))
 					{
-						//For each action in the script
-						foreach (var a in buttTimer(current_script.Actions, current_time + offset))
-						{
-							//Action duration
-							int dur = a.Item1;
-							//Action position
-							double pos = a.Item2;
-							//Action intensity (for vibration devices)
-							double intensity = buttvib.Get();
+						//Action duration
+						int dur = a.Item1;
+						//Action position
+						double pos = a.Item2;
+						//Action intensity (for vibration devices)
+						double intensity = buttvib.Get();
 
 #if DEBUG
-							//Trace.WriteLine($"DEBUG Action: {dur} {pos}");
+						//Trace.WriteLine($"DEBUG Action: {dur} {pos}");
 #endif
-							//If the action is too fast, ignore
-							if (dur < 10)
-								continue;
+						//If the action is too fast, ignore
+						//double speed = VibrationConvert.ActionSpeed((old_pos, old_dur), (pos, dur));
+						if (dur < 50)
+							continue;
 
-							if (MainWindow.started && !this.paused) {
-								//Play action
+						if (MainWindow.started && !this.paused) {
+							//Play action
+							butt.client.Devices.AsParallel().ForAll(device => {
 								if (device.AllowedMessages.ContainsKey(MessageAttributeType.LinearCmd)) {
 									device.SendLinearCmd((uint)dur, pos);
 								} else if (device.AllowedMessages.ContainsKey(MessageAttributeType.VibrateCmd)) {
@@ -175,53 +173,46 @@ namespace SetariaPlayer
 										device.SendVibrateCmd(intensity);
 										oldIntensity = intensity;
 									}
-								}
-							}
+								}/* else if (device.AllowedMessages.ContainsKey(MessageAttributeType.RotateCmd)) {
+								}*/
+							});
+						}
 #if DEBUG
-							//Trace.WriteLine($"DEBUG Linear: {dur} {pos}");
-							//Trace.WriteLine($"DEBUG Vibrate: {dur} {intensity}");
+						//Trace.WriteLine($"DEBUG Linear: {dur} {pos}");
+						//Trace.WriteLine($"DEBUG Vibrate: {dur} {intensity}");
 #endif
-							//Wait until the action should be done
-							long taken = Utilities.curtime() + dur;
-							while (taken > Utilities.curtime() || paused) {
-								Thread.Sleep(1);
-								//If we should exit
-								if (ct.IsCancellationRequested) { StopSig(device); return; };
-								//If we paused (cannot happen in Setaria)
-								if (paused) { 
-									taken += 1; 
-									oldIntensity = 0.0; 
-									//TODO: In Setaria this is impossible
-									//Except in the gallery, where the animation doesnt pause
-									//But the signal is still sent
-									//Weird
-									/*if (ismaster)
-										pausefix += 1;*/
-								}
+						//Wait until the action should be done
+						long taken = Utilities.curtime() + dur;
+						while (taken > Utilities.curtime() || paused) {
+							Thread.Sleep(1);
+							//If we should exit
+							if (ct.IsCancellationRequested) {
+								butt.client.Devices.AsParallel().ForAll(device => StopSig(device));
+								return; 
+							};
+							//If we paused (cannot happen in Setaria)
+							if (paused) { 
+								taken += 1; 
+								oldIntensity = 0.0; 
+								//TODO: In Setaria this is impossible
+								//Except in the gallery, where the animation doesnt pause
+								//But the signal is still sent
+								//Weird
 							}
 						}
-
-						//If user choose if should loop
-						if (loopOverride == null) {
-							if (!current_script.Loop) { 
-								StopSig(device);
-								return;
-							}
-						} else {
-							if (loopOverride == false) { 
-								StopSig(device);
-								return;
-							}
-						}
-
-						//If we are the main process, update the time
-						if (ismaster)
-							current_time += current_script.Duration();
 					}
 
-					//Make vibration devices stop
-					StopSig(device);
-				});
+					//If user choose if should loop
+					if (!current_script.Loop || (loopOverride != null && loopOverride == false)) {
+						break;
+					}
+
+					//Update the time
+					current_time += current_script.Duration();
+				}
+
+				//Make vibration devices stop
+				butt.client.Devices.AsParallel().ForAll(device => StopSig(device));
 			});
 		}
 		public void Pause() { 
@@ -236,8 +227,7 @@ namespace SetariaPlayer
 		public void Stop() {
 			if (playTaskTS != null)
 				playTaskTS.Cancel();
-			foreach (var i in butt.client.Devices)
-				StopSig(i);
+			butt.client.Devices.AsParallel().ForAll(device => StopSig(device));
 			buttvib.Clear();
 		}
 	}

@@ -22,6 +22,7 @@ namespace SetariaPlayer.Func {
 			public override List<(long, int)> Actions { 
 				//Hacking your own classes?!
 				//Naughty
+				//TODO: Move to script
 				get {
 					return new List<(long, int)>
 						{
@@ -46,14 +47,12 @@ namespace SetariaPlayer.Func {
 
 		}
 		public void Start() {
-			sp.Play(filler);
 			running = true;
+			sp.Play(filler);
 
 			watcher = new Task(() => {
 				while (running) {
-					//long durfix = Math.Max(850, filler.Duration());
-					long durfix = Config.cfg.fillerModTime;
-					if (last != null && Utilities.curtime() > last + durfix) {
+					if (last != null && Utilities.curtime() > last) {
 						sp.setTimeScale(1.0);
 						fillerMod = 1.0;
 						last = null;
@@ -77,20 +76,24 @@ namespace SetariaPlayer.Func {
 		public static (long, int) getAction(int height) {
 			return (150, height);
 		}
+		private long ModTime() {
+			//long durfix = Math.Max(850, filler.Duration());
+			return Config.cfg.fillerModTime;
+		}
 		public void Fire() {
 			sp.setTimeScale(Config.cfg.fillerModFireSpeed);
 			fillerMod = Config.cfg.fillerModFireHeight;
-			last = Utilities.curtime();
+			last = Utilities.curtime() + this.ModTime();
 		}
 		public void Lazer() {
 			sp.setTimeScale(Config.cfg.fillerModLazerSpeed);
 			fillerMod = Config.cfg.fillerModLazerHeight;
-			last = Utilities.curtime();
+			last = Utilities.curtime() + this.ModTime();
 		}
 		public void Damage() {
 			sp.setTimeScale(Config.cfg.fillerModDamageSpeed);
 			fillerMod = Config.cfg.fillerModDamageHeight;
-			last = Utilities.curtime();
+			last = Utilities.curtime() + this.ModTime();
 		}
 	}
 }
