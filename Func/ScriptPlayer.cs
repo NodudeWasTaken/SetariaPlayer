@@ -154,6 +154,11 @@ namespace SetariaPlayer
 						//Action intensity (for vibration devices)
 						double intensity = buttvib.Get();
 
+						//Limit stroke range
+						pos = (pos * (Config.cfg.strokeMax - Config.cfg.strokeMin)) + Config.cfg.strokeMin;
+
+						//TODO: Limit acceleration
+
 #if DEBUG
 						//Trace.WriteLine($"DEBUG Action: {dur} {pos}");
 #endif

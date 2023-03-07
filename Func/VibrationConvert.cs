@@ -40,9 +40,9 @@ namespace SetariaPlayer
 			pos.Add(timestep);
 		}
 		public static double ActionSpeed((long, double) o, (long, double) c) {
-			//Distance over 20cm (0.2m, approx height of handy)
-			double d1 = 0.2 * o.Item2;
-			double d2 = 0.2 * c.Item2;
+			//Distance over 15cm
+			double d1 = 0.15 * o.Item2;
+			double d2 = 0.15 * c.Item2;
 			//Speed in m pr second
 			double m = Math.Abs(d1 - d2);
 			double s = Math.Abs(o.Item1 - c.Item1) / 1000.0;

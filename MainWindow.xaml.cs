@@ -27,7 +27,7 @@ namespace SetariaPlayer
 	/// </summary>
 	public partial class MainWindow : Window
 	{
-		private string version = "InDev Build 16";
+		private string version = "InDev Build 17";
 		public static bool started = false;
 		private bool ready = false;
 		private ButtplugInt b;
@@ -118,6 +118,8 @@ namespace SetariaPlayer
 			FillerCheckbox.IsChecked = Config.cfg.filler;
 			FillerDuration.Value = Config.cfg.fillerDur;
 			FillerHeight.Value = Config.cfg.fillerHeight;
+			MaxStrokeLength.Value = Config.cfg.strokeMax / 100;
+			MinStrokeLength.Value = Config.cfg.strokeMin / 100;
 			//Trace.Listeners.Add(new MyTraceListener(Logs));
 
 			foreach (var f in Directory.GetFiles(".", "*.funscript"))
@@ -130,36 +132,34 @@ namespace SetariaPlayer
 
 			ready = true;
 		}
-		private void ImDying() {
-			if (this.activeState != null) {
-				this.activeState.Update();
+		private void ImDying(Action a) {
+			if (ready) {
+				a.Invoke();
+				if (this.activeState != null) {
+					this.activeState.Update();
+				}
 			}
 		}
 		private void Slider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
 		{
-			if (ready) {
+			ImDying(() => {
 				Config.cfg.vibrationBufferDuration = (int)(e.NewValue * 1000);
-				ImDying();
-			}
+			});
 		}
-		private void Slider_ValueChanged_1(object sender, RoutedPropertyChangedEventArgs<double> e)
-		{
-			if (ready) {
+		private void Slider_ValueChanged_1(object sender, RoutedPropertyChangedEventArgs<double> e) {
+			ImDying(() => {
 				Config.cfg.vibrationUpdateDiff = e.NewValue / 100.0;
-				ImDying();
-			}
+			});
 		}
 		private void Slider_ValueChanged_2(object sender, RoutedPropertyChangedEventArgs<double> e) {
-			if (ready) {
+			ImDying(() => {
 				Config.cfg.vibrationMaxSpeed = e.NewValue;
-				ImDying();
-			}
+			});
 		}
 		private void Slider_ValueChanged_3(object sender, RoutedPropertyChangedEventArgs<double> e) {
-			if (ready) {
+			ImDying(() => {
 				Config.cfg.vibrationCalcDiff = e.NewValue / 100.0;
-				ImDying();
-			}
+			});
 		}
 
 		private void Button_Click(object sender, RoutedEventArgs e)
@@ -208,7 +208,9 @@ namespace SetariaPlayer
 					//activeState.Exit(r, ref state);
 					activeState = inactive;
 					activeState.Enter(r, ref state);
+					StatusBarText.Text = "Player State: " + activeState.name;
 				}
+
 
 				//If it didn't exit
 				if (state != State.Inactive) {
@@ -221,6 +223,7 @@ namespace SetariaPlayer
 							st.Enter(r, ref state);
 							Trace.WriteLine($"Enter State: {st.name}");
 							activeState = st;
+							StatusBarText.Text = "Player State: " + st.name;
 							return "OK";
 						}
 					}
@@ -230,24 +233,31 @@ namespace SetariaPlayer
 		}
 
 		private void CheckBox_Checked(object sender, RoutedEventArgs e) {
-			if (ready) {
+			ImDying(() => {
 				Config.cfg.filler = FillerCheckbox.IsChecked == true;
-				ImDying();
-			}
+			});
 		}
 
 		private void FillerDuration_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) {
-			if (ready) {
+			ImDying(() => {
 				Config.cfg.fillerDur = (int)FillerDuration.Value;
-				ImDying();
-			}
+			});
 		}
 
 		private void FillerHeight_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) {
-			if (ready) {
-				Config.cfg.fillerHeight = (int)FillerHeight.Value;
-				ImDying();
-			}
+			ImDying(() => { 
+				Config.cfg.fillerHeight = (int)FillerHeight.Value; 
+			});
+		}
+		private void MaxStrokeLength_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) {
+			ImDying(() => {
+				Config.cfg.strokeMax = MaxStrokeLength.Value / 100;
+			});
+		}
+		private void MinStrokeLength_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) {
+			ImDying(() => {
+				Config.cfg.strokeMin = MinStrokeLength.Value / 100;
+			});
 		}
 
 		private void Button_Click_1(object sender, RoutedEventArgs e) {

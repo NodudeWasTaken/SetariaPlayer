@@ -21,6 +21,9 @@ namespace SetariaPlayer
 			public double vibrationUpdateDiff { get; set; } = 0.2;
 			public double vibrationCalcDiff { get; set; } = 0.15;
 			public double vibrationMaxSpeed { get; set; } = 2;
+			public double strokeMax { get; set; } = 1.0;
+			public double strokeMin { get; set; } = 0;
+			public double strokeAccelMax { get; set; } = 20; //TODO: Implement
 			public bool filler { get; set; } = false;
 			public int fillerDur { get; set; } = 300;
 			public int fillerHeight { get; set; } = 15;

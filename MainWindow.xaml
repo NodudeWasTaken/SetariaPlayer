@@ -7,167 +7,197 @@
         mc:Ignorable="d"
 		ResizeMode="NoResize"
 		Loaded="Window_Loaded"
-        Title="Setaria Player" Height="264" Width="547">
-	<Grid>
-		<TabControl>
-			<TabItem Header="Main">
-				<Grid Background="White">
+        Title="Setaria Player" Height="304" Width="547">
+	<DockPanel>
+		<StatusBar DockPanel.Dock="Bottom">
+			<StatusBarItem>
+				<TextBlock Name="StatusBarText" />
+			</StatusBarItem>
+		</StatusBar>
+		<Grid>
+			<TabControl>
+				<TabItem Header="Main">
+					<Grid Background="White">
 
-					<Button x:Name="StartButton" Content="Start" Margin="10,155,405,10" Click="Button_Click"/>
-					<Label Content="Connected devices:" HorizontalAlignment="Left" Margin="356,10,0,0" VerticalAlignment="Top" Height="31" Width="114"/>
-					<ListBox x:Name="DeviceList" Margin="356,41,10,10"/>
-					<Button x:Name="SaveButton" Content="Save" Margin="141,155,337,10" Click="Button2_Click"/>
-					<Button Content="↻" Margin="475,10,10,0" VerticalAlignment="Top" Click="Button_Click_1" Height="26" FontSize="16" BorderBrush="#FF707070" Background="#FFE8E8E8"/>
-					<TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Welcome to SetariaPlayer!&#10;Here you can checkout:&#10;* The filler tab for filler script settings&#10;* The vibration tab for vibration device settings&#10;* The script tab for script selection&#10;* The intiface tab if your device needs intiface connectivity&#10;* The about tab for credits" VerticalAlignment="Top" Height="140" Width="341"/>
-				</Grid>
-			</TabItem>
+						<Button x:Name="StartButton" Content="Start" Margin="10,155,405,10" Click="Button_Click"/>
+						<Label Content="Connected devices:" HorizontalAlignment="Left" Margin="356,10,0,0" VerticalAlignment="Top" Height="31" Width="114"/>
+						<ListBox x:Name="DeviceList" Margin="356,41,10,10"/>
+						<Button x:Name="SaveButton" Content="Save" Margin="141,155,337,10" Click="Button2_Click"/>
+						<Button Content="↻" Margin="475,10,10,0" VerticalAlignment="Top" Click="Button_Click_1" Height="26" FontSize="16" BorderBrush="#FF707070" Background="#FFE8E8E8"/>
+						<TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Welcome to SetariaPlayer!&#10;Here you can checkout:&#10;* The filler tab for filler script settings&#10;* The stroker tab for stroker device settings&#10;* The vibration tab for vibration device settings&#10;* The script tab for script selection&#10;* The intiface tab if your device needs intiface connectivity&#10;* The about tab for credits" VerticalAlignment="Top" Height="140" Width="341"/>
+					</Grid>
+				</TabItem>
+				<TabItem Header="Filler">
+					<Grid Background="White">
+						<CheckBox x:Name="FillerCheckbox" Content="Filler" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Checked="CheckBox_Checked" Unchecked="CheckBox_Checked"/>
 
-			<TabItem Header="Filler">
-				<Grid Background="White">
-					<CheckBox x:Name="FillerCheckbox" Content="Filler" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Checked="CheckBox_Checked" Unchecked="CheckBox_Checked"/>
+						<Label Content="Filler duration (s): " HorizontalAlignment="Left" Margin="10,30,0,0" VerticalAlignment="Top"/>
+						<DockPanel VerticalAlignment="Top" Margin="120,36,226,0" Height="25" ToolTip="The time it should take your device to reach said stroke height times 2">
+							<TextBox Text="{Binding ElementName=FillerDuration, Path=Value, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Right" TextAlignment="Right" Width="30" />
+							<Slider x:Name="FillerDuration" HorizontalAlignment="Left" VerticalAlignment="Top" Width="150" 
+									Minimum="50" 
+									Maximum="1000" 
+									TickFrequency="25" 
+							TickPlacement="BottomRight" IsSnapToTickEnabled="True" AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0" ValueChanged="FillerDuration_ValueChanged"/>
+						</DockPanel>
 
-					<Label Content="Filler duration (s): " HorizontalAlignment="Left" Margin="10,30,0,0" VerticalAlignment="Top"/>
-					<DockPanel VerticalAlignment="Top" Margin="120,36,226,0" Height="25" ToolTip="The time it should take your device to reach said stroke height times 2">
-						<TextBox Text="{Binding ElementName=FillerDuration, Path=Value, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Right" TextAlignment="Right" Width="30" />
-						<Slider x:Name="FillerDuration" HorizontalAlignment="Left" VerticalAlignment="Top" Width="150" 
-								Minimum="50" 
-								Maximum="1000" 
-								TickFrequency="25" 
-						TickPlacement="BottomRight" IsSnapToTickEnabled="True" AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0" ValueChanged="FillerDuration_ValueChanged"/>
-					</DockPanel>
-
-					<Label Content="Filler height (%): " HorizontalAlignment="Left" Margin="10,61,0,0" VerticalAlignment="Top"/>
-					<DockPanel VerticalAlignment="Top" Margin="120,65,226,0" Height="25" ToolTip="The stroke height your device should play">
-						<TextBox Text="{Binding ElementName=FillerHeight, Path=Value, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Right" TextAlignment="Right" Width="30" />
-						<Slider x:Name="FillerHeight" HorizontalAlignment="Left" VerticalAlignment="Top" Width="150" 
-								Minimum="0" 
-								Maximum="100" 
-								TickFrequency="5" 
-						TickPlacement="BottomRight" IsSnapToTickEnabled="True" AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0" ValueChanged="FillerHeight_ValueChanged"/>
-					</DockPanel>
-
-
-				</Grid>
-			</TabItem>
-
-			<TabItem Header="Vibration">
-				<Grid Background="White">
-					<Grid.ColumnDefinitions>
-						<ColumnDefinition Width="56*"/>
-						<ColumnDefinition Width="485*"/>
-					</Grid.ColumnDefinitions>
-					<Label 
-						Content="Buffer duration (s):" 
-						HorizontalAlignment="Left" 
-						Margin="10,11,0,0" 
-						VerticalAlignment="Top" 
-						Width="145" Grid.ColumnSpan="2"
-					/>
-					<DockPanel VerticalAlignment="Top" Margin="100,16,190,0" Height="25" ToolTip="How long the vibration converter's buffer is in seconds" Grid.Column="1">
-						<TextBox Text="{Binding ElementName=BufferVal, Path=Value, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Right" TextAlignment="Right" Width="30" />
-						<Slider x:Name="BufferVal" HorizontalAlignment="Left" VerticalAlignment="Top" Width="150" 
-								Minimum="1" 
-								Maximum="30" 
-								TickFrequency="1" 
-						TickPlacement="BottomRight" IsSnapToTickEnabled="True" AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0" ValueChanged="Slider_ValueChanged"/>
-					</DockPanel>
-
-					<Label 
-						Content="Minimum update % diff:" 
-						HorizontalAlignment="Left" 
-						Margin="10,42,0,0" 
-						VerticalAlignment="Top" 
-						Width="145" Grid.ColumnSpan="2"
-					/>
-					<DockPanel VerticalAlignment="Top" Margin="100,46,190,0" Height="25" ToolTip="Minimum percentage difference for a intensity update to be sent to vibration devices" Grid.Column="1">
-						<TextBox Text="{Binding ElementName=DiffVal, Path=Value, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Right" TextAlignment="Right" Width="30" />
-						<Slider x:Name="DiffVal" HorizontalAlignment="Left" VerticalAlignment="Top" Width="150" 
-								Minimum="0" 
-								Maximum="100" 
-								TickFrequency="1" 
-						TickPlacement="BottomRight" IsSnapToTickEnabled="True" AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0" ValueChanged="Slider_ValueChanged_1"/>
-					</DockPanel>
-
-					<Label 
-						Content="Maximum calc % diff:" 
-						HorizontalAlignment="Left" 
-						Margin="10,73,0,0" 
-						VerticalAlignment="Top" 
-						Width="145" Grid.ColumnSpan="2"
-					/>
-					<DockPanel VerticalAlignment="Top" Margin="100,76,190,0" Height="25" ToolTip="Maximum speed difference to include when calculating average (calculated from newest to oldest) for vibration devices" Grid.Column="1">
-						<TextBox Text="{Binding ElementName=DiffVal_Copy, Path=Value, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Right" TextAlignment="Right" Width="30" />
-						<Slider x:Name="DiffVal_Copy" HorizontalAlignment="Left" VerticalAlignment="Top" Width="150" 
-								Minimum="0" 
-								Maximum="100" 
-								TickFrequency="1" 
-						TickPlacement="BottomRight" IsSnapToTickEnabled="True" AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0" ValueChanged="Slider_ValueChanged_3"/>
-					</DockPanel>
-
-					<Label 
-						Content="Max speed (m/s):" 
-						HorizontalAlignment="Left" 
-						Margin="10,104,0,0" 
-						VerticalAlignment="Top" 
-						Width="101" Grid.ColumnSpan="2"
-					/>
-					<DockPanel VerticalAlignment="Top" Margin="100,106,190,0" Height="25" ToolTip="Maximum assumed speed in a funscript which will result in 100% intensity in a vibration device" Grid.Column="1">
-						<TextBox Text="{Binding ElementName=SpeedVal, Path=Value, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Right" TextAlignment="Right" Width="30" />
-						<Slider x:Name="SpeedVal" HorizontalAlignment="Left" VerticalAlignment="Top" Width="150" 
-								Minimum="0.5" 
-								Maximum="10" 
-								TickFrequency="0.5" 
-						TickPlacement="BottomRight" IsSnapToTickEnabled="True" AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0" ValueChanged="Slider_ValueChanged_2"/>
-					</DockPanel>
-				</Grid>
-			</TabItem>
-
-			<!--<TabItem Header="Logs">
-				<Grid Background="White">
-					<TextBox x:Name="Logs" TextWrapping="Wrap" Text="" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto" Margin="10,10,10,10" />
-				</Grid>
-			</TabItem>-->
-
-			<TabItem Header="Script">
-				<Grid Background="White">
-					<ListBox x:Name="Scripts" PreviewMouseDown="Scripts_MouseDown"/>
-				</Grid>
-			</TabItem>
-
-			<TabItem Header="Intiface">
-				<Grid Background="White">
-					<TextBox x:Name="ConnectionURL" HorizontalAlignment="Left" Margin="55,49,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="172" TextChanged="ConnectionURL_TextChanged"/>
-					<Label Content="URL:" HorizontalAlignment="Left" Margin="12,45,0,0" VerticalAlignment="Top" Width="38" Height="26"/>
-					<TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="This is optional&#x0a;Buttplug's library has embedded compatibility with most devices" VerticalAlignment="Top"/>
-					<TextBlock HorizontalAlignment="Left" Margin="10,72,0,0" TextWrapping="Wrap" Text="This requires a restart and will crash if it fails" VerticalAlignment="Top"/>
-				</Grid>
-			</TabItem>
+						<Label Content="Filler height (%): " HorizontalAlignment="Left" Margin="10,61,0,0" VerticalAlignment="Top"/>
+						<DockPanel VerticalAlignment="Top" Margin="120,65,226,0" Height="25" ToolTip="The stroke height your device should play">
+							<TextBox Text="{Binding ElementName=FillerHeight, Path=Value, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Right" TextAlignment="Right" Width="30" />
+							<Slider x:Name="FillerHeight" HorizontalAlignment="Left" VerticalAlignment="Top" Width="150" 
+									Minimum="0" 
+									Maximum="100" 
+									TickFrequency="5" 
+							TickPlacement="BottomRight" IsSnapToTickEnabled="True" AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0" ValueChanged="FillerHeight_ValueChanged"/>
+						</DockPanel>
 
 
-			<TabItem Header="About">
-				<Grid Background="White">
-					<TextBlock HorizontalAlignment="Center" TextWrapping="Wrap" Text="" VerticalAlignment="Center" Height="200" Width="521">
-						<Run Text="Thanks to:"/>
-						<LineBreak/>
-						<Run Text="99DM for scripting the entire game!"/>
-						<LineBreak/>
-						<Run Text="Dimnogro for helping with the project!"/>
-						<LineBreak/>
-						<Run Text="funscriptguy for testing!"/>
-						<LineBreak/>
-						<Run Text="abrakadabra for testing!"/>
-						<LineBreak/>
-						<Run Text="MKN for hardmode and testing!"/>
-						<LineBreak/>
-						<LineBreak/>
-						<LineBreak/>
-						<Run Text="Kind regards"/>
-						<LineBreak/>
-						<Run Text="Nodude"/>
-					</TextBlock>
-				</Grid>
-			</TabItem>
-		</TabControl>
+					</Grid>
+				</TabItem>
 
-	</Grid>
+				<TabItem Header="Stroker">
+					<Grid Background="White">
+						<Label Content="Max stroke height (%): " HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
+						<DockPanel VerticalAlignment="Top" Margin="147,12,200,0" Height="25" ToolTip="The maximum percentage to stroke up">
+							<TextBox Text="{Binding ElementName=MaxStrokeLength, Path=Value, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Right" TextAlignment="Right" Width="30" />
+							<Slider x:Name="MaxStrokeLength" HorizontalAlignment="Left" VerticalAlignment="Top" Width="150" 
+									Minimum="0" 
+									Maximum="100" 
+									TickFrequency="1" 
+							TickPlacement="BottomRight" IsSnapToTickEnabled="True" AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0" ValueChanged="MaxStrokeLength_ValueChanged"/>
+						</DockPanel>
+
+						<Label Content="Min stroke height (%): " HorizontalAlignment="Left" Margin="10,39,0,0" VerticalAlignment="Top"/>
+						<DockPanel VerticalAlignment="Top" Margin="147,40,200,0" Height="25" ToolTip="The max percentage to stroke down">
+							<TextBox Text="{Binding ElementName=MinStrokeLength, Path=Value, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Right" TextAlignment="Right" Width="30" />
+							<Slider x:Name="MinStrokeLength" HorizontalAlignment="Left" VerticalAlignment="Top" Width="150" 
+									Minimum="0" 
+									Maximum="100" 
+									TickFrequency="1" 
+							TickPlacement="BottomRight" IsSnapToTickEnabled="True" AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0" ValueChanged="MinStrokeLength_ValueChanged"/>
+						</DockPanel>
+					</Grid>
+				</TabItem>
+
+				<TabItem Header="Vibration">
+					<Grid Background="White">
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="56*"/>
+							<ColumnDefinition Width="485*"/>
+						</Grid.ColumnDefinitions>
+						<Label 
+							Content="Buffer duration (s):" 
+							HorizontalAlignment="Left" 
+							Margin="10,11,0,0" 
+							VerticalAlignment="Top" 
+							Width="145" Grid.ColumnSpan="2"
+						/>
+						<DockPanel VerticalAlignment="Top" Margin="100,16,190,0" Height="25" ToolTip="How long the vibration converter's buffer is in seconds" Grid.Column="1">
+							<TextBox Text="{Binding ElementName=BufferVal, Path=Value, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Right" TextAlignment="Right" Width="30" />
+							<Slider x:Name="BufferVal" HorizontalAlignment="Left" VerticalAlignment="Top" Width="150" 
+									Minimum="1" 
+									Maximum="30" 
+									TickFrequency="1" 
+							TickPlacement="BottomRight" IsSnapToTickEnabled="True" AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0" ValueChanged="Slider_ValueChanged"/>
+						</DockPanel>
+
+						<Label 
+							Content="Minimum update % diff:" 
+							HorizontalAlignment="Left" 
+							Margin="10,42,0,0" 
+							VerticalAlignment="Top" 
+							Width="145" Grid.ColumnSpan="2"
+						/>
+						<DockPanel VerticalAlignment="Top" Margin="100,46,190,0" Height="25" ToolTip="Minimum percentage difference for a intensity update to be sent to vibration devices" Grid.Column="1">
+							<TextBox Text="{Binding ElementName=DiffVal, Path=Value, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Right" TextAlignment="Right" Width="30" />
+							<Slider x:Name="DiffVal" HorizontalAlignment="Left" VerticalAlignment="Top" Width="150" 
+									Minimum="0" 
+									Maximum="100" 
+									TickFrequency="1" 
+							TickPlacement="BottomRight" IsSnapToTickEnabled="True" AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0" ValueChanged="Slider_ValueChanged_1"/>
+						</DockPanel>
+
+						<Label 
+							Content="Maximum calc % diff:" 
+							HorizontalAlignment="Left" 
+							Margin="10,73,0,0" 
+							VerticalAlignment="Top" 
+							Width="145" Grid.ColumnSpan="2"
+						/>
+						<DockPanel VerticalAlignment="Top" Margin="100,76,190,0" Height="25" ToolTip="Maximum speed difference to include when calculating average (calculated from newest to oldest) for vibration devices" Grid.Column="1">
+							<TextBox Text="{Binding ElementName=DiffVal_Copy, Path=Value, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Right" TextAlignment="Right" Width="30" />
+							<Slider x:Name="DiffVal_Copy" HorizontalAlignment="Left" VerticalAlignment="Top" Width="150" 
+									Minimum="0" 
+									Maximum="100" 
+									TickFrequency="1" 
+							TickPlacement="BottomRight" IsSnapToTickEnabled="True" AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0" ValueChanged="Slider_ValueChanged_3"/>
+						</DockPanel>
+
+						<Label 
+							Content="Max speed (m/s):" 
+							HorizontalAlignment="Left" 
+							Margin="10,104,0,0" 
+							VerticalAlignment="Top" 
+							Width="101" Grid.ColumnSpan="2"
+						/>
+						<DockPanel VerticalAlignment="Top" Margin="100,106,190,0" Height="25" ToolTip="Maximum assumed speed in a funscript which will result in 100% intensity in a vibration device" Grid.Column="1">
+							<TextBox Text="{Binding ElementName=SpeedVal, Path=Value, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Right" TextAlignment="Right" Width="30" />
+							<Slider x:Name="SpeedVal" HorizontalAlignment="Left" VerticalAlignment="Top" Width="150" 
+									Minimum="0.5" 
+									Maximum="10" 
+									TickFrequency="0.5" 
+							TickPlacement="BottomRight" IsSnapToTickEnabled="True" AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0" ValueChanged="Slider_ValueChanged_2"/>
+						</DockPanel>
+					</Grid>
+				</TabItem>
+
+				<!--<TabItem Header="Logs">
+					<Grid Background="White">
+						<TextBox x:Name="Logs" TextWrapping="Wrap" Text="" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto" Margin="10,10,10,10" />
+					</Grid>
+				</TabItem>-->
+
+				<TabItem Header="Script">
+					<Grid Background="White">
+						<ListBox x:Name="Scripts" PreviewMouseDown="Scripts_MouseDown"/>
+					</Grid>
+				</TabItem>
+
+				<TabItem Header="Intiface">
+					<Grid Background="White">
+						<TextBox x:Name="ConnectionURL" HorizontalAlignment="Left" Margin="55,49,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="172" TextChanged="ConnectionURL_TextChanged"/>
+						<Label Content="URL:" HorizontalAlignment="Left" Margin="12,45,0,0" VerticalAlignment="Top" Width="38" Height="26"/>
+						<TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="This is optional&#x0a;Buttplug's library has embedded compatibility with most devices" VerticalAlignment="Top"/>
+						<TextBlock HorizontalAlignment="Left" Margin="10,72,0,0" TextWrapping="Wrap" Text="This requires a restart and will crash if it fails" VerticalAlignment="Top"/>
+					</Grid>
+				</TabItem>
+
+
+				<TabItem Header="About">
+					<Grid Background="White">
+						<TextBlock HorizontalAlignment="Center" TextWrapping="Wrap" Text="" VerticalAlignment="Center" Height="200" Width="521">
+							<Run Text="Thanks to:"/>
+							<LineBreak/>
+							<Run Text="99DM for scripting the entire game!"/>
+							<LineBreak/>
+							<Run Text="Dimnogro for helping with the project!"/>
+							<LineBreak/>
+							<Run Text="funscriptguy for testing!"/>
+							<LineBreak/>
+							<Run Text="abrakadabra for testing!"/>
+							<LineBreak/>
+							<Run Text="MKN for hardmode and testing!"/>
+							<LineBreak/>
+							<LineBreak/>
+							<LineBreak/>
+							<Run Text="Kind regards"/>
+							<LineBreak/>
+							<Run Text="Nodude"/>
+						</TextBlock>
+					</Grid>
+				</TabItem>
+			</TabControl>
+
+		</Grid>
+	</DockPanel>
 </Window>
