@@ -27,7 +27,7 @@ namespace SetariaPlayer
 	/// </summary>
 	public partial class MainWindow : Window
 	{
-		private string version = "InDev Build 17";
+		private string version = "InDev Build 18";
 		public static bool started = false;
 		private bool ready = false;
 		private ButtplugInt b;
@@ -77,6 +77,10 @@ namespace SetariaPlayer
 			this.DataContext = this;
 
 			Config.cfg = Config.load();
+			if (Config.cfg.intifaceUrl.Length <= 0) {
+				Config.cfg.intifaceUrl = "ws://localhost:12345";
+				//Temporary mitigation, remove sometime
+			}
 
 			this.b = new ButtplugInt();
 			b.Start();
@@ -118,8 +122,17 @@ namespace SetariaPlayer
 			FillerCheckbox.IsChecked = Config.cfg.filler;
 			FillerDuration.Value = Config.cfg.fillerDur;
 			FillerHeight.Value = Config.cfg.fillerHeight;
-			MaxStrokeLength.Value = Config.cfg.strokeMax / 100;
-			MinStrokeLength.Value = Config.cfg.strokeMin / 100;
+			MaxStrokeLength.Value = Config.cfg.strokeMax * 100;
+			MinStrokeLength.Value = Config.cfg.strokeMin * 100;
+			ConnectionURL.Text = Config.cfg.intifaceUrl;
+			//TODO: Toggles for these
+			FireHeight.Value = Config.cfg.fillerAModFireHeight;
+			FireLength.Value = Config.cfg.fillerAModFireLength;
+			LazerHeight.Value = Config.cfg.fillerAModLazerHeight;
+			LazerLength.Value = Config.cfg.fillerAModLazerLength;
+			DamageHeight.Value = Config.cfg.fillerAModDamageHeight;
+			DamageLength.Value = Config.cfg.fillerAModDamageLength;
+
 			//Trace.Listeners.Add(new MyTraceListener(Logs));
 
 			foreach (var f in Directory.GetFiles(".", "*.funscript"))
@@ -192,6 +205,7 @@ namespace SetariaPlayer
 					}
 				}
 
+				//TODO: Redroom effect (you are being watched) something
 				if (r.Url.AbsolutePath.Equals("/game/pause")) {
 					activeState.Pause();
 					return "OK";
@@ -279,6 +293,36 @@ namespace SetariaPlayer
 
 		private void ConnectionURL_TextChanged(object sender, TextChangedEventArgs e) {
 			Config.cfg.intifaceUrl = ConnectionURL.Text;
+		}
+		private void FireLength_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) {
+			ImDying(() => {
+				Config.cfg.fillerAModFireLength = (int)FireLength.Value;
+			});
+		}
+		private void FireHeight_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) {
+			ImDying(() => {
+				Config.cfg.fillerAModFireHeight = (int)FireHeight.Value;
+			});
+		}
+		private void LazerLength_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) {
+			ImDying(() => {
+				Config.cfg.fillerAModLazerLength = (int)LazerLength.Value;
+			});
+		}
+		private void LazerHeight_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) {
+			ImDying(() => {
+				Config.cfg.fillerAModLazerHeight = (int)LazerHeight.Value;
+			});
+		}
+		private void DamageLength_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) {
+			ImDying(() => {
+				Config.cfg.fillerAModDamageLength = (int)DamageLength.Value;
+			});
+		}
+		private void DamageHeight_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) {
+			ImDying(() => {
+				Config.cfg.fillerAModDamageHeight = (int)DamageHeight.Value;
+			});
 		}
 	}
 }

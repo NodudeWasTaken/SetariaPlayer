@@ -49,7 +49,7 @@ namespace SetariaPlayer
 		public InactiveState(ButtplugInt b, ScriptPlayer sp, ScriptParser sr) : base(b, sp, sr) {
 			this.name = "Inactive";
 			this.urlPrefix = "/game/player_damage";
-			fi = new Filler(sp);
+			fi = new Filler(sp, () => Config.cfg.filler);
 		}
 		public override void Enter(HttpListenerRequest r, ref State s) {
 			base.Enter(r, ref s);
@@ -79,26 +79,12 @@ namespace SetariaPlayer
 				}
 			}
 
-			if (!Config.cfg.filler) {
-				if (r.Url.AbsolutePath.Equals("/game/fire"))
-					sp.Play(Script.vibrate_strong);
-				if (r.Url.AbsolutePath.Equals("/game/fire_lazer"))
-					sp.Play(Script.vibrate_ultra);
-				if (r.Url.AbsolutePath.Equals("/game/player_damage"))
-					sp.Play(Script.vibrate_ultra);
-				//player_damage2 happens at the end of animations
-				/*
-				if (r.Url.AbsolutePath.Equals("/game/player_damage2"))
-					Console.WriteLine("How did you trigger this?");
-				*/
-			} else {
-				if (r.Url.AbsolutePath.Equals("/game/fire"))
-					fi.Fire();
-				if (r.Url.AbsolutePath.Equals("/game/fire_lazer"))
-					fi.Lazer();
-				if (r.Url.AbsolutePath.Equals("/game/player_damage"))
-					fi.Damage();
-			}
+			if (r.Url.AbsolutePath.Equals("/game/fire"))
+				fi.Fire();
+			if (r.Url.AbsolutePath.Equals("/game/fire_lazer"))
+				fi.Lazer();
+			if (r.Url.AbsolutePath.Equals("/game/player_damage"))
+				fi.Damage();
 		}
 		public override void Pause() {
 			base.Pause();

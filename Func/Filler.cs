@@ -40,13 +40,19 @@ namespace SetariaPlayer.Func {
 		private ScriptPlayer sp;
 		private Task watcher;
 		private bool running = false;
+		private Func<bool> shouldrun;
 
-		public Filler(ScriptPlayer sp) {
+		public Filler(ScriptPlayer sp, Func<bool> shouldrun) {
+			this.shouldrun = shouldrun;
 			this.sp = sp;
 			this.filler = new FillerData(() => fillerMod);
 
 		}
 		public void Start() {
+			if (!this.shouldrun()) {
+				return;
+			}
+
 			running = true;
 			sp.Play(filler);
 
@@ -55,6 +61,7 @@ namespace SetariaPlayer.Func {
 					if (last != null && Utilities.curtime() > last) {
 						sp.setTimeScale(1.0);
 						fillerMod = 1.0;
+						sp.Play(filler);
 						last = null;
 					}
 					Thread.Sleep(1);
@@ -80,20 +87,38 @@ namespace SetariaPlayer.Func {
 			//long durfix = Math.Max(850, filler.Duration());
 			return Config.cfg.fillerModTime;
 		}
+		private Data getFireScript() {
+			return new Data("vibrate", "Fire", 0, Config.cfg.fillerAModFireLength, false,
+				new List<(long, int)> {
+					(Config.cfg.fillerAModFireLength, Config.cfg.fillerAModFireHeight),
+					(Config.cfg.fillerAModFireLength, 0),
+				});
+		}
+		private Data getLazerScript() {
+			return new Data("vibrate", "Lazer", 0, Config.cfg.fillerAModLazerLength, false,
+				new List<(long, int)> {
+					(Config.cfg.fillerAModLazerLength, Config.cfg.fillerAModLazerHeight),
+					(Config.cfg.fillerAModLazerLength, 0),
+				});
+		}
+		private Data getDamageScript() {
+			return new Data("vibrate", "Damage", 0, Config.cfg.fillerAModDamageLength, false,
+				new List<(long, int)> {
+					(Config.cfg.fillerAModDamageLength, Config.cfg.fillerAModDamageHeight),
+					(Config.cfg.fillerAModDamageLength, 0),
+				});
+		}
 		public void Fire() {
-			sp.setTimeScale(Config.cfg.fillerModFireSpeed);
-			fillerMod = Config.cfg.fillerModFireHeight;
-			last = Utilities.curtime() + this.ModTime();
+			this.last = Utilities.curtime() + this.ModTime();
+			this.sp.Play(this.getFireScript());
 		}
 		public void Lazer() {
-			sp.setTimeScale(Config.cfg.fillerModLazerSpeed);
-			fillerMod = Config.cfg.fillerModLazerHeight;
-			last = Utilities.curtime() + this.ModTime();
+			this.last = Utilities.curtime() + this.ModTime();
+			this.sp.Play(this.getLazerScript());
 		}
 		public void Damage() {
-			sp.setTimeScale(Config.cfg.fillerModDamageSpeed);
-			fillerMod = Config.cfg.fillerModDamageHeight;
-			last = Utilities.curtime() + this.ModTime();
+			this.last = Utilities.curtime() + this.ModTime();
+			this.sp.Play(this.getDamageScript());
 		}
 	}
 }

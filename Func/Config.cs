@@ -15,7 +15,7 @@ namespace SetariaPlayer
 		private static string dataf = "config.json";
 
 		public class ConfigInt {
-			public string intifaceUrl { get; set; } = "";
+			public string intifaceUrl { get; set; } = "ws://localhost:12345";
 			public string scriptPath { get; set; } = "rec.funscript";
 			public int vibrationBufferDuration { get; set; } = 5000;
 			public double vibrationUpdateDiff { get; set; } = 0.2;
@@ -28,12 +28,12 @@ namespace SetariaPlayer
 			public int fillerDur { get; set; } = 300;
 			public int fillerHeight { get; set; } = 15;
 			public int fillerModTime { get; set; } = 650;
-			public double fillerModFireSpeed { get; set; } = 1.25;
-			public double fillerModFireHeight { get; set; } = 1.25;
-			public double fillerModLazerSpeed { get; set; } = 1.5;
-			public double fillerModLazerHeight { get; set; } = 1.30;
-			public double fillerModDamageSpeed { get; set; } = 1.5;
-			public double fillerModDamageHeight { get; set; } = 1.45;
+			public int fillerAModFireLength { get; set; } = 140;
+			public int fillerAModFireHeight { get; set; } = 10;
+			public int fillerAModLazerLength { get; set; } = 120;
+			public int fillerAModLazerHeight { get; set; } = 10;
+			public int fillerAModDamageLength { get; set; } = 100;
+			public int fillerAModDamageHeight { get; set; } = 10;
 			public void save() {
 				Trace.WriteLine("Config save!");
 				string output = JsonSerializer.Serialize(this); ;

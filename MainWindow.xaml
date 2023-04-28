@@ -55,6 +55,72 @@
 					</Grid>
 				</TabItem>
 
+				<TabItem Header="Actions" Margin="-2,-2,-2,0">
+					<Grid Background="White">
+
+						<Label Content="Fire length (ms): " HorizontalAlignment="Left" Margin="10,4,0,0" VerticalAlignment="Top"/>
+						<DockPanel VerticalAlignment="Top" Margin="130,4,226,0" Height="25" ToolTip="The stroke height your device should play">
+							<TextBox Text="{Binding ElementName=FireLength, Path=Value, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Right" TextAlignment="Right" Width="30" />
+							<Slider x:Name="FireLength" HorizontalAlignment="Left" VerticalAlignment="Top" Width="150" 
+									Minimum="1" 
+									Maximum="1000" 
+									TickFrequency="10" 
+							TickPlacement="BottomRight" IsSnapToTickEnabled="True" AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0" ValueChanged="FireLength_ValueChanged"/>
+						</DockPanel>
+
+						<Label Content="Fire height (%): " HorizontalAlignment="Left" Margin="10,31,0,0" VerticalAlignment="Top"/>
+						<DockPanel VerticalAlignment="Top" Margin="130,35,226,0" Height="25" ToolTip="The stroke height your device should play">
+							<TextBox Text="{Binding ElementName=FireHeight, Path=Value, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Right" TextAlignment="Right" Width="30" />
+							<Slider x:Name="FireHeight" HorizontalAlignment="Left" VerticalAlignment="Top" Width="150" 
+									Minimum="0" 
+									Maximum="100" 
+									TickFrequency="5" 
+							TickPlacement="BottomRight" IsSnapToTickEnabled="True" AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0" ValueChanged="FireHeight_ValueChanged"/>
+						</DockPanel>
+
+						<Label Content="Lazer length (ms): " HorizontalAlignment="Left" Margin="10,64,0,0" VerticalAlignment="Top"/>
+						<DockPanel VerticalAlignment="Top" Margin="130,64,226,0" Height="25" ToolTip="The stroke height your device should play">
+							<TextBox Text="{Binding ElementName=LazerLength, Path=Value, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Right" TextAlignment="Right" Width="30" />
+							<Slider x:Name="LazerLength" HorizontalAlignment="Left" VerticalAlignment="Top" Width="150" 
+									Minimum="1" 
+									Maximum="1000" 
+									TickFrequency="10" 
+							TickPlacement="BottomRight" IsSnapToTickEnabled="True" AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0" ValueChanged="LazerLength_ValueChanged"/>
+						</DockPanel>
+
+						<Label Content="Lazer height (%): " HorizontalAlignment="Left" Margin="10,91,0,0" VerticalAlignment="Top"/>
+						<DockPanel VerticalAlignment="Top" Margin="130,95,226,0" Height="25" ToolTip="The stroke height your device should play">
+							<TextBox Text="{Binding ElementName=LazerHeight, Path=Value, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Right" TextAlignment="Right" Width="30" />
+							<Slider x:Name="LazerHeight" HorizontalAlignment="Left" VerticalAlignment="Top" Width="150" 
+									Minimum="0" 
+									Maximum="100" 
+									TickFrequency="5" 
+							TickPlacement="BottomRight" IsSnapToTickEnabled="True" AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0" ValueChanged="LazerHeight_ValueChanged"/>
+						</DockPanel>
+
+						<Label Content="Damage length (ms): " HorizontalAlignment="Left" Margin="10,124,0,0" VerticalAlignment="Top"/>
+						<DockPanel VerticalAlignment="Top" Margin="130,124,226,0" Height="25" ToolTip="The stroke height your device should play">
+							<TextBox Text="{Binding ElementName=DamageLength, Path=Value, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Right" TextAlignment="Right" Width="30" />
+							<Slider x:Name="DamageLength" HorizontalAlignment="Left" VerticalAlignment="Top" Width="150" 
+									Minimum="1" 
+									Maximum="1000" 
+									TickFrequency="10" 
+							TickPlacement="BottomRight" IsSnapToTickEnabled="True" AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0" ValueChanged="DamageLength_ValueChanged"/>
+						</DockPanel>
+
+						<Label Content="Damage height (%): " HorizontalAlignment="Left" Margin="10,151,0,0" VerticalAlignment="Top"/>
+						<DockPanel VerticalAlignment="Top" Margin="130,155,226,0" Height="25" ToolTip="The stroke height your device should play">
+							<TextBox Text="{Binding ElementName=DamageHeight, Path=Value, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Right" TextAlignment="Right" Width="30" />
+							<Slider x:Name="DamageHeight" HorizontalAlignment="Left" VerticalAlignment="Top" Width="150" 
+									Minimum="0" 
+									Maximum="100" 
+									TickFrequency="5" 
+							TickPlacement="BottomRight" IsSnapToTickEnabled="True" AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0" ValueChanged="DamageHeight_ValueChanged"/>
+						</DockPanel>
+
+					</Grid>
+				</TabItem>
+
 				<TabItem Header="Stroker">
 					<Grid Background="White">
 						<Label Content="Max stroke height (%): " HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
@@ -168,7 +234,7 @@
 						<TextBox x:Name="ConnectionURL" HorizontalAlignment="Left" Margin="55,49,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="172" TextChanged="ConnectionURL_TextChanged"/>
 						<Label Content="URL:" HorizontalAlignment="Left" Margin="12,45,0,0" VerticalAlignment="Top" Width="38" Height="26"/>
 						<TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="This is optional&#x0a;Buttplug's library has embedded compatibility with most devices" VerticalAlignment="Top"/>
-						<TextBlock HorizontalAlignment="Left" Margin="10,72,0,0" TextWrapping="Wrap" Text="This requires a restart and will crash if it fails" VerticalAlignment="Top"/>
+						<TextBlock HorizontalAlignment="Left" Margin="10,72,0,0" TextWrapping="Wrap" Text="This requires a restart. &#x0a;Default: ws://localhost:12345" VerticalAlignment="Top"/>
 					</Grid>
 				</TabItem>
 
