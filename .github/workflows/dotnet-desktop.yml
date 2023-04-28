@@ -93,7 +93,7 @@ jobs:
     - name: Move scripts
       run: |
         copy rec.funscript bin\${{ matrix.configuration }}\net6.0-windows\publish\rec.funscript
-        copy data.csv bin\${{ matrix.configuration }}\net6.0-windows\publish\data.csv
+        copy rec.csv bin\${{ matrix.configuration }}\net6.0-windows\publish\data.csv
     - name: Upload dotnet build
       uses: actions/upload-artifact@v3
       if: ${{ matrix.configuration }} == Release
