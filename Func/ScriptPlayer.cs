@@ -108,19 +108,21 @@ namespace SetariaPlayer
 		 * If you want an time offset.
 		 */
 		public void Play(Data current_script, bool? loopOverride=null, int offset=0) {
-			//The start time which we should respect when playing the script
-			long current_time =Utilities.curtime();
-			//Reset the timer
-			time.reset();
-
 			//Was canceled, but isn't done yet
 			if (playTask != null) {
 				//Ask it to stop
-				if (!playTaskTS.IsCancellationRequested)
-					this.Stop();
+				if (!playTaskTS.IsCancellationRequested) {
+					playTaskTS.Cancel();
+				}
 				//Wait for it to stop
 				playTask.Wait();
+				//this.Stop();
 			}
+
+			//The start time which we should respect when playing the script
+			long current_time = Utilities.curtime();
+			//Reset the timer
+			time.reset();
 
 			//TODO: Detect if too fast for linear device and vibrate instead
 			//TODO: Timing drifts heavily at the end of finish animations
@@ -230,8 +232,10 @@ namespace SetariaPlayer
 			paused = false; 
 		}
 		public void Stop() {
-			if (playTaskTS != null)
+			if (playTaskTS != null) {
 				playTaskTS.Cancel();
+				//playTask.Wait();
+			}
 			butt.client.Devices.AsParallel().ForAll(device => StopSig(device));
 			buttvib.Clear();
 		}

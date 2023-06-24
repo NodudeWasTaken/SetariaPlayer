@@ -16,6 +16,7 @@ namespace SetariaPlayer
 
 		public class ConfigInt {
 			public string intifaceUrl { get; set; } = "ws://localhost:12345";
+			public bool intifaceBuiltin { get; set; } = true;
 			public string scriptPath { get; set; } = "rec.funscript";
 			public int vibrationBufferDuration { get; set; } = 5000;
 			public double vibrationUpdateDiff { get; set; } = 0.2;
@@ -25,7 +26,7 @@ namespace SetariaPlayer
 			public double strokeMin { get; set; } = 0;
 			public double strokeAccelMax { get; set; } = 20; //TODO: Implement
 			public bool filler { get; set; } = false;
-			public int fillerDur { get; set; } = 300;
+			public int fillerDur { get; set; } = 300; // TODO: Per filler type then extend pattern based on...
 			public int fillerHeight { get; set; } = 15;
 			public int fillerModTime { get; set; } = 650;
 			public int fillerAModFireLength { get; set; } = 140;

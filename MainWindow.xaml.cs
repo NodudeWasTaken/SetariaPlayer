@@ -17,6 +17,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 using System.Xml.Linq;
 using static Buttplug.ServerMessage.Types;
 
@@ -27,7 +28,7 @@ namespace SetariaPlayer
 	/// </summary>
 	public partial class MainWindow : Window
 	{
-		private string version = "InDev Build 18";
+		private string version = "InDev Build 19.1";
 		public static bool started = false;
 		private bool ready = false;
 		private ButtplugInt b;
@@ -66,21 +67,22 @@ namespace SetariaPlayer
 		}
 		private void LogIt() {
 			Trace.Listeners.Add(new TextWriterTraceListener("SetariaPlayer.log"));
+			Trace.Listeners.Add(new MyTraceListener(LogBox));
 			Trace.AutoFlush = true;
 			Trace.Indent();
 			Trace.WriteLine("Entering Main");
 		}
 
 		public MainWindow() {
-			LogIt();
 			InitializeComponent();
+			LogIt();
 			this.DataContext = this;
 
 			Config.cfg = Config.load();
-			if (Config.cfg.intifaceUrl.Length <= 0) {
+			/*if (Config.cfg.intifaceUrl.Length <= 0) {
 				Config.cfg.intifaceUrl = "ws://localhost:12345";
 				//Temporary mitigation, remove sometime
-			}
+			}*/
 
 			this.b = new ButtplugInt();
 			b.Start();
@@ -103,6 +105,8 @@ namespace SetariaPlayer
 			this.inactive = new InactiveState(b, sp, sr);
 			this.states.Add(new SceneState(b, sp, sr));
 			this.states.Add(new Fairy1State(b, sp, sr));
+			// Hardcore mode adds stuff for DeathRoomState
+			// this.states.Add(new DeathRoomState(b, sp, sr));
 			this.state = State.Inactive;
 			this.activeState = inactive;
 			sp.Pause();
@@ -132,8 +136,7 @@ namespace SetariaPlayer
 			LazerLength.Value = Config.cfg.fillerAModLazerLength;
 			DamageHeight.Value = Config.cfg.fillerAModDamageHeight;
 			DamageLength.Value = Config.cfg.fillerAModDamageLength;
-
-			//Trace.Listeners.Add(new MyTraceListener(Logs));
+			useIntiface.IsChecked = Config.cfg.intifaceBuiltin;
 
 			foreach (var f in Directory.GetFiles(".", "*.funscript"))
 			{
@@ -142,10 +145,9 @@ namespace SetariaPlayer
 				Scripts.Items.Add(itm);
 			}
 
-
 			ready = true;
 		}
-		private void ImDying(Action a) {
+		private void UpdateUX(Action a) {
 			if (ready) {
 				a.Invoke();
 				if (this.activeState != null) {
@@ -155,39 +157,40 @@ namespace SetariaPlayer
 		}
 		private void Slider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
 		{
-			ImDying(() => {
+			UpdateUX(() => {
 				Config.cfg.vibrationBufferDuration = (int)(e.NewValue * 1000);
 			});
 		}
 		private void Slider_ValueChanged_1(object sender, RoutedPropertyChangedEventArgs<double> e) {
-			ImDying(() => {
+			UpdateUX(() => {
 				Config.cfg.vibrationUpdateDiff = e.NewValue / 100.0;
 			});
 		}
 		private void Slider_ValueChanged_2(object sender, RoutedPropertyChangedEventArgs<double> e) {
-			ImDying(() => {
+			UpdateUX(() => {
 				Config.cfg.vibrationMaxSpeed = e.NewValue;
 			});
 		}
 		private void Slider_ValueChanged_3(object sender, RoutedPropertyChangedEventArgs<double> e) {
-			ImDying(() => {
+			UpdateUX(() => {
 				Config.cfg.vibrationCalcDiff = e.NewValue / 100.0;
 			});
 		}
 
-		private void Button_Click(object sender, RoutedEventArgs e)
-		{
-			Trace.WriteLine(StartButton.Content.ToString());
-			if (StartButton.Content.ToString() == "Stop") {
-				//TODO: Use some force-stop mechanism instead?
-				started = false;
-				//sp.Pause();
-				StartButton.Content = "Start";
-			} else {
-				started = true;
-				//sp.Resume();
-				StartButton.Content = "Stop";
-			}
+		private void Button_Click(object sender, RoutedEventArgs e) {
+			UpdateUX(() => {
+				Trace.WriteLine(StartButton.Content.ToString());
+				if (StartButton.Content.ToString() == "Stop") {
+					//TODO: Use some force-stop mechanism instead?
+					started = false;
+					//sp.Pause();
+					StartButton.Content = "Start";
+				} else {
+					started = true;
+					//sp.Resume();
+					StartButton.Content = "Stop";
+				}
+			});
 		}
 		private void Button2_Click(object sender, RoutedEventArgs e) {
 			Trace.WriteLine("Config save");
@@ -205,7 +208,6 @@ namespace SetariaPlayer
 					}
 				}
 
-				//TODO: Redroom effect (you are being watched) something
 				if (r.Url.AbsolutePath.Equals("/game/pause")) {
 					activeState.Pause();
 					return "OK";
@@ -247,37 +249,43 @@ namespace SetariaPlayer
 		}
 
 		private void CheckBox_Checked(object sender, RoutedEventArgs e) {
-			ImDying(() => {
+			UpdateUX(() => {
 				Config.cfg.filler = FillerCheckbox.IsChecked == true;
 			});
 		}
 
 		private void FillerDuration_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) {
-			ImDying(() => {
+			UpdateUX(() => {
 				Config.cfg.fillerDur = (int)FillerDuration.Value;
 			});
 		}
 
 		private void FillerHeight_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) {
-			ImDying(() => { 
+			UpdateUX(() => { 
 				Config.cfg.fillerHeight = (int)FillerHeight.Value; 
 			});
 		}
 		private void MaxStrokeLength_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) {
-			ImDying(() => {
+			UpdateUX(() => {
 				Config.cfg.strokeMax = MaxStrokeLength.Value / 100;
 			});
 		}
 		private void MinStrokeLength_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) {
-			ImDying(() => {
+			UpdateUX(() => {
 				Config.cfg.strokeMin = MinStrokeLength.Value / 100;
 			});
 		}
 
 		private void Button_Click_1(object sender, RoutedEventArgs e) {
 			new Task(async () => {
-				await this.b.client.StopScanningAsync();
-				await this.b.client.StartScanningAsync();
+				try {
+					await this.b.client.StopScanningAsync();
+					await this.b.client.StartScanningAsync();
+				} catch (ButtplugConnectorException e) {
+					Trace.WriteLine("Failed to scan, is Buttplug connected?");
+				} catch (ButtplugDeviceException e) {
+					Trace.WriteLine("Failed to scan, already scanning");
+				}
 			}).Start();
 		}
 
@@ -290,38 +298,48 @@ namespace SetariaPlayer
 				this.sr.Load(script);
 			}
 		}
-
-		private void ConnectionURL_TextChanged(object sender, TextChangedEventArgs e) {
-			Config.cfg.intifaceUrl = ConnectionURL.Text;
+		private void ConnectionURL_OnKeyDown(object sender, KeyEventArgs e) {
+			if (e.Key == Key.Return) {
+				UpdateUX(() => {
+					Config.cfg.intifaceUrl = ConnectionURL.Text;
+					this.b.Refresh();
+				});
+			}
 		}
 		private void FireLength_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) {
-			ImDying(() => {
+			UpdateUX(() => {
 				Config.cfg.fillerAModFireLength = (int)FireLength.Value;
 			});
 		}
 		private void FireHeight_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) {
-			ImDying(() => {
+			UpdateUX(() => {
 				Config.cfg.fillerAModFireHeight = (int)FireHeight.Value;
 			});
 		}
 		private void LazerLength_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) {
-			ImDying(() => {
+			UpdateUX(() => {
 				Config.cfg.fillerAModLazerLength = (int)LazerLength.Value;
 			});
 		}
 		private void LazerHeight_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) {
-			ImDying(() => {
+			UpdateUX(() => {
 				Config.cfg.fillerAModLazerHeight = (int)LazerHeight.Value;
 			});
 		}
 		private void DamageLength_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) {
-			ImDying(() => {
+			UpdateUX(() => {
 				Config.cfg.fillerAModDamageLength = (int)DamageLength.Value;
 			});
 		}
 		private void DamageHeight_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) {
-			ImDying(() => {
+			UpdateUX(() => {
 				Config.cfg.fillerAModDamageHeight = (int)DamageHeight.Value;
+			});
+		}
+
+		private void CheckBox_Checked_1(object sender, RoutedEventArgs e) {
+			UpdateUX(() => {
+				Config.cfg.intifaceBuiltin = (bool)useIntiface.IsChecked;
 			});
 		}
 	}

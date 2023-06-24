@@ -66,6 +66,7 @@ namespace SetariaPlayer
 				if (!fi.Running())
 					fi.Start();
 			}
+			//TODO: oDeathRoom and oCyclops
 		}
 		public override void Update(HttpListenerRequest r, ref State s) {
 			base.Update(r, ref s);
@@ -101,6 +102,36 @@ namespace SetariaPlayer
 			sp.Stop();
 		}
 	}
+	class DeathRoomState : StateInt {
+		private long time = 0;
+		public DeathRoomState(ButtplugInt b, ScriptPlayer sp, ScriptParser sr) : base(b, sp, sr) {
+			this.name = "DeathRoom";
+			this.urlPrefix = "/game/custom_DeathRoomGirl";
+		}
+		public override void Enter(HttpListenerRequest r, ref State s) {
+			base.Enter(r, ref s);
+			this.Update(r, ref s);
+			sp.Play(sr.get("sHFairy1", "start"), false);
+		}
+		public override void Update(HttpListenerRequest r, ref State s) {
+			base.Update(r, ref s);
+			if (r.Url.AbsolutePath.Equals("/game/custom_DeathRoomGirl_stop") || r.Url.AbsolutePath.Equals("/game/gallery_stop")) {
+				this.Exit(r, ref s);
+				return;
+			}
+
+			if (r.Url.AbsolutePath.Equals("/game/custom_DeathRoomGirl_action")) {
+				float animflag = float.Parse(r.QueryString["anim_flag"], CultureInfo.InvariantCulture);
+				if (animflag == 7) {
+					//Max update time is 1/10 a second
+					if ((time + Config.cfg.fillerAModDamageLength) < Utilities.curtime()) {
+						this.sp.Play(Filler.getDamageScript());
+						time = Utilities.curtime();
+					}
+				}
+			}
+		}
+	}
 	class Fairy1State : StateInt {
 		private float max = -569;
 		private float min = -469;
@@ -108,7 +139,7 @@ namespace SetariaPlayer
 		public Fairy1State(ButtplugInt b, ScriptPlayer sp, ScriptParser sr) : base(b, sp, sr) {
 			this.name = "Fairy1 player";
 			this.urlPrefix = "/game/custom_HFairy1";
-	}
+		}
 		public override void Enter(HttpListenerRequest r, ref State s) {
 			base.Enter(r, ref s);
 			this.Update(r, ref s);

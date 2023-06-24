@@ -20,6 +20,9 @@ namespace SetariaPlayer
 			// Handle requests
 			listenTask = HandleButtplug();
 		}
+		public void Refresh() {
+			listenTask = HandleConnect();
+		}
 		public void Stop()
 		{
 			StopButtplug().Wait();
@@ -59,6 +62,7 @@ namespace SetariaPlayer
 			client.DeviceAdded += (obj, args) =>
 			{
 				var device = args.Device;
+
 				Trace.WriteLine($"Device Added: {device.Name}");
 				foreach (var msg in args.Device.AllowedMessages)
 				{
@@ -84,18 +88,28 @@ namespace SetariaPlayer
 			{
 				Trace.WriteLine("Server disconnected.");
 			};
-			if (Config.cfg.intifaceUrl != null && !String.IsNullOrEmpty(Config.cfg.intifaceUrl)) {
-				Uri fuck = new Uri(Config.cfg.intifaceUrl);
-				ButtplugWebsocketConnectorOptions options = new ButtplugWebsocketConnectorOptions(fuck);
-				//TODO: Detect errors
-				await client.ConnectAsync(options).ConfigureAwait(false);
-			} else {
-				ButtplugEmbeddedConnectorOptions options = null;
-				//options.AllowRawMessages = true;
-				await client.ConnectAsync(options).ConfigureAwait(false);
-			}
-			await client.StartScanningAsync().ConfigureAwait(false);
+			await HandleConnect();
+			await client.StartScanningAsync().ConfigureAwait(true);
 			Trace.WriteLine($"Is Scanning: {client.IsScanning}");
+		}
+		public async Task HandleConnect() {
+			Trace.WriteLine("Trying to connect Intiface");
+			try {
+				if (!Config.cfg.intifaceBuiltin && !String.IsNullOrEmpty(Config.cfg.intifaceUrl)) {
+					Uri fuck = new Uri(Config.cfg.intifaceUrl);
+					ButtplugWebsocketConnectorOptions options = new ButtplugWebsocketConnectorOptions(fuck);
+					//TODO: Detect errors
+					await client.ConnectAsync(options).ConfigureAwait(true);
+				} else {
+					ButtplugEmbeddedConnectorOptions options = null;
+					//options.AllowRawMessages = true;
+					await client.ConnectAsync(options).ConfigureAwait(true);
+				}
+				Trace.WriteLine("Intiface Connected!");
+			} catch (ButtplugConnectorException e) {
+				Trace.WriteLine("Failed to connect to intiface!");
+				return;
+			}
 		}
 	}
 }

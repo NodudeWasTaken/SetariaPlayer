@@ -3,7 +3,6 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:SetariaPlayer"
         mc:Ignorable="d"
 		ResizeMode="NoResize"
 		Loaded="Window_Loaded"
@@ -18,13 +17,13 @@
 			<TabControl>
 				<TabItem Header="Main">
 					<Grid Background="White">
-
 						<Button x:Name="StartButton" Content="Start" Margin="10,155,405,10" Click="Button_Click"/>
 						<Label Content="Connected devices:" HorizontalAlignment="Left" Margin="356,10,0,0" VerticalAlignment="Top" Height="31" Width="114"/>
 						<ListBox x:Name="DeviceList" Margin="356,41,10,10"/>
 						<Button x:Name="SaveButton" Content="Save" Margin="141,155,337,10" Click="Button2_Click"/>
 						<Button Content="↻" Margin="475,10,10,0" VerticalAlignment="Top" Click="Button_Click_1" Height="26" FontSize="16" BorderBrush="#FF707070" Background="#FFE8E8E8"/>
 						<TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Welcome to SetariaPlayer!&#10;Here you can checkout:&#10;* The filler tab for filler script settings&#10;* The stroker tab for stroker device settings&#10;* The vibration tab for vibration device settings&#10;* The script tab for script selection&#10;* The intiface tab if your device needs intiface connectivity&#10;* The about tab for credits" VerticalAlignment="Top" Height="140" Width="341"/>
+
 					</Grid>
 				</TabItem>
 				<TabItem Header="Filler">
@@ -55,7 +54,7 @@
 					</Grid>
 				</TabItem>
 
-				<TabItem Header="Actions" Margin="-2,-2,-2,0">
+				<TabItem Header="Actions">
 					<Grid Background="White">
 
 						<Label Content="Fire length (ms): " HorizontalAlignment="Left" Margin="10,4,0,0" VerticalAlignment="Top"/>
@@ -231,13 +230,21 @@
 
 				<TabItem Header="Intiface">
 					<Grid Background="White">
-						<TextBox x:Name="ConnectionURL" HorizontalAlignment="Left" Margin="55,49,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="172" TextChanged="ConnectionURL_TextChanged"/>
+						<TextBox x:Name="ConnectionURL" HorizontalAlignment="Left" Margin="55,49,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="172" KeyDown="ConnectionURL_OnKeyDown"/>
 						<Label Content="URL:" HorizontalAlignment="Left" Margin="12,45,0,0" VerticalAlignment="Top" Width="38" Height="26"/>
 						<TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="This is optional&#x0a;Buttplug's library has embedded compatibility with most devices" VerticalAlignment="Top"/>
 						<TextBlock HorizontalAlignment="Left" Margin="10,72,0,0" TextWrapping="Wrap" Text="This requires a restart. &#x0a;Default: ws://localhost:12345" VerticalAlignment="Top"/>
+						<CheckBox x:Name="useIntiface" Content="Use Intiface connection" HorizontalAlignment="Left" Margin="10,109,0,0" VerticalAlignment="Top" Checked="CheckBox_Checked_1"/>
 					</Grid>
 				</TabItem>
 
+				<TabItem Header="Logs">
+					<Grid Background="White">
+						<TextBox x:Name="LogBox" HorizontalAlignment="Center" TextWrapping="Wrap" Text="" VerticalAlignment="Center" IsReadOnly="True" Height="200" Width="521">
+
+						</TextBox>
+					</Grid>
+				</TabItem>
 
 				<TabItem Header="About">
 					<Grid Background="White">

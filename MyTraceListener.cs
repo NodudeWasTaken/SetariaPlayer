@@ -10,21 +10,23 @@ using static System.Net.Mime.MediaTypeNames;
 
 namespace SetariaPlayer {
 	public class MyTraceListener : TraceListener {
-		private TextBoxBase output;
+		private TextBox output;
 
-		public MyTraceListener(TextBoxBase output) {
+		public MyTraceListener(TextBox output) {
 			this.Name = "Trace";
 			this.output = output;
 		}
 
 
 		public override void Write(string message) {
-			Action append = delegate () {
+			output.Dispatcher.Invoke(() => {
 				output.AppendText(string.Format("[{0}] ", DateTime.Now.ToString()));
 				output.AppendText(message);
-			};
-			append();
 
+				output.CaretIndex = output.Text.Length;
+				var rect = output.GetRectFromCharacterIndex(output.CaretIndex);
+				output.ScrollToHorizontalOffset(rect.Right);
+			});
 		}
 
 		public override void WriteLine(string message) {

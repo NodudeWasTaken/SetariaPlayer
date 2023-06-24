@@ -83,42 +83,42 @@ namespace SetariaPlayer.Func {
 		public static (long, int) getAction(int height) {
 			return (150, height);
 		}
-		private long ModTime() {
+		/*private long ModTime() {
 			//long durfix = Math.Max(850, filler.Duration());
 			return Config.cfg.fillerModTime;
-		}
-		private Data getFireScript() {
+		}*/
+		public static Data getFireScript() {
 			return new Data("vibrate", "Fire", 0, Config.cfg.fillerAModFireLength, false,
 				new List<(long, int)> {
-					(Config.cfg.fillerAModFireLength, Config.cfg.fillerAModFireHeight),
+					(Config.cfg.fillerAModFireLength/2, Config.cfg.fillerAModFireHeight),
 					(Config.cfg.fillerAModFireLength, 0),
 				});
 		}
-		private Data getLazerScript() {
+		public static Data getLazerScript() {
 			return new Data("vibrate", "Lazer", 0, Config.cfg.fillerAModLazerLength, false,
 				new List<(long, int)> {
-					(Config.cfg.fillerAModLazerLength, Config.cfg.fillerAModLazerHeight),
+					(Config.cfg.fillerAModLazerLength/2, Config.cfg.fillerAModLazerHeight),
 					(Config.cfg.fillerAModLazerLength, 0),
 				});
 		}
-		private Data getDamageScript() {
+		public static Data getDamageScript() {
 			return new Data("vibrate", "Damage", 0, Config.cfg.fillerAModDamageLength, false,
 				new List<(long, int)> {
-					(Config.cfg.fillerAModDamageLength, Config.cfg.fillerAModDamageHeight),
+					(Config.cfg.fillerAModDamageLength/2, Config.cfg.fillerAModDamageHeight),
 					(Config.cfg.fillerAModDamageLength, 0),
 				});
 		}
 		public void Fire() {
-			this.last = Utilities.curtime() + this.ModTime();
-			this.sp.Play(this.getFireScript());
+			this.last = Utilities.curtime() + Config.cfg.fillerAModFireLength;
+			this.sp.Play(getFireScript());
 		}
 		public void Lazer() {
-			this.last = Utilities.curtime() + this.ModTime();
-			this.sp.Play(this.getLazerScript());
+			this.last = Utilities.curtime() + Config.cfg.fillerAModLazerLength;
+			this.sp.Play(getLazerScript());
 		}
 		public void Damage() {
-			this.last = Utilities.curtime() + this.ModTime();
-			this.sp.Play(this.getDamageScript());
+			this.last = Utilities.curtime() + Config.cfg.fillerAModDamageLength;
+			this.sp.Play(getDamageScript());
 		}
 	}
 }

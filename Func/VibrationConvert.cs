@@ -17,6 +17,8 @@ namespace SetariaPlayer
 		}
 		private double def = 0.10;
 		public VibrationConvert() { }
+
+		// Filter by distance
 		private void FilterDist((long, double) timestep) {
 			pos = pos.Where((pos) => pos.Item1 + this.dist >= timestep.Item1).ToList();
 		}
@@ -33,6 +35,7 @@ namespace SetariaPlayer
 				}
 			}
 		}*/
+
 		public void Update((long, double) timestep) {
 			//TODO: Dont need to do this every time
 			//Even if it should be relatively inexpensive

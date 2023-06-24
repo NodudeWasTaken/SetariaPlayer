@@ -17,6 +17,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Folder Include="Func\Setaria\" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Buttplug" Version="2.0.6" />
   </ItemGroup>
 
