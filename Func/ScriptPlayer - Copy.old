@@ -1,0 +1,251 @@
+﻿using Buttplug;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using static Buttplug.ServerMessage.Types;
+
+/*
+ * This code is really ugly
+ * Better format:
+ * Constant loop,
+ *	Check for if script
+ *	play
+ *	check cancel or pause
+ * Run,
+ *	Replace script
+ *	set time
+ */
+
+namespace SetariaPlayer
+{
+	class Script {
+		//Some example actions
+		public static Data vibrate_weak = new Data("vibrate","weak",0,700,false, 
+		new List<(long, int)> {
+			(350, 10),
+			(700, 0),
+		});
+		public static Data vibrate_mid = new Data("vibrate", "mid", 0, 500, false,
+		new List<(long, int)> {
+			(250, 10),
+			(500, 0),
+		});
+		public static Data vibrate_strong = new Data("vibrate", "strong", 0, 200, false,
+		new List<(long, int)> {
+			(100, 10),
+			(200, 0),
+		});
+		public static Data vibrate_ultra = new Data("vibrate", "ultra", 0, 140, false,
+		new List<(long, int)> {
+			(70, 10),
+			(140, 0),
+		});
+
+		//TODO: Move to funscript
+	}
+	class ScriptPlayer : IDisposable {
+		//The current worker task
+		private Task playTask;
+		private CancellationTokenSource playTaskTS;
+		//Buttplug instance
+		private ButtplugInt butt;
+		//Heatmapper for vibration device compatibility
+		private VibrationConvert buttvib = new VibrationConvert();
+		//A timer with scale support
+		private TimeStretcher time = new TimeStretcher();
+		//.
+		public bool paused = false;
+
+		private IEnumerator<(long, int, double)> current_script = null;
+		private bool shouldRun = true;
+		private double oldIntensity = 0;
+		private int updateTime = 1000 / 30;
+
+		public ScriptPlayer(ButtplugInt bp) {
+			this.butt = bp;
+			this.playTaskTS = new CancellationTokenSource();
+			this.playTask = new Task(() => {
+				try {
+					this.PlayLoop();
+				} catch (Exception ex) {
+					Trace.WriteLine(ex);
+					throw;
+				}
+			});
+			this.playTask.Start();
+		}
+
+		// Remenants of project Kemiza
+		public IEnumerable<(long, int)> Iterate(
+			List<(long, int)> points, 
+			bool loop, 
+			long end
+		) {
+			long offset = 0L;
+			while (offset == 0L || loop) {
+				foreach (var point in points) {
+					yield return (point.Item1 + offset, point.Item2);
+				}
+				offset += end;
+			}
+		}
+		public IEnumerator<(long, int, double)> IterateByDuration(
+			List<(long, int)> points, 
+			bool loop, 
+			long end, 
+			long startTime
+		) {
+			this.time.Reset();
+			foreach (var item in this.Iterate(points, loop, end)) {
+				// Get the time index
+				long index = item.Item1;
+
+				// Get the scaling factor
+				double scaleFactor = Math.Pow(this.time.GetScale(), -1);
+
+				// Calculate the duration
+				int duration = (int)(((index + startTime) - this.time.Get()) * scaleFactor);
+
+				// Calculate the position in a 0-1 range
+				double position = (double)(item.Item2 / 100.0);
+
+				// Yield
+				yield return (index, duration, position);
+			}
+		}
+
+		//Does what it says
+		public void SetTimeScale(double scale) {
+			this.time.SetScale(scale);
+		}
+		private void StopSig(ButtplugClientDevice device) {
+			device.SendStopDeviceCmd();
+		}
+		private void PlayLoop() {
+			while (!this.playTaskTS.IsCancellationRequested) {
+				if (!this.shouldRun || this.current_script == null) {
+					Thread.Sleep(updateTime);
+					continue;
+				}
+
+				//For each action in the script
+				var a = current_script.Current;
+				this.shouldRun = current_script.MoveNext();
+
+				//Action time index
+				long idx = a.Item1;
+				//Action duration
+				int dur = a.Item2;
+				//Action position
+				double pos = a.Item3;
+
+				buttvib.Update((idx, pos));
+				//Action intensity (for vibration devices)
+				double intensity = buttvib.Get();
+
+				//Limit stroke range
+				pos = (pos * (Config.cfg.strokeMax - Config.cfg.strokeMin)) + Config.cfg.strokeMin;
+
+				//TODO: Limit acceleration
+
+#if DEBUG
+				//Trace.WriteLine($"DEBUG Action: {dur} {pos}");
+#endif
+
+				//If the action is too fast, ignore
+				//double speed = VibrationConvert.ActionSpeed((old_pos, old_dur), (pos, dur));
+				if (dur < 50)
+					continue;
+
+				if (MainWindow.started && !this.paused) {
+					//Play action
+					butt.client.Devices.AsParallel().ForAll(device => {
+						if (device.AllowedMessages.ContainsKey(MessageAttributeType.LinearCmd)) {
+							device.SendLinearCmd((uint)dur, pos);
+						} else if (device.AllowedMessages.ContainsKey(MessageAttributeType.VibrateCmd)) {
+							//Only update vibration if difference is bigger than x%
+							if (Utilities.diff(oldIntensity, intensity) > Config.cfg.vibrationUpdateDiff) {
+								device.SendVibrateCmd(intensity);
+								oldIntensity = intensity;
+							}
+						}
+						/* else if (device.AllowedMessages.ContainsKey(MessageAttributeType.RotateCmd)) {
+						}*/
+					});
+				}
+
+#if DEBUG
+				//Trace.WriteLine($"DEBUG Linear: {dur} {pos}");
+				//Trace.WriteLine($"DEBUG Vibrate: {dur} {intensity}");
+#endif
+
+				//Wait until the action should be done
+				long taken = Utilities.curtime() + dur;
+				while (taken > Utilities.curtime() || paused) {
+					Thread.Sleep(updateTime);
+					//If we should exit
+					if (playTaskTS.IsCancellationRequested) {
+						butt.client.Devices.AsParallel().ForAll(device => StopSig(device));
+						return;
+					};
+					//If we paused (cannot happen in Setaria)
+					if (paused) {
+						taken += 1;
+						oldIntensity = 0.0;
+						//TODO: In Setaria this is impossible
+						//Except in the gallery, where the animation doesnt pause
+						//But the signal is still sent
+						//Weird
+					}
+				}
+
+				if (!this.shouldRun) {
+					butt.client.Devices.AsParallel().ForAll(device => StopSig(device));
+				}
+			}
+		}
+		/*
+		 * Plays a given script with optional arguments
+		 * 
+		 * Args:
+		 * Script data.
+		 * If you want the script to loop.
+		 * If you want an time offset.
+		 */
+		public void Play(Data current_script, bool? shouldLoop = null, int offset = 0) {
+			bool loop = current_script.Loop || (shouldLoop != null && shouldLoop == true);
+			this.current_script = IterateByDuration(
+				current_script.Actions,
+				loop,
+				current_script.End,
+				Utilities.curtime() + offset
+			);
+			this.shouldRun = true;
+			this.paused = false;
+		}
+
+		public void Pause() {
+			this.paused = true;
+			foreach (var i in this.butt.client.Devices)
+				if (i.AllowedMessages.ContainsKey(MessageAttributeType.VibrateCmd))
+					i.SendStopDeviceCmd();
+		}
+		public void Resume() {
+			this.paused = false; 
+		}
+		public void Stop() {
+			this.shouldRun = false;
+			this.butt.client.Devices.AsParallel().ForAll(device => StopSig(device));
+			this.buttvib.Clear();
+		}
+		public void Dispose() {
+			this.playTaskTS.Cancel();
+		}
+	}
+}

@@ -23,59 +23,59 @@ namespace SetariaPlayer
 		/*
 		 * Gets the current time
 		 */
-		public long get() {
-			this.update();
+		public long Get() {
+			this.Update();
 			return this.m_time;
 		}
 		/*
 		 * Set the timescale and update the current time
 		 */
-		public void setScale(double scale) {
-			this.update();
+		public void SetScale(double scale) {
+			this.Update();
 			this.m_scale = scale;
 		}
 		/*
 		 * Get the timescale
 		 */
-		public double getScale() {
+		public double GetScale() {
 			return this.m_scale;
 		}
 		/*
 		 * Calculates the time since last update in realtime
 		 */
-		private long diff() {
+		private long Diff() {
 			return this.m_time + (Utilities.curtime() - this.m_offset);
 		}
 		/*
 		 * Updates the stretched time
 		 */
-		public void update() {
-			this.m_time += (long)((diff() - this.m_time) * this.m_scale);
+		public void Update() {
+			this.m_time += (long)((Diff() - this.m_time) * this.m_scale);
 			this.m_offset = Utilities.curtime();
 		}
 		/*
 		 * Reset the current time
 		 */
-		public void reset() {
+		public void Reset() {
 			this.m_time = Utilities.curtime();
 			this.m_offset = this.m_time;
 			this.m_scale = 1.0;
 		}
-		public void test() {
+		public void Test() {
 			TimeStretcher t = new TimeStretcher();
-			Trace.WriteLine(string.Format("t0 {0}", Utilities.curtime() - t.get()));
-			t.setScale(0.5);
+			Trace.WriteLine(string.Format("t0 {0}", Utilities.curtime() - t.Get()));
+			t.SetScale(0.5);
 			Thread.Sleep(1000);
-			Trace.WriteLine(string.Format("t1 {0}", Utilities.curtime() - t.get()));
-			t.setScale(1);
+			Trace.WriteLine(string.Format("t1 {0}", Utilities.curtime() - t.Get()));
+			t.SetScale(1);
 			Thread.Sleep(1000);
-			Trace.WriteLine(string.Format("t2 {0}", Utilities.curtime() - t.get()));
-			t.setScale(1.5);
+			Trace.WriteLine(string.Format("t2 {0}", Utilities.curtime() - t.Get()));
+			t.SetScale(1.5);
 			Thread.Sleep(1000);
-			Trace.WriteLine(string.Format("t3 {0}", Utilities.curtime() - t.get()));
-			t.setScale(1);
+			Trace.WriteLine(string.Format("t3 {0}", Utilities.curtime() - t.Get()));
+			t.SetScale(1);
 			Thread.Sleep(1000);
-			Trace.WriteLine(string.Format("t4 {0}", Utilities.curtime() - t.get()));
+			Trace.WriteLine(string.Format("t4 {0}", Utilities.curtime() - t.Get()));
 		}
 	}
 }

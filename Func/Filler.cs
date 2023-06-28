@@ -59,7 +59,7 @@ namespace SetariaPlayer.Func {
 			watcher = new Task(() => {
 				while (running) {
 					if (last != null && Utilities.curtime() > last) {
-						sp.setTimeScale(1.0);
+						sp.SetTimeScale(1.0);
 						fillerMod = 1.0;
 						sp.Play(filler);
 						last = null;

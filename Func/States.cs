@@ -257,7 +257,7 @@ namespace SetariaPlayer
 
 			if (curscript != null && curscript.GetId() == script.GetId()) {
 				Trace.WriteLine($"Already playing {mob} {animation_scene}!");
-				sp.setTimeScale(animation_speed);
+				sp.SetTimeScale(animation_speed);
 				return;
 			}
 
@@ -278,7 +278,7 @@ namespace SetariaPlayer
 			//TODO: Fix
 			shift = 0;
 			sp.Play(script, null, shift);
-			sp.setTimeScale(animation_speed);
+			sp.SetTimeScale(animation_speed);
 			curscript = script;
 		}
 		public override void Exit(HttpListenerRequest r, ref State s) {

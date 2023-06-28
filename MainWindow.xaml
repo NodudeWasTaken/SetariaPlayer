@@ -234,7 +234,7 @@
 						<Label Content="URL:" HorizontalAlignment="Left" Margin="12,45,0,0" VerticalAlignment="Top" Width="38" Height="26"/>
 						<TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="This is optional&#x0a;Buttplug's library has embedded compatibility with most devices" VerticalAlignment="Top"/>
 						<TextBlock HorizontalAlignment="Left" Margin="10,72,0,0" TextWrapping="Wrap" Text="This requires a restart. &#x0a;Default: ws://localhost:12345" VerticalAlignment="Top"/>
-						<CheckBox x:Name="useIntiface" Content="Use Intiface connection" HorizontalAlignment="Left" Margin="10,109,0,0" VerticalAlignment="Top" Checked="CheckBox_Checked_1"/>
+						<CheckBox x:Name="useIntiface" Content="Use Builtin Intiface" HorizontalAlignment="Left" Margin="10,109,0,0" VerticalAlignment="Top" Checked="CheckBox_Checked_1"/>
 					</Grid>
 				</TabItem>
 

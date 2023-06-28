@@ -79,9 +79,9 @@ namespace SetariaPlayer
 				//Get the time index
 				long idx = a.Item1;
 				//Get the scaling factor
-				double scaleF = Math.Pow(time.getScale(), -1);
+				double scaleF = Math.Pow(time.GetScale(), -1);
 				//Calculate the duration
-				int dur = (int)(((idx + stime) - time.get()) * scaleF);
+				int dur = (int)(((idx + stime) - time.Get()) * scaleF);
 				//Calculate the position in a 0-1 range
 				double pos = (double)(a.Item2 / 100.0);
 
@@ -92,8 +92,8 @@ namespace SetariaPlayer
 			}
 		}
 		//Does what it says
-		public void setTimeScale(double scale) {
-			time.setScale(scale);
+		public void SetTimeScale(double scale) {
+			time.SetScale(scale);
 		}
 		private void StopSig(ButtplugClientDevice device) {
 			device.SendStopDeviceCmd();
@@ -108,6 +108,11 @@ namespace SetariaPlayer
 		 * If you want an time offset.
 		 */
 		public void Play(Data current_script, bool? loopOverride=null, int offset=0) {
+			//The start time which we should respect when playing the script
+			long current_time = Utilities.curtime();
+			//Reset the timer
+			time.Reset();
+
 			//Was canceled, but isn't done yet
 			if (playTask != null) {
 				//Ask it to stop
@@ -118,11 +123,6 @@ namespace SetariaPlayer
 				playTask.Wait();
 				//this.Stop();
 			}
-
-			//The start time which we should respect when playing the script
-			long current_time = Utilities.curtime();
-			//Reset the timer
-			time.reset();
 
 			//TODO: Detect if too fast for linear device and vibrate instead
 			//TODO: Timing drifts heavily at the end of finish animations

@@ -28,7 +28,7 @@ namespace SetariaPlayer
 	/// </summary>
 	public partial class MainWindow : Window
 	{
-		private string version = "InDev Build 19.1";
+		private string version = "InDev Build 19.3";
 		public static bool started = false;
 		private bool ready = false;
 		private ButtplugInt b;
@@ -76,43 +76,50 @@ namespace SetariaPlayer
 		public MainWindow() {
 			InitializeComponent();
 			LogIt();
-			this.DataContext = this;
 
-			Config.cfg = Config.load();
-			/*if (Config.cfg.intifaceUrl.Length <= 0) {
-				Config.cfg.intifaceUrl = "ws://localhost:12345";
-				//Temporary mitigation, remove sometime
-			}*/
+			try {
+				this.DataContext = this;
 
-			this.b = new ButtplugInt();
-			b.Start();
+				Config.cfg = Config.load();
+				if (String.IsNullOrEmpty(Config.cfg.intifaceUrl)) {
+					Config.cfg.intifaceUrl = "ws://localhost:12345";
+					//Temporary mitigation, remove sometime
+				}
 
-			var handleItemUpdate = () => {
-				this.Dispatcher.Invoke(() => {
-					DeviceList.Items.Clear();
-					foreach (var s in ListOfDevices) {
-						DeviceList.Items.Add(s);
-					}
-				});
-			};
-			this.b.client.DeviceAdded += (obj, args) => { handleItemUpdate(); };
-			this.b.client.DeviceRemoved += (obj, args) => { handleItemUpdate(); };
+				this.b = new ButtplugInt();
+				b.Start();
 
-			this.sr = new ScriptParser();
-			this.h = new HttpServer("http://127.0.0.1:5050/");
-			this.sp = new ScriptPlayer(b);
+				var handleItemUpdate = () => {
+					this.Dispatcher.BeginInvoke(() => {
+						DeviceList.Items.Clear();
+						foreach (var s in ListOfDevices) {
+							DeviceList.Items.Add(s);
+						}
+					});
+				};
+				this.b.client.DeviceAdded += (obj, args) => { handleItemUpdate(); };
+				this.b.client.DeviceRemoved += (obj, args) => { handleItemUpdate(); };
 
-			this.inactive = new InactiveState(b, sp, sr);
-			this.states.Add(new SceneState(b, sp, sr));
-			this.states.Add(new Fairy1State(b, sp, sr));
-			// Hardcore mode adds stuff for DeathRoomState
-			// this.states.Add(new DeathRoomState(b, sp, sr));
-			this.state = State.Inactive;
-			this.activeState = inactive;
-			sp.Pause();
+				this.sr = new ScriptParser();
+				this.h = new HttpServer("http://127.0.0.1:5050/");
+				this.sp = new ScriptPlayer(b);
 
-			this.h.Hook(HttpHookCallback);
-			h.Start();
+				this.inactive = new InactiveState(b, sp, sr);
+				this.states.Add(new SceneState(b, sp, sr));
+				this.states.Add(new Fairy1State(b, sp, sr));
+				// Hardcore mode adds stuff for DeathRoomState
+				// this.states.Add(new DeathRoomState(b, sp, sr));
+				this.state = State.Inactive;
+				this.activeState = inactive;
+				sp.Pause();
+
+				this.h.Hook(HttpHookCallback);
+				h.Start();
+			}
+			catch (Exception ex) {
+				Trace.WriteLine(ex);
+				throw;
+			}
 
 			Title += $" ({version})";
 		}

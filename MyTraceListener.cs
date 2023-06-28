@@ -19,7 +19,7 @@ namespace SetariaPlayer {
 
 
 		public override void Write(string message) {
-			output.Dispatcher.Invoke(() => {
+			output.Dispatcher.BeginInvoke(() => {
 				output.AppendText(string.Format("[{0}] ", DateTime.Now.ToString()));
 				output.AppendText(message);
 
