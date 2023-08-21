@@ -121,7 +121,6 @@ namespace SetariaPlayer
 				}
 				//Wait for it to stop
 				playTask.Wait();
-				//this.Stop();
 			}
 
 			//TODO: Detect if too fast for linear device and vibrate instead
@@ -144,11 +143,9 @@ namespace SetariaPlayer
 				double oldIntensity = 0;
 
 				//While should run
-				while (!ct.IsCancellationRequested && playing)
-				{
+				while (!ct.IsCancellationRequested && playing) {
 					//For each action in the script
-					foreach (var a in buttTimer(current_script.Actions, current_time + offset))
-					{
+					foreach (var a in buttTimer(current_script.Actions, current_time + offset)) {
 						//Action duration
 						int dur = a.Item1;
 						//Action position
@@ -174,13 +171,16 @@ namespace SetariaPlayer
 							butt.client.Devices.AsParallel().ForAll(device => {
 								if (device.AllowedMessages.ContainsKey(MessageAttributeType.LinearCmd)) {
 									device.SendLinearCmd((uint)dur, pos);
-								} else if (device.AllowedMessages.ContainsKey(MessageAttributeType.VibrateCmd)) {
+								}
+								if (device.AllowedMessages.ContainsKey(MessageAttributeType.VibrateCmd)) {
 									//Only update vibration if difference is bigger than x%
 									if (Utilities.diff(oldIntensity, intensity) > Config.cfg.vibrationUpdateDiff) {
 										device.SendVibrateCmd(intensity);
 										oldIntensity = intensity;
 									}
-								}/* else if (device.AllowedMessages.ContainsKey(MessageAttributeType.RotateCmd)) {
+								}
+								/*if (device.AllowedMessages.ContainsKey(MessageAttributeType.RotateCmd)) {
+									device.SendRotateCmd()
 								}*/
 							});
 						}

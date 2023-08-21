@@ -17,22 +17,25 @@ namespace SetariaPlayer
 		Inactive,
 		ScenePlaying,
 	};
-	class StateInt
+	class StateBase
 	{
 		public string name;
 		public string urlPrefix;
 		protected ButtplugInt b;
 		protected ScriptPlayer sp;
 		protected ScriptParser sr;
-		public StateInt(ButtplugInt b, ScriptPlayer sp, ScriptParser sr) {
+		public StateBase(ButtplugInt b, ScriptPlayer sp, ScriptParser sr) {
 			this.b = b;
 			this.sp = sp;
 			this.sr = sr;
 		}
 		public virtual void Enter(HttpListenerRequest r, ref State s) { }
-		public virtual bool shouldEnter(HttpListenerRequest r)
+		public virtual bool ShouldEnter(HttpListenerRequest r)
 		{
 			return r.Url.AbsolutePath.Equals(this.urlPrefix);
+		}
+		public virtual bool ShouldExit(HttpListenerRequest r) {
+			return !ShouldEnter(r);
 		}
 		public virtual void Update(HttpListenerRequest r, ref State s) { }
 		public virtual void Update() { }
@@ -40,7 +43,7 @@ namespace SetariaPlayer
 		public virtual void Resume() { sp.Resume(); }
 		public virtual void Exit(HttpListenerRequest r, ref State s) { }
 	}
-	class InactiveState : StateInt
+	class InactiveState : StateBase
 	{
 		public float hp;
 		public float mp;
@@ -84,6 +87,8 @@ namespace SetariaPlayer
 				fi.Fire();
 			if (r.Url.AbsolutePath.Equals("/game/fire_lazer"))
 				fi.Lazer();
+			if (r.Url.AbsolutePath.Equals("/game/fire_shotgun"))
+				fi.Lazer();
 			if (r.Url.AbsolutePath.Equals("/game/player_damage"))
 				fi.Damage();
 		}
@@ -102,7 +107,8 @@ namespace SetariaPlayer
 			sp.Stop();
 		}
 	}
-	class DeathRoomState : StateInt {
+	// Unused
+	class DeathRoomState : StateBase {
 		private long time = 0;
 		public DeathRoomState(ButtplugInt b, ScriptPlayer sp, ScriptParser sr) : base(b, sp, sr) {
 			this.name = "DeathRoom";
@@ -132,7 +138,7 @@ namespace SetariaPlayer
 			}
 		}
 	}
-	class Fairy1State : StateInt {
+	class Fairy1State : StateBase {
 		private float max = -569;
 		private float min = -469;
 		private long time = 0;
@@ -189,10 +195,21 @@ namespace SetariaPlayer
 			sp.Stop();
 		}
 	}
-	class SceneState : StateInt {
+	class ChairRoomState : ScenePlayerState {
+		// For Lutellaria Area3State animation
+		// TODO: Should there be a randomized pattern boss room?
+		public ChairRoomState(ButtplugInt b, ScriptPlayer sp, ScriptParser sr): base(b,sp,sr) {
+			this.name = "Chairroom";
+			this.urlPrefix = "/game/area3_gallery";
+		}
+		public override bool ShouldExit(HttpListenerRequest r) {
+			return r.Url.AbsolutePath.Equals("/game/gallery_stop");
+		}
+	}
+	class ScenePlayerState : StateBase {
 		private string lastmob = "";
 		private Data curscript = null;
-		public SceneState(ButtplugInt b, ScriptPlayer sp, ScriptParser sr) : base(b,sp,sr) {
+		public ScenePlayerState(ButtplugInt b, ScriptPlayer sp, ScriptParser sr) : base(b,sp,sr) {
 			this.name = "Scene player";
 			this.urlPrefix = "/game/gallery";
 		}
@@ -202,17 +219,25 @@ namespace SetariaPlayer
 			lastmob = "";
 			this.Update(r,ref s);
 		}
+		public override bool ShouldExit(HttpListenerRequest r) {
+			return r.Url.AbsolutePath.Equals("/game/gallery_stop") || (!r.Url.AbsolutePath.StartsWith(this.urlPrefix) && !r.Url.AbsolutePath.StartsWith("/game/player_damage2"));
+		}
 		public override void Update(HttpListenerRequest r, ref State s) {
 			base.Update(r, ref s);
-			if (r.Url.AbsolutePath.Equals("/game/gallery_stop") || 
-				(!r.Url.AbsolutePath.StartsWith("/game/gallery") && !r.Url.AbsolutePath.StartsWith("/game/player_damage2"))
-			) {
+			if (this.ShouldExit(r)) {
 				//player_damage2 is end animation damage
 				this.Exit(r, ref s);
 				return;
 			}
 			if (!r.QueryString.HasKeys()) {
 				Trace.WriteLine("Missing query string!");
+				return;
+			}
+			if (!r.QueryString.AllKeys.Contains("anim_name") ||
+				!r.QueryString.AllKeys.Contains("anim_scene") ||
+				!r.QueryString.AllKeys.Contains("anim_speed") ||
+				!r.QueryString.AllKeys.Contains("enemy_skin")) {
+				Trace.WriteLine("Wrong query string!");
 				return;
 			}
 
@@ -247,6 +272,9 @@ namespace SetariaPlayer
 				animation_scene = "scene1";
 				animation_speed = 1f;
 			}
+			/*if (mob == "sArea3Animation" && animation_speed == 0) {
+				animation_speed = 1f;
+			}*/
 
 			var script = sr.get(mob, animation_scene);
 			if (script == null) {

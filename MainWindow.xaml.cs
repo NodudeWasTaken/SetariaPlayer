@@ -28,7 +28,7 @@ namespace SetariaPlayer
 	/// </summary>
 	public partial class MainWindow : Window
 	{
-		private string version = "InDev Build 19.3";
+		private string version = "InDev Build 19.5";
 		public static bool started = false;
 		private bool ready = false;
 		private ButtplugInt b;
@@ -36,10 +36,10 @@ namespace SetariaPlayer
 		private HttpServer h;
 		private ScriptPlayer sp;
 
-		private List<StateInt> states = new List<StateInt>();
-		private StateInt inactive;
+		private List<StateBase> states = new List<StateBase>();
+		private StateBase inactive;
 		private State state = State.Inactive;
-		private StateInt activeState;
+		private StateBase activeState;
 		public IList<string> ListOfDevices { 
 			get {
 				if (b == null || b.client == null) {
@@ -105,10 +105,11 @@ namespace SetariaPlayer
 				this.sp = new ScriptPlayer(b);
 
 				this.inactive = new InactiveState(b, sp, sr);
-				this.states.Add(new SceneState(b, sp, sr));
+				this.states.Add(new ScenePlayerState(b, sp, sr));
 				this.states.Add(new Fairy1State(b, sp, sr));
 				// Hardcore mode adds stuff for DeathRoomState
 				// this.states.Add(new DeathRoomState(b, sp, sr));
+				this.states.Add(new ChairRoomState(b, sp, sr));
 				this.state = State.Inactive;
 				this.activeState = inactive;
 				sp.Pause();
@@ -150,6 +151,9 @@ namespace SetariaPlayer
 				ListBoxItem itm = new ListBoxItem();
 				itm.Content = f;
 				Scripts.Items.Add(itm);
+				if (Config.cfg.scriptPath.Equals(f)) {
+					Scripts.SelectedItem = itm;
+				}
 			}
 
 			ready = true;
@@ -241,7 +245,7 @@ namespace SetariaPlayer
 				} else {
 					foreach (var st in states) { 
 						//TODO: This isn't an entirely nice way to do this
-						if (st.shouldEnter(r)) {
+						if (st.ShouldEnter(r)) {
 							activeState.Exit(r, ref state);
 							st.Enter(r, ref state);
 							Trace.WriteLine($"Enter State: {st.name}");
@@ -344,10 +348,19 @@ namespace SetariaPlayer
 			});
 		}
 
-		private void CheckBox_Checked_1(object sender, RoutedEventArgs e) {
+		private void intifaceBuiltin_Checked_1(object sender, RoutedEventArgs e) {
 			UpdateUX(() => {
-				Config.cfg.intifaceBuiltin = (bool)useIntiface.IsChecked;
+				Config.cfg.intifaceBuiltin = useIntiface.IsChecked == true;
 			});
 		}
-	}
+
+		private void Button_Click_2(object sender, RoutedEventArgs e) {
+			try {
+				this.b.Refresh();
+			} catch(Exception ex) {
+				Trace.WriteLine(ex.ToString());
+			}
+
+		}
+    }
 }

@@ -37,10 +37,10 @@ namespace SetariaPlayer
 					await resp.OutputStream.WriteAsync(data, 0, data.Length);
 					resp.Close();
 				} catch (HttpListenerException ex) {
+					Trace.WriteLine($"HttpServer.Error {ex.Message}");
 #if DEBUG
 					throw;
 #endif
-					Trace.WriteLine($"HttpServer.Error {ex.Message}");
 				}
 			}
 		}

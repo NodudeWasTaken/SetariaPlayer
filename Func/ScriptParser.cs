@@ -58,11 +58,7 @@ namespace SetariaPlayer
 	{
 		private List<Data> records = new List<Data>();
 		public ScriptParser() {
-#if DEBUG
-			string recordpath = "../../../rec.funscript";
-#else
 			string recordpath = Config.cfg.scriptPath;
-#endif
 			this.Load(recordpath);
 		}
 

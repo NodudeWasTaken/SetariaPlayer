@@ -24,8 +24,9 @@ namespace SetariaPlayer {
 				output.AppendText(message);
 
 				output.CaretIndex = output.Text.Length;
-				var rect = output.GetRectFromCharacterIndex(output.CaretIndex);
-				output.ScrollToHorizontalOffset(rect.Right);
+				/*var rect = output.GetRectFromCharacterIndex(output.CaretIndex);
+				output.ScrollToHorizontalOffset(rect.Right);*/
+				output.ScrollToEnd();
 			});
 		}
 
