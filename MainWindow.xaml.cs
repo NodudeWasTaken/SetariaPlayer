@@ -28,7 +28,7 @@ namespace SetariaPlayer
 	/// </summary>
 	public partial class MainWindow : Window
 	{
-		private string version = "InDev Build 19.5";
+		private string version = "InDev Build 19.6";
 		public static bool started = false;
 		private bool ready = false;
 		private ButtplugInt b;
@@ -166,29 +166,29 @@ namespace SetariaPlayer
 				}
 			}
 		}
-		private void Slider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+		private void VibrationBufferSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
 		{
 			UpdateUX(() => {
 				Config.cfg.vibrationBufferDuration = (int)(e.NewValue * 1000);
 			});
 		}
-		private void Slider_ValueChanged_1(object sender, RoutedPropertyChangedEventArgs<double> e) {
+		private void VibrationUpdateDiffSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) {
 			UpdateUX(() => {
 				Config.cfg.vibrationUpdateDiff = e.NewValue / 100.0;
 			});
 		}
-		private void Slider_ValueChanged_2(object sender, RoutedPropertyChangedEventArgs<double> e) {
+		private void VibrationMaxSpeedSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) {
 			UpdateUX(() => {
 				Config.cfg.vibrationMaxSpeed = e.NewValue;
 			});
 		}
-		private void Slider_ValueChanged_3(object sender, RoutedPropertyChangedEventArgs<double> e) {
+		private void VibrationCalcDiffSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) {
 			UpdateUX(() => {
 				Config.cfg.vibrationCalcDiff = e.NewValue / 100.0;
 			});
 		}
 
-		private void Button_Click(object sender, RoutedEventArgs e) {
+		private void StartButton_Click(object sender, RoutedEventArgs e) {
 			UpdateUX(() => {
 				Trace.WriteLine(StartButton.Content.ToString());
 				if (StartButton.Content.ToString() == "Stop") {
@@ -203,7 +203,7 @@ namespace SetariaPlayer
 				}
 			});
 		}
-		private void Button2_Click(object sender, RoutedEventArgs e) {
+		private void SaveButton_Click(object sender, RoutedEventArgs e) {
 			Trace.WriteLine("Config save");
 			Config.cfg.save();
 		}
@@ -259,7 +259,7 @@ namespace SetariaPlayer
 			return "KO";
 		}
 
-		private void CheckBox_Checked(object sender, RoutedEventArgs e) {
+		private void FillerCheckBox_Checked(object sender, RoutedEventArgs e) {
 			UpdateUX(() => {
 				Config.cfg.filler = FillerCheckbox.IsChecked == true;
 			});
@@ -287,7 +287,7 @@ namespace SetariaPlayer
 			});
 		}
 
-		private void Button_Click_1(object sender, RoutedEventArgs e) {
+		private void RescanButton_Click(object sender, RoutedEventArgs e) {
 			new Task(async () => {
 				try {
 					await this.b.client.StopScanningAsync();
@@ -354,7 +354,7 @@ namespace SetariaPlayer
 			});
 		}
 
-		private void Button_Click_2(object sender, RoutedEventArgs e) {
+		private void RefreshButton_Click(object sender, RoutedEventArgs e) {
 			try {
 				this.b.Refresh();
 			} catch(Exception ex) {

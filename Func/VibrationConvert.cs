@@ -53,6 +53,8 @@ namespace SetariaPlayer
 			double ms = m / s;
 			return ms;
 		}
+
+		// TODO: New strat, only activate on downs (maybe keep intensity idk)
 		public double Get()
 		{
 			if (pos.Count < 2) {
