@@ -46,8 +46,9 @@ namespace SetariaPlayer
 	class InactiveState : StateBase
 	{
 		public float hp;
+		public float maxhp;
 		public float mp;
-		private Filler fi;
+		public Filler fi;
 
 		public InactiveState(ButtplugInt b, ScriptPlayer sp, ScriptParser sr) : base(b, sp, sr) {
 			this.name = "Inactive";
@@ -74,23 +75,50 @@ namespace SetariaPlayer
 		public override void Update(HttpListenerRequest r, ref State s) {
 			base.Update(r, ref s);
 			this.Update();
+
+			float? newhp = null;
+			float? newmaxhp = null;
+			float? newmp = null;
+			float? damage = null;
 			if (r.QueryString.HasKeys()) {
 				foreach (string qs in r.QueryString.AllKeys) {
 					if (qs == "hp")
-						hp = float.Parse(r.QueryString[qs], CultureInfo.InvariantCulture);
+						newhp = float.Parse(r.QueryString[qs], CultureInfo.InvariantCulture);
+					if (qs == "maxhp")
+						newmaxhp = float.Parse(r.QueryString[qs], CultureInfo.InvariantCulture);
 					if (qs == "mp")
-						mp = float.Parse(r.QueryString[qs], CultureInfo.InvariantCulture);
+						newmp = float.Parse(r.QueryString[qs], CultureInfo.InvariantCulture);
+				}
+
+				if (newhp.HasValue && newmaxhp.HasValue && newhp.Value < hp) {
+					double val = Utilities.NormalizedApproach(newhp.Value, maxhp);
+					//fi.fillerLengthMod = 1.0 + (val * Config.cfg.fillerModHPImpact);
+					fi.fillerHeightMod = 1.0 + (val * Config.cfg.fillerModHPImpact);
+					damage = Math.Abs(newhp.Value - hp) / maxhp;
+					damage = (float)Utilities.Limit(damage.Value, 0, 1);
 				}
 			}
 
+			if (r.Url.AbsolutePath.Equals("/game/melee"))
+				fi.Melee();
 			if (r.Url.AbsolutePath.Equals("/game/fire"))
 				fi.Fire();
 			if (r.Url.AbsolutePath.Equals("/game/fire_lazer"))
 				fi.Lazer();
 			if (r.Url.AbsolutePath.Equals("/game/fire_shotgun"))
 				fi.Lazer();
-			if (r.Url.AbsolutePath.Equals("/game/player_damage"))
-				fi.Damage();
+			if (r.Url.AbsolutePath.Equals("/game/player_damage")) {
+				double damageProd = 1;
+				if (damage.HasValue) {
+					// TODO: Config
+					damageProd += Config.cfg.damageImpact * damage.Value;
+				}
+				fi.Damage(damageProd);
+			}
+
+			hp = newhp.HasValue ? newhp.Value : hp;
+			maxhp = newmaxhp.HasValue ? newmaxhp.Value : maxhp;
+			mp = newmp.HasValue ? newmp.Value : mp;
 		}
 		public override void Pause() {
 			base.Pause();
@@ -105,6 +133,35 @@ namespace SetariaPlayer
 			base.Exit(r, ref s);
 			fi.Stop();
 			sp.Stop();
+		}
+	}
+	class BossState : InactiveState {
+		public BossState(ButtplugInt b, ScriptPlayer sp, ScriptParser sr) : base(b, sp, sr) {
+			this.name = "Boss mode";
+			this.urlPrefix = "/game/custom_bossmode";
+		}
+		public override void Update() {
+			base.Update();
+
+			if (!fi.Running())
+				fi.Start();
+		}
+		public override void Update(HttpListenerRequest r, ref State s) {
+			base.Update(r, ref s);
+			if (r.Url.AbsolutePath.Equals("/game/custom_bossmode_stop")) {
+				this.Exit(r, ref s);
+				return;
+			}
+
+			// TODO MAYBE Ideas:
+			// Treat boss attacks as fire events
+			// A "versus" where you are punished the more % the boss has of health compared to you, or reverse
+			// Special attacks, randomize or insanity mode (extreme speed for short periods).
+			//
+			base.fi.fillerHeightMod = Math.Max(fi.fillerHeightMod, 1.45);
+			base.fi.fillerLengthMod = Math.Min(fi.fillerLengthMod, 0.9);
+			if (r.Url.AbsolutePath.Equals("/game/fire_shotgun"))
+				fi.Lazer();
 		}
 	}
 	// Unused

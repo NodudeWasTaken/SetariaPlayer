@@ -54,7 +54,12 @@ namespace SetariaPlayer
 			return ms;
 		}
 
-		// TODO: New strat, only activate on downs (maybe keep intensity idk)
+		public static List<double> FindPeaks(List<double> data) {
+			return data
+				.Where((value, index) => index+1 <= data.Count || data[index - 1] < value && value >= data[index + 1])
+				.ToList();
+		}
+
 		public double Get()
 		{
 			if (pos.Count < 2) {
@@ -71,6 +76,8 @@ namespace SetariaPlayer
 				result.Add(VibrationConvert.ActionSpeed(o,c));
 			}
 
+			result = FindPeaks(result);
+
 			//Filter if too different
 			//Enables us to react to local changes
 			double lastElem = result.Last();
@@ -86,6 +93,16 @@ namespace SetariaPlayer
 			double speed = result.Average() / Config.cfg.vibrationMaxSpeed;
 			//Limit the max
 			speed = Math.Min(speed, 1.0);
+
+			// Onlydown
+			if (Config.cfg.vibrationOnlyDown) {
+				if (pos[pos.Count - 2].Item2 < pos[pos.Count - 1].Item2) {
+					speed = 0f;
+				} else {
+					speed = result.Last();
+				}
+			}
+
 			//TODO: Fix divide by zero
 			if (Double.IsNaN(speed)) {
 				return def;

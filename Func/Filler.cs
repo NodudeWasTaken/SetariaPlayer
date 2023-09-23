@@ -8,7 +8,8 @@ using System.Threading.Tasks;
 namespace SetariaPlayer.Func {
 	internal class Filler {
 		private class FillerData : Data {
-			private Func<double> mod;
+			private Func<double> height_mod;
+			private Func<double> length_mod;
 			public override long Start { 
 				get {
 					return 0;
@@ -24,18 +25,20 @@ namespace SetariaPlayer.Func {
 				//Naughty
 				//TODO: Move to script
 				get {
+					long fillerD = (long)(Config.cfg.fillerDur*length_mod());
 					return new List<(long, int)>
 						{
 							(0,0),
-							(Config.cfg.fillerDur/2, (int)Math.Min(Config.cfg.fillerHeight*mod(), 100)),
-							(Config.cfg.fillerDur, 0)
+							(fillerD/2, (int)Math.Min(Config.cfg.fillerHeight*height_mod(), 100)),
+							(fillerD, 0)
 						};
 				}
 			}
-			public FillerData(Func<double> mod) : base("InactiveState", "Filler", 0, 0, true, new List<(long, int)>()) { this.mod = mod; }
+			public FillerData(Func<double> height_mod, Func<double> length_mod) : base("InactiveState", "Filler", 0, 0, true, new List<(long, int)>()) { this.height_mod = height_mod; this.length_mod = length_mod; }
 		}
 		private long? last = null;
-		private double fillerMod = 1.0;
+		public double fillerHeightMod = 1.0;
+		public double fillerLengthMod = 1.0;
 		private Data filler;
 		private ScriptPlayer sp;
 		private Task watcher;
@@ -45,7 +48,7 @@ namespace SetariaPlayer.Func {
 		public Filler(ScriptPlayer sp, Func<bool> shouldrun) {
 			this.shouldrun = shouldrun;
 			this.sp = sp;
-			this.filler = new FillerData(() => fillerMod);
+			this.filler = new FillerData(() => fillerHeightMod, () => fillerLengthMod);
 
 		}
 		public void Start() {
@@ -60,9 +63,11 @@ namespace SetariaPlayer.Func {
 				while (running) {
 					if (last != null && Utilities.curtime() > last) {
 						sp.SetTimeScale(1.0);
-						fillerMod = 1.0;
 						sp.Play(filler);
 						last = null;
+					} else {
+						fillerHeightMod = 1.0;
+						fillerLengthMod = 1.0;
 					}
 					Thread.Sleep(1);
 				}
@@ -87,6 +92,13 @@ namespace SetariaPlayer.Func {
 			//long durfix = Math.Max(850, filler.Duration());
 			return Config.cfg.fillerModTime;
 		}*/
+		public static Data getMeleeScript() {
+			return new Data("vibrate", "Melee", 0, Config.cfg.fillerAModMeleeLength, false,
+				new List<(long, int)> {
+					(Config.cfg.fillerAModMeleeLength/2, Config.cfg.fillerAModMeleeHeight),
+					(Config.cfg.fillerAModMeleeLength, 0),
+				});
+		}
 		public static Data getFireScript() {
 			return new Data("vibrate", "Fire", 0, Config.cfg.fillerAModFireLength, false,
 				new List<(long, int)> {
@@ -101,12 +113,16 @@ namespace SetariaPlayer.Func {
 					(Config.cfg.fillerAModLazerLength, 0),
 				});
 		}
-		public static Data getDamageScript() {
+		public static Data getDamageScript(double damage_perc=1.0) {
 			return new Data("vibrate", "Damage", 0, Config.cfg.fillerAModDamageLength, false,
 				new List<(long, int)> {
-					(Config.cfg.fillerAModDamageLength/2, Config.cfg.fillerAModDamageHeight),
+					(Config.cfg.fillerAModDamageLength/2, (int)(Config.cfg.fillerAModDamageHeight * damage_perc)),
 					(Config.cfg.fillerAModDamageLength, 0),
 				});
+		}
+		public void Melee() {
+			this.last = Utilities.curtime() + Config.cfg.fillerAModFireLength;
+			this.sp.Play(getMeleeScript());
 		}
 		public void Fire() {
 			this.last = Utilities.curtime() + Config.cfg.fillerAModFireLength;
@@ -116,9 +132,9 @@ namespace SetariaPlayer.Func {
 			this.last = Utilities.curtime() + Config.cfg.fillerAModLazerLength;
 			this.sp.Play(getLazerScript());
 		}
-		public void Damage() {
+		public void Damage(double damage_perc = 1.0) {
 			this.last = Utilities.curtime() + Config.cfg.fillerAModDamageLength;
-			this.sp.Play(getDamageScript());
+			this.sp.Play(getDamageScript(damage_perc));
 		}
 	}
 }

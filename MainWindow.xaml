@@ -6,7 +6,7 @@
         mc:Ignorable="d"
 		Loaded="Window_Loaded"
         Title="Setaria Player" 
-		MinHeight="320" MinWidth="630" Height="320" Width="630">
+		MinHeight="350" MinWidth="630" Height="350" Width="630">
 	<DockPanel>
 		<StatusBar DockPanel.Dock="Bottom">
 			<StatusBarItem>
@@ -53,12 +53,12 @@
 				</TabItem>
 				<TabItem Header="Filler">
 					<Grid Background="White">
-						<CheckBox x:Name="FillerCheckbox" Content="Filler" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Checked="FillerCheckBox_Checked" Unchecked="FillerCheckBox_Checked"/>
+						<CheckBox x:Name="FillerCheckbox" Content="Filler enabled" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Checked="FillerCheckBox_Checked" Unchecked="FillerCheckBox_Checked"/>
 
 						<Label Content="Filler duration (s): " HorizontalAlignment="Left" Margin="10,30,0,0" VerticalAlignment="Top"/>
 						<DockPanel VerticalAlignment="Top" Margin="120,36,226,0" Height="25" ToolTip="The time it should take your device to reach said stroke height times 2">
 							<TextBox Text="{Binding ElementName=FillerDuration, Path=Value, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Right" TextAlignment="Right" Width="30" />
-							<Slider x:Name="FillerDuration" HorizontalAlignment="Left" VerticalAlignment="Top" Width="150" 
+							<Slider x:Name="FillerDuration" Width="Auto" DockPanel.Dock="Left"
 									Minimum="50" 
 									Maximum="1000" 
 									TickFrequency="25" 
@@ -68,14 +68,22 @@
 						<Label Content="Filler height (%): " HorizontalAlignment="Left" Margin="10,61,0,0" VerticalAlignment="Top"/>
 						<DockPanel VerticalAlignment="Top" Margin="120,65,226,0" Height="25" ToolTip="The stroke height your device should play">
 							<TextBox Text="{Binding ElementName=FillerHeight, Path=Value, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Right" TextAlignment="Right" Width="30" />
-							<Slider x:Name="FillerHeight" HorizontalAlignment="Left" VerticalAlignment="Top" Width="150" 
+							<Slider x:Name="FillerHeight"  Width="Auto" DockPanel.Dock="Left"
 									Minimum="0" 
 									Maximum="100" 
 									TickFrequency="5" 
 							TickPlacement="BottomRight" IsSnapToTickEnabled="True" AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0" ValueChanged="FillerHeight_ValueChanged"/>
 						</DockPanel>
 
-
+						<Label Content="Filler hp impact (%): " HorizontalAlignment="Left" Margin="10,91,0,0" VerticalAlignment="Top"/>
+						<DockPanel VerticalAlignment="Top" Margin="120,95,226,0" Height="25" ToolTip="The stroke height your device should play">
+							<TextBox Text="{Binding ElementName=FillerHPImpact, Path=Value, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Right" TextAlignment="Right" Width="30" />
+							<Slider x:Name="FillerHPImpact"  Width="Auto" DockPanel.Dock="Left"
+									Minimum="0" 
+									Maximum="500" 
+									TickFrequency="10" 
+							TickPlacement="BottomRight" IsSnapToTickEnabled="True" AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0" ValueChanged="FillerHPImpact_ValueChanged"/>
+						</DockPanel>
 					</Grid>
 				</TabItem>
 
@@ -85,7 +93,7 @@
 						<Label Content="Fire length (ms): " HorizontalAlignment="Left" Margin="10,4,0,0" VerticalAlignment="Top"/>
 						<DockPanel VerticalAlignment="Top" Margin="130,4,226,0" Height="25" ToolTip="The stroke height your device should play">
 							<TextBox Text="{Binding ElementName=FireLength, Path=Value, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Right" TextAlignment="Right" Width="30" />
-							<Slider x:Name="FireLength" HorizontalAlignment="Left" VerticalAlignment="Top" Width="150" 
+							<Slider x:Name="FireLength" Width="Auto" DockPanel.Dock="Left"
 									Minimum="1" 
 									Maximum="1000" 
 									TickFrequency="10" 
@@ -95,7 +103,7 @@
 						<Label Content="Fire height (%): " HorizontalAlignment="Left" Margin="10,31,0,0" VerticalAlignment="Top"/>
 						<DockPanel VerticalAlignment="Top" Margin="130,35,226,0" Height="25" ToolTip="The stroke height your device should play">
 							<TextBox Text="{Binding ElementName=FireHeight, Path=Value, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Right" TextAlignment="Right" Width="30" />
-							<Slider x:Name="FireHeight" HorizontalAlignment="Left" VerticalAlignment="Top" Width="150" 
+							<Slider x:Name="FireHeight" Width="Auto" DockPanel.Dock="Left"
 									Minimum="0" 
 									Maximum="100" 
 									TickFrequency="5" 
@@ -105,7 +113,7 @@
 						<Label Content="Lazer length (ms): " HorizontalAlignment="Left" Margin="10,64,0,0" VerticalAlignment="Top"/>
 						<DockPanel VerticalAlignment="Top" Margin="130,64,226,0" Height="25" ToolTip="The stroke height your device should play">
 							<TextBox Text="{Binding ElementName=LazerLength, Path=Value, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Right" TextAlignment="Right" Width="30" />
-							<Slider x:Name="LazerLength" HorizontalAlignment="Left" VerticalAlignment="Top" Width="150" 
+							<Slider x:Name="LazerLength" Width="Auto" DockPanel.Dock="Left"
 									Minimum="1" 
 									Maximum="1000" 
 									TickFrequency="10" 
@@ -115,7 +123,7 @@
 						<Label Content="Lazer height (%): " HorizontalAlignment="Left" Margin="10,91,0,0" VerticalAlignment="Top"/>
 						<DockPanel VerticalAlignment="Top" Margin="130,95,226,0" Height="25" ToolTip="The stroke height your device should play">
 							<TextBox Text="{Binding ElementName=LazerHeight, Path=Value, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Right" TextAlignment="Right" Width="30" />
-							<Slider x:Name="LazerHeight" HorizontalAlignment="Left" VerticalAlignment="Top" Width="150" 
+							<Slider x:Name="LazerHeight" Width="Auto" DockPanel.Dock="Left"
 									Minimum="0" 
 									Maximum="100" 
 									TickFrequency="5" 
@@ -125,7 +133,7 @@
 						<Label Content="Damage length (ms): " HorizontalAlignment="Left" Margin="10,124,0,0" VerticalAlignment="Top"/>
 						<DockPanel VerticalAlignment="Top" Margin="130,124,226,0" Height="25" ToolTip="The stroke height your device should play">
 							<TextBox Text="{Binding ElementName=DamageLength, Path=Value, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Right" TextAlignment="Right" Width="30" />
-							<Slider x:Name="DamageLength" HorizontalAlignment="Left" VerticalAlignment="Top" Width="150" 
+							<Slider x:Name="DamageLength" Width="Auto" DockPanel.Dock="Left"
 									Minimum="1" 
 									Maximum="1000" 
 									TickFrequency="10" 
@@ -135,13 +143,44 @@
 						<Label Content="Damage height (%): " HorizontalAlignment="Left" Margin="10,151,0,0" VerticalAlignment="Top"/>
 						<DockPanel VerticalAlignment="Top" Margin="130,155,226,0" Height="25" ToolTip="The stroke height your device should play">
 							<TextBox Text="{Binding ElementName=DamageHeight, Path=Value, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Right" TextAlignment="Right" Width="30" />
-							<Slider x:Name="DamageHeight" HorizontalAlignment="Left" VerticalAlignment="Top" Width="150" 
+							<Slider x:Name="DamageHeight" Width="Auto" DockPanel.Dock="Left"
 									Minimum="0" 
 									Maximum="100" 
 									TickFrequency="5" 
 							TickPlacement="BottomRight" IsSnapToTickEnabled="True" AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0" ValueChanged="DamageHeight_ValueChanged"/>
 						</DockPanel>
 
+
+						<Label Content="Melee length (ms): " HorizontalAlignment="Left" Margin="10,184,0,0" VerticalAlignment="Top"/>
+						<DockPanel VerticalAlignment="Top" Margin="130,185,226,0" Height="25" ToolTip="The stroke height your device should play">
+							<TextBox Text="{Binding ElementName=MeleeLength, Path=Value, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Right" TextAlignment="Right" Width="30" />
+							<Slider x:Name="MeleeLength" Width="Auto" DockPanel.Dock="Left"
+									Minimum="1" 
+									Maximum="1000" 
+									TickFrequency="10" 
+							TickPlacement="BottomRight" IsSnapToTickEnabled="True" AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0" ValueChanged="MeleeLength_ValueChanged"/>
+						</DockPanel>
+
+						<Label Content="Melee height (%): " HorizontalAlignment="Left" Margin="10,211,0,0" VerticalAlignment="Top"/>
+						<DockPanel VerticalAlignment="Top" Margin="130,215,226,0" Height="25" ToolTip="The stroke height your device should play">
+							<TextBox Text="{Binding ElementName=MeleeHeight, Path=Value, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Right" TextAlignment="Right" Width="30" />
+							<Slider x:Name="MeleeHeight" Width="Auto" DockPanel.Dock="Left"
+									Minimum="0" 
+									Maximum="100" 
+									TickFrequency="5" 
+							TickPlacement="BottomRight" IsSnapToTickEnabled="True" AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0" ValueChanged="MeleeHeight_ValueChanged"/>
+						</DockPanel>
+
+
+						<Label Content="Damage impact (%): " HorizontalAlignment="Left" Margin="10,244,0,0" VerticalAlignment="Top"/>
+						<DockPanel VerticalAlignment="Top" Margin="130,246,226,0" Height="25" ToolTip="The p">
+							<TextBox Text="{Binding ElementName=DamageImpact, Path=Value, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Right" TextAlignment="Right" Width="30" />
+							<Slider x:Name="DamageImpact" Width="Auto" DockPanel.Dock="Left"
+									Minimum="0" 
+									Maximum="500" 
+									TickFrequency="10" 
+							TickPlacement="BottomRight" IsSnapToTickEnabled="True" AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0" ValueChanged="DamageImpact_ValueChanged"/>
+						</DockPanel>
 					</Grid>
 				</TabItem>
 
@@ -150,7 +189,7 @@
 						<Label Content="Max stroke height (%): " HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
 						<DockPanel VerticalAlignment="Top" Margin="147,12,200,0" Height="25" ToolTip="The maximum percentage to stroke up">
 							<TextBox Text="{Binding ElementName=MaxStrokeLength, Path=Value, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Right" TextAlignment="Right" Width="30" />
-							<Slider x:Name="MaxStrokeLength" HorizontalAlignment="Left" VerticalAlignment="Top" Width="150" 
+							<Slider x:Name="MaxStrokeLength" Width="Auto" DockPanel.Dock="Left"
 									Minimum="0" 
 									Maximum="100" 
 									TickFrequency="1" 
@@ -160,7 +199,7 @@
 						<Label Content="Min stroke height (%): " HorizontalAlignment="Left" Margin="10,39,0,0" VerticalAlignment="Top"/>
 						<DockPanel VerticalAlignment="Top" Margin="147,40,200,0" Height="25" ToolTip="The max percentage to stroke down">
 							<TextBox Text="{Binding ElementName=MinStrokeLength, Path=Value, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Right" TextAlignment="Right" Width="30" />
-							<Slider x:Name="MinStrokeLength" HorizontalAlignment="Left" VerticalAlignment="Top" Width="150" 
+							<Slider x:Name="MinStrokeLength" Width="Auto" DockPanel.Dock="Left"
 									Minimum="0" 
 									Maximum="100" 
 									TickFrequency="1" 
@@ -184,7 +223,7 @@
 						/>
 						<DockPanel VerticalAlignment="Top" Margin="100,16,190,0" Height="25" ToolTip="How long the vibration converter's buffer is in seconds" Grid.Column="1">
 							<TextBox Text="{Binding ElementName=BufferVal, Path=Value, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Right" TextAlignment="Right" Width="30" />
-							<Slider x:Name="BufferVal" HorizontalAlignment="Left" VerticalAlignment="Top" Width="150" 
+							<Slider x:Name="BufferVal" Width="Auto" DockPanel.Dock="Left"
 									Minimum="1" 
 									Maximum="30" 
 									TickFrequency="1" 
@@ -192,31 +231,15 @@
 						</DockPanel>
 
 						<Label 
-							Content="Minimum update % diff:" 
-							HorizontalAlignment="Left" 
-							Margin="10,42,0,0" 
-							VerticalAlignment="Top" 
-							Width="145" Grid.ColumnSpan="2"
-						/>
-						<DockPanel VerticalAlignment="Top" Margin="100,46,190,0" Height="25" ToolTip="Minimum percentage difference for a intensity update to be sent to vibration devices" Grid.Column="1">
-							<TextBox Text="{Binding ElementName=DiffVal, Path=Value, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Right" TextAlignment="Right" Width="30" />
-							<Slider x:Name="DiffVal" HorizontalAlignment="Left" VerticalAlignment="Top" Width="150" 
-									Minimum="0" 
-									Maximum="100" 
-									TickFrequency="1" 
-							TickPlacement="BottomRight" IsSnapToTickEnabled="True" AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0" ValueChanged="VibrationUpdateDiffSlider_ValueChanged"/>
-						</DockPanel>
-
-						<Label 
 							Content="Maximum calc % diff:" 
 							HorizontalAlignment="Left" 
-							Margin="10,73,0,0" 
+							Margin="10,43,0,0" 
 							VerticalAlignment="Top" 
 							Width="145" Grid.ColumnSpan="2"
 						/>
-						<DockPanel VerticalAlignment="Top" Margin="100,76,190,0" Height="25" ToolTip="Maximum speed difference to include when calculating average (calculated from newest to oldest) for vibration devices" Grid.Column="1">
+						<DockPanel VerticalAlignment="Top" Margin="100,46,190,0" Height="25" ToolTip="Maximum speed difference to include when calculating average (calculated from newest to oldest) for vibration devices" Grid.Column="1">
 							<TextBox Text="{Binding ElementName=DiffVal_Copy, Path=Value, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Right" TextAlignment="Right" Width="30" />
-							<Slider x:Name="DiffVal_Copy" HorizontalAlignment="Left" VerticalAlignment="Top" Width="150" 
+							<Slider x:Name="DiffVal_Copy" Width="Auto" DockPanel.Dock="Left"
 									Minimum="0" 
 									Maximum="100" 
 									TickFrequency="1" 
@@ -224,20 +247,21 @@
 						</DockPanel>
 
 						<Label 
-							Content="Max speed (m/s):" 
+							Content="Assumed speed (m/s):" 
 							HorizontalAlignment="Left" 
-							Margin="10,104,0,0" 
+							Margin="10,74,0,0" 
 							VerticalAlignment="Top" 
-							Width="101" Grid.ColumnSpan="2"
+							Width="145" Grid.ColumnSpan="2"
 						/>
-						<DockPanel VerticalAlignment="Top" Margin="100,106,190,0" Height="25" ToolTip="Maximum assumed speed in a funscript which will result in 100% intensity in a vibration device" Grid.Column="1">
+						<DockPanel VerticalAlignment="Top" Margin="100,76,190,0" Height="25" ToolTip="Maximum assumed speed in a funscript which will result in 100% intensity in a vibration device" Grid.Column="1">
 							<TextBox Text="{Binding ElementName=SpeedVal, Path=Value, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Right" TextAlignment="Right" Width="30" />
-							<Slider x:Name="SpeedVal" HorizontalAlignment="Left" VerticalAlignment="Top" Width="150" 
-									Minimum="0.5" 
-									Maximum="10" 
-									TickFrequency="0.5" 
+							<Slider x:Name="SpeedVal" Width="Auto" DockPanel.Dock="Left"
+									Minimum="0.01" 
+									Maximum="5" 
+									TickFrequency="0.1" 
 							TickPlacement="BottomRight" IsSnapToTickEnabled="True" AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0" ValueChanged="VibrationMaxSpeedSlider_ValueChanged"/>
 						</DockPanel>
+						<CheckBox Content="Only vibrate on down movement" x:Name="VibrateOnlyDown" Checked="VibrateOnlyDown_Checked" Unchecked="VibrateOnlyDown_Checked" HorizontalAlignment="Left" Margin="10,106,0,0" VerticalAlignment="Top" Width="207" Grid.ColumnSpan="2"/>
 					</Grid>
 				</TabItem>
 
@@ -285,6 +309,23 @@
 							<LineBreak/>
 							<Run Text="Nodude"/>
 						</TextBlock>
+					</Grid>
+				</TabItem>
+
+				<TabItem Header="Debug">
+					<Grid Background="White">
+						<StackPanel HorizontalAlignment="Left" VerticalAlignment="Center" Width="56" Margin="10,0,0,0" Height="234">
+							<Label Content="Stroker:" HorizontalAlignment="Left"/>
+							<Border x:Name="rectangleStrokerContainer" Width="25" Height="200" BorderBrush="Black" BorderThickness="1">
+								<Rectangle x:Name="filledStrokerRectangle" Width="Auto" Height="0" Fill="Green" VerticalAlignment="Bottom" />
+							</Border>
+						</StackPanel>
+						<StackPanel HorizontalAlignment="Left" VerticalAlignment="Center" Width="56" Margin="60,0,0,0" Height="234">
+							<Label Content="Vibrator:" HorizontalAlignment="Left"/>
+							<Border x:Name="rectangleVibContainer" Width="25" Height="200" BorderBrush="Black" BorderThickness="1">
+								<Rectangle x:Name="filledVibRectangle" Width="Auto" Height="0" Fill="Green" VerticalAlignment="Bottom" />
+							</Border>
+						</StackPanel>
 					</Grid>
 				</TabItem>
 			</TabControl>

@@ -28,13 +28,14 @@ namespace SetariaPlayer
 	/// </summary>
 	public partial class MainWindow : Window
 	{
-		private string version = "InDev Build 19.6";
+		private string version = "InDev Build 19.7";
 		public static bool started = false;
 		private bool ready = false;
 		private ButtplugInt b;
 		private ScriptParser sr;
 		private HttpServer h;
 		private ScriptPlayer sp;
+		public static MainWindow DumbPointerHack;
 
 		private List<StateBase> states = new List<StateBase>();
 		private StateBase inactive;
@@ -74,6 +75,7 @@ namespace SetariaPlayer
 		}
 
 		public MainWindow() {
+			MainWindow.DumbPointerHack = this;
 			InitializeComponent();
 			LogIt();
 
@@ -128,9 +130,9 @@ namespace SetariaPlayer
 			Trace.WriteLine("Window_Loaded");
 
 			BufferVal.Value = Config.cfg.vibrationBufferDuration / 1000;
-			DiffVal.Value = Config.cfg.vibrationUpdateDiff * 100;
 			DiffVal_Copy.Value = Config.cfg.vibrationCalcDiff * 100;
 			SpeedVal.Value = Config.cfg.vibrationMaxSpeed;
+			VibrateOnlyDown.IsChecked = Config.cfg.vibrationOnlyDown;
 			FillerCheckbox.IsChecked = Config.cfg.filler;
 			FillerDuration.Value = Config.cfg.fillerDur;
 			FillerHeight.Value = Config.cfg.fillerHeight;
@@ -144,7 +146,11 @@ namespace SetariaPlayer
 			LazerLength.Value = Config.cfg.fillerAModLazerLength;
 			DamageHeight.Value = Config.cfg.fillerAModDamageHeight;
 			DamageLength.Value = Config.cfg.fillerAModDamageLength;
+			MeleeHeight.Value = Config.cfg.fillerAModMeleeHeight;
+			MeleeLength.Value = Config.cfg.fillerAModMeleeLength;
 			useIntiface.IsChecked = Config.cfg.intifaceBuiltin;
+			DamageImpact.Value = Config.cfg.damageImpact * 100;
+			FillerHPImpact.Value = Config.cfg.fillerModHPImpact * 100;
 
 			foreach (var f in Directory.GetFiles(".", "*.funscript"))
 			{
@@ -170,11 +176,6 @@ namespace SetariaPlayer
 		{
 			UpdateUX(() => {
 				Config.cfg.vibrationBufferDuration = (int)(e.NewValue * 1000);
-			});
-		}
-		private void VibrationUpdateDiffSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) {
-			UpdateUX(() => {
-				Config.cfg.vibrationUpdateDiff = e.NewValue / 100.0;
 			});
 		}
 		private void VibrationMaxSpeedSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) {
@@ -347,6 +348,27 @@ namespace SetariaPlayer
 				Config.cfg.fillerAModDamageHeight = (int)DamageHeight.Value;
 			});
 		}
+		private void MeleeLength_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) {
+			UpdateUX(() => {
+				Config.cfg.fillerAModMeleeLength = (int)MeleeLength.Value;
+			});
+		}
+		private void MeleeHeight_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) {
+			UpdateUX(() => {
+				Config.cfg.fillerAModMeleeHeight = (int)MeleeHeight.Value;
+			});
+		}
+		private void DamageImpact_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) {
+			UpdateUX(() => {
+				Config.cfg.damageImpact = DamageImpact.Value / 100;
+			});
+		}
+		private void FillerHPImpact_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) {
+			UpdateUX(() => {
+				Config.cfg.fillerModHPImpact = FillerHPImpact.Value / 100;
+			});
+		}
+
 
 		private void intifaceBuiltin_Checked_1(object sender, RoutedEventArgs e) {
 			UpdateUX(() => {
@@ -362,5 +384,32 @@ namespace SetariaPlayer
 			}
 
 		}
-    }
+
+		private void VibrateOnlyDown_Checked(object sender, RoutedEventArgs e) {
+			UpdateUX(() => {
+				Config.cfg.vibrationOnlyDown = VibrateOnlyDown.IsChecked == true;
+			});
+		}
+
+		public void UpdateStrokerHeight(double percentage) {
+			double maxHeight = rectangleStrokerContainer.ActualHeight;
+			double filledHeight = maxHeight * percentage;
+
+			double emptyHeight = maxHeight - filledHeight;
+
+			// Update the position and size of the filled rectangle
+			Canvas.SetBottom(filledStrokerRectangle, emptyHeight);
+			filledStrokerRectangle.Height = filledHeight;
+		}
+		public void UpdateVibratorHeight(double percentage) {
+			double maxHeight = rectangleVibContainer.ActualHeight;
+			double filledHeight = maxHeight * percentage;
+
+			double emptyHeight = maxHeight - filledHeight;
+
+			// Update the position and size of the filled rectangle
+			Canvas.SetBottom(filledVibRectangle, emptyHeight);
+			filledVibRectangle.Height = filledHeight;
+		}
+	}
 }

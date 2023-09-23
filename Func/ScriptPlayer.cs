@@ -135,12 +135,9 @@ namespace SetariaPlayer
 				//For all connected devices
 				CancellationToken ct = playTaskTS.Token;
 				playing = true;
-				while (butt.client.Devices.Length <= 0 && !ct.IsCancellationRequested) {
+				/*while (butt.client.Devices.Length <= 0 && !ct.IsCancellationRequested) {
 					Thread.Sleep(1);
-				}
-
-				//Remember the old intensity, for reducing updates
-				double oldIntensity = 0;
+				}*/
 
 				//While should run
 				while (!ct.IsCancellationRequested && playing) {
@@ -166,6 +163,13 @@ namespace SetariaPlayer
 						if (dur < 50)
 							continue;
 
+						// Use the Dispatcher to update the UI on the main thread
+						MainWindow.DumbPointerHack.Dispatcher.BeginInvoke(new Action(() =>
+						{
+							MainWindow.DumbPointerHack.UpdateStrokerHeight(pos);
+							MainWindow.DumbPointerHack.UpdateVibratorHeight(intensity);
+						}));
+
 						if (MainWindow.started && !this.paused) {
 							//Play action
 							butt.client.Devices.AsParallel().ForAll(device => {
@@ -173,11 +177,7 @@ namespace SetariaPlayer
 									device.SendLinearCmd((uint)dur, pos);
 								}
 								if (device.AllowedMessages.ContainsKey(MessageAttributeType.VibrateCmd)) {
-									//Only update vibration if difference is bigger than x%
-									if (Utilities.diff(oldIntensity, intensity) > Config.cfg.vibrationUpdateDiff) {
-										device.SendVibrateCmd(intensity);
-										oldIntensity = intensity;
-									}
+									device.SendVibrateCmd(intensity);
 								}
 								/*if (device.AllowedMessages.ContainsKey(MessageAttributeType.RotateCmd)) {
 									device.SendRotateCmd()
@@ -199,8 +199,7 @@ namespace SetariaPlayer
 							};
 							//If we paused (cannot happen in Setaria)
 							if (paused) { 
-								taken += 1; 
-								oldIntensity = 0.0; 
+								taken += 1;  
 								//TODO: In Setaria this is impossible
 								//Except in the gallery, where the animation doesnt pause
 								//But the signal is still sent
