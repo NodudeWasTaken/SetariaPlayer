@@ -152,6 +152,10 @@ namespace SetariaPlayer.EffectPlayer
             double intensity = _vibrate.Get();
             if (command) {
 				double pos = (_posp * (Config.cfg.strokeMax - Config.cfg.strokeMin)) + Config.cfg.strokeMin;
+                
+                // Infinity fix
+                pos = Math.Clamp(pos, 0.0, 1.0);
+                intensity = Math.Clamp(intensity, 0.0, 1.0);
 
 				// Use the Dispatcher to update the UI on the main thread
 				MainWindow.DumbPointerHack.Dispatcher.BeginInvoke(new Action(() =>
@@ -176,7 +180,7 @@ namespace SetariaPlayer.EffectPlayer
 			// Use the Dispatcher to update the UI on the main thread
 			MainWindow.DumbPointerHack.Dispatcher.BeginInvoke(new Action(() =>
 			{
-				MainWindow.DumbPointerHack.UpdateVibratorHeight(0);
+				MainWindow.DumbPointerHack.UpdateVibratorHeight(0.0);
 			}));
 
 			_client.client.Devices.AsParallel().ForAll(device => {
