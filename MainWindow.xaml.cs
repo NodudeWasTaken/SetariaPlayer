@@ -29,7 +29,7 @@ namespace SetariaPlayer
     /// </summary>
     public partial class MainWindow : Window
 	{
-		private string version = "Alpha Build 1.01";
+		private string version = "Alpha Build 1.02";
 		public static bool started = false;
 		private bool ready = false;
 		private ButtplugInt b;

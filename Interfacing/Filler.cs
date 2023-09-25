@@ -48,6 +48,7 @@ namespace SetariaPlayer {
 			if (!this.shouldrun()) {
 				return;
 			}
+			// BUG: Cannot disable if enabled live
 
 			running = true;
 			sp.Play(filler);

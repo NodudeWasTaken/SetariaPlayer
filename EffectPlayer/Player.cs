@@ -87,7 +87,9 @@ namespace SetariaPlayer.EffectPlayer
 			}
             long lastPointDuration = data.Duration() - data.Actions.Last().Item1;
             if (lastPointDuration > 5) {
-                moves.Add(new ActionMove(lastPointDuration, data.Actions.First().Item2));
+                (long, int) a = (moves.Last().dur, moves.Last().height);
+                (long, int) b = (moves.First().dur + a.Item1, moves.First().height);
+				moves.Add(new ActionMove(lastPointDuration, Utils.InterpolateHeight(a, b, lastPointDuration)));// data.Actions.First().Item2));
             }
 			return new Interaction(moves, data.Loop);
         }
@@ -182,6 +184,10 @@ namespace SetariaPlayer.EffectPlayer
                     device.SendStopDeviceCmd();
                 }
             });
-        }
+
+			_interaction = null;
+			_action = null;
+			_played = 0;
+		}
     }
 }

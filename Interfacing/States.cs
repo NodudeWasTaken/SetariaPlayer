@@ -302,7 +302,7 @@ namespace SetariaPlayer
 	}
 	class ScenePlayerState : StateBase {
 		private string lastmob = "";
-		private Data curscript = null;
+		private Data? curscript = null;
 		public ScenePlayerState(ButtplugInt b, Controller sp, ScriptParser sr) : base(b,sp,sr) {
 			this.name = "Scene player";
 			this.urlPrefix = "/game/gallery";
@@ -374,6 +374,7 @@ namespace SetariaPlayer
 			if (script == null) {
 				Trace.WriteLine($"Missing script for {mob} {animation_scene}!");
 				sp.Stop();
+				curscript = null;
 				return;
 			}
 
