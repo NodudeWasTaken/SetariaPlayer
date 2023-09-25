@@ -1,4 +1,5 @@
 ﻿using Buttplug;
+using SetariaPlayer.EffectPlayer;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -23,18 +24,18 @@ using static Buttplug.ServerMessage.Types;
 
 namespace SetariaPlayer
 {
-	/// <summary>
-	/// Interaction logic for MainWindow.xaml
-	/// </summary>
-	public partial class MainWindow : Window
+    /// <summary>
+    /// Interaction logic for MainWindow.xaml
+    /// </summary>
+    public partial class MainWindow : Window
 	{
-		private string version = "InDev Build 19.7";
+		private string version = "Alpha Build 1";
 		public static bool started = false;
 		private bool ready = false;
 		private ButtplugInt b;
 		private ScriptParser sr;
 		private HttpServer h;
-		private ScriptPlayer sp;
+		private Controller sp;
 		public static MainWindow DumbPointerHack;
 
 		private List<StateBase> states = new List<StateBase>();
@@ -104,7 +105,7 @@ namespace SetariaPlayer
 
 				this.sr = new ScriptParser();
 				this.h = new HttpServer("http://127.0.0.1:5050/");
-				this.sp = new ScriptPlayer(b);
+				this.sp = new Controller(b);
 
 				this.inactive = new InactiveState(b, sp, sr);
 				this.states.Add(new ScenePlayerState(b, sp, sr));
@@ -164,7 +165,7 @@ namespace SetariaPlayer
 
 			ready = true;
 		}
-		private void UpdateUX(Action a) {
+		private void UpdateUX(System.Action a) {
 			if (ready) {
 				a.Invoke();
 				if (this.activeState != null) {
@@ -195,11 +196,11 @@ namespace SetariaPlayer
 				if (StartButton.Content.ToString() == "Stop") {
 					//TODO: Use some force-stop mechanism instead?
 					started = false;
-					//sp.Pause();
+					sp.Pause();
 					StartButton.Content = "Start";
 				} else {
 					started = true;
-					//sp.Resume();
+					sp.Resume();
 					StartButton.Content = "Stop";
 				}
 			});

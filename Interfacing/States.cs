@@ -1,4 +1,4 @@
-﻿using SetariaPlayer.Func;
+﻿using SetariaPlayer.EffectPlayer;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -22,9 +22,9 @@ namespace SetariaPlayer
 		public string name;
 		public string urlPrefix;
 		protected ButtplugInt b;
-		protected ScriptPlayer sp;
+		protected Controller sp;
 		protected ScriptParser sr;
-		public StateBase(ButtplugInt b, ScriptPlayer sp, ScriptParser sr) {
+		public StateBase(ButtplugInt b, Controller sp, ScriptParser sr) {
 			this.b = b;
 			this.sp = sp;
 			this.sr = sr;
@@ -50,7 +50,7 @@ namespace SetariaPlayer
 		public float mp;
 		public Filler fi;
 
-		public InactiveState(ButtplugInt b, ScriptPlayer sp, ScriptParser sr) : base(b, sp, sr) {
+		public InactiveState(ButtplugInt b, Controller sp, ScriptParser sr) : base(b, sp, sr) {
 			this.name = "Inactive";
 			this.urlPrefix = "/game/player_damage";
 			fi = new Filler(sp, () => Config.cfg.filler);
@@ -82,20 +82,21 @@ namespace SetariaPlayer
 			float? damage = null;
 			if (r.QueryString.HasKeys()) {
 				foreach (string qs in r.QueryString.AllKeys) {
+					string value = r.QueryString[qs];
 					if (qs == "hp")
-						newhp = float.Parse(r.QueryString[qs], CultureInfo.InvariantCulture);
+						newhp = float.Parse(value, CultureInfo.InvariantCulture);
 					if (qs == "maxhp")
-						newmaxhp = float.Parse(r.QueryString[qs], CultureInfo.InvariantCulture);
+						newmaxhp = float.Parse(value, CultureInfo.InvariantCulture);
 					if (qs == "mp")
-						newmp = float.Parse(r.QueryString[qs], CultureInfo.InvariantCulture);
+						newmp = float.Parse(value, CultureInfo.InvariantCulture);
 				}
 
 				if (newhp.HasValue && newmaxhp.HasValue && newhp.Value < hp) {
-					double val = Utilities.NormalizedApproach(newhp.Value, maxhp);
+					double val = Utils.NormalizedApproach(newhp.Value, maxhp);
 					//fi.fillerLengthMod = 1.0 + (val * Config.cfg.fillerModHPImpact);
 					fi.fillerHeightMod = 1.0 + (val * Config.cfg.fillerModHPImpact);
 					damage = Math.Abs(newhp.Value - hp) / maxhp;
-					damage = (float)Utilities.Limit(damage.Value, 0, 1);
+					damage = (float)Utils.Limit(damage.Value, 0, 1);
 				}
 			}
 
@@ -114,6 +115,33 @@ namespace SetariaPlayer
 					damageProd += Config.cfg.damageImpact * damage.Value;
 				}
 				fi.Damage(damageProd);
+			}
+			if (r.Url.AbsolutePath.Equals("/game/custom_interval")) {
+				int dist = 500;
+				int length = 2000;
+				int min = 0;
+				int max = 25;
+
+				foreach (string qs in r.QueryString.AllKeys) {
+					string value = r.QueryString[qs];
+					if (qs == "dist")
+						dist = int.Parse(value, CultureInfo.InvariantCulture);
+					if (qs == "length")
+						length = int.Parse(value, CultureInfo.InvariantCulture);
+					if (qs == "min")
+						min = int.Parse(value, CultureInfo.InvariantCulture);
+					if (qs == "max")
+						max = int.Parse(value, CultureInfo.InvariantCulture);
+				}
+
+				var actions = new List<ActionMove>();
+				bool b = true;
+				for (int i=0; i<length; i += dist) {
+					actions.Add(new ActionMove(dist, b ? max : min));
+					b = !b;
+				}
+
+				sp.Overwrite(new Interaction(actions, false));
 			}
 
 			hp = newhp.HasValue ? newhp.Value : hp;
@@ -136,7 +164,7 @@ namespace SetariaPlayer
 		}
 	}
 	class BossState : InactiveState {
-		public BossState(ButtplugInt b, ScriptPlayer sp, ScriptParser sr) : base(b, sp, sr) {
+		public BossState(ButtplugInt b, Controller sp, ScriptParser sr) : base(b, sp, sr) {
 			this.name = "Boss mode";
 			this.urlPrefix = "/game/custom_bossmode";
 		}
@@ -167,14 +195,14 @@ namespace SetariaPlayer
 	// Unused
 	class DeathRoomState : StateBase {
 		private long time = 0;
-		public DeathRoomState(ButtplugInt b, ScriptPlayer sp, ScriptParser sr) : base(b, sp, sr) {
+		public DeathRoomState(ButtplugInt b, Controller sp, ScriptParser sr) : base(b, sp, sr) {
 			this.name = "DeathRoom";
 			this.urlPrefix = "/game/custom_DeathRoomGirl";
 		}
 		public override void Enter(HttpListenerRequest r, ref State s) {
 			base.Enter(r, ref s);
 			this.Update(r, ref s);
-			sp.Play(sr.get("sHFairy1", "start"), false);
+			sp.Play(Interaction.FromData(sr.get("sHFairy1", "start")), false);
 		}
 		public override void Update(HttpListenerRequest r, ref State s) {
 			base.Update(r, ref s);
@@ -187,9 +215,9 @@ namespace SetariaPlayer
 				float animflag = float.Parse(r.QueryString["anim_flag"], CultureInfo.InvariantCulture);
 				if (animflag == 7) {
 					//Max update time is 1/10 a second
-					if ((time + Config.cfg.fillerAModDamageLength) < Utilities.curtime()) {
+					if ((time + Config.cfg.fillerAModDamageLength) < Utils.UnixTimeMS()) {
 						this.sp.Play(Filler.getDamageScript());
-						time = Utilities.curtime();
+						time = Utils.UnixTimeMS();
 					}
 				}
 			}
@@ -199,14 +227,14 @@ namespace SetariaPlayer
 		private float max = -569;
 		private float min = -469;
 		private long time = 0;
-		public Fairy1State(ButtplugInt b, ScriptPlayer sp, ScriptParser sr) : base(b, sp, sr) {
+		public Fairy1State(ButtplugInt b, Controller sp, ScriptParser sr) : base(b, sp, sr) {
 			this.name = "Fairy1 player";
 			this.urlPrefix = "/game/custom_HFairy1";
 		}
 		public override void Enter(HttpListenerRequest r, ref State s) {
 			base.Enter(r, ref s);
 			this.Update(r, ref s);
-			sp.Play(sr.get("sHFairy1", "start"), false);
+			sp.Play(Interaction.FromData(sr.get("sHFairy1", "start")), false);
 		}
 		public override void Update(HttpListenerRequest r, ref State s) {
 			base.Update(r, ref s);
@@ -216,7 +244,7 @@ namespace SetariaPlayer
 			}
 
 			if (r.Url.AbsolutePath.Equals("/game/custom_HFairy1_finish")) {
-				sp.Play(sr.get("sHFairy1", "finish"), false);
+				sp.Play(Interaction.FromData(sr.get("sHFairy1", "finish")), false);
 				return;
 			}
 
@@ -233,7 +261,7 @@ namespace SetariaPlayer
 				float p = 1-Math.Abs((bonepos - min) / (max - min));
 
 				//Max update time is 1/10 a second
-				if (time + 100 < Utilities.curtime()) {
+				if (time + 100 < Utils.UnixTimeMS()) {
 					this.b.client.Devices.AsParallel().ForAll(device => {
 						if (device.AllowedMessages.ContainsKey(MessageAttributeType.LinearCmd)) {
 							Trace.WriteLine($"HFairy1 action {p}");
@@ -243,7 +271,7 @@ namespace SetariaPlayer
 							device.SendVibrateCmd(p);
 						}
 					});
-					time = Utilities.curtime();
+					time = Utils.UnixTimeMS();
 				}
 			}
 		}
@@ -254,8 +282,7 @@ namespace SetariaPlayer
 	}
 	class ChairRoomState : ScenePlayerState {
 		// For Lutellaria Area3State animation
-		// TODO: Should there be a randomized pattern boss room?
-		public ChairRoomState(ButtplugInt b, ScriptPlayer sp, ScriptParser sr): base(b,sp,sr) {
+		public ChairRoomState(ButtplugInt b, Controller sp, ScriptParser sr): base(b,sp,sr) {
 			this.name = "Chairroom";
 			this.urlPrefix = "/game/area3_gallery";
 		}
@@ -266,7 +293,7 @@ namespace SetariaPlayer
 	class ScenePlayerState : StateBase {
 		private string lastmob = "";
 		private Data curscript = null;
-		public ScenePlayerState(ButtplugInt b, ScriptPlayer sp, ScriptParser sr) : base(b,sp,sr) {
+		public ScenePlayerState(ButtplugInt b, Controller sp, ScriptParser sr) : base(b,sp,sr) {
 			this.name = "Scene player";
 			this.urlPrefix = "/game/gallery";
 		}
@@ -362,7 +389,7 @@ namespace SetariaPlayer
 			int shift = (int)(transition_time * 1000.0);
 			//TODO: Fix
 			shift = 0;
-			sp.Play(script, null, shift);
+			sp.Play(Interaction.FromData(script));
 			sp.SetTimeScale(animation_speed);
 			curscript = script;
 		}
