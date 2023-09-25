@@ -170,9 +170,14 @@ namespace SetariaPlayer.EffectPlayer
 
             _played = Utils.UnixTimeMS();
         }
-        public void Stop()
-        {
-            _client.client.Devices.AsParallel().ForAll(device => {
+        public void Stop() {
+			// Use the Dispatcher to update the UI on the main thread
+			MainWindow.DumbPointerHack.Dispatcher.BeginInvoke(new Action(() =>
+			{
+				MainWindow.DumbPointerHack.UpdateVibratorHeight(0);
+			}));
+
+			_client.client.Devices.AsParallel().ForAll(device => {
 				if (device.AllowedMessages.ContainsKey(MessageAttributeType.VibrateCmd)) {
                     device.SendStopDeviceCmd();
                 }

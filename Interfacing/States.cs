@@ -117,7 +117,7 @@ namespace SetariaPlayer
 				fi.Damage(damageProd);
 			}
 			if (r.Url.AbsolutePath.Equals("/game/custom_interval")) {
-				int dist = 500;
+				float dist = 500;
 				int length = 2000;
 				int min = 0;
 				int max = 25;
@@ -134,14 +134,24 @@ namespace SetariaPlayer
 						max = int.Parse(value, CultureInfo.InvariantCulture);
 				}
 
-				var actions = new List<ActionMove>();
-				bool b = true;
-				for (int i=0; i<length; i += dist) {
-					actions.Add(new ActionMove(dist, b ? max : min));
-					b = !b;
+				if (r.QueryString.AllKeys.Contains("speed")) {
+					//abs(min-max) / (dist/1000)=speed
+					float speed = int.Parse(r.QueryString["speed"], CultureInfo.InvariantCulture);
+					dist = 1000.0f * (Math.Abs(min - max) / speed);
 				}
 
-				sp.Overwrite(new Interaction(actions, false));
+				if (dist > 0) {
+					var actions = new List<ActionMove>();
+					bool b = true;
+					for (float i = 0; i < length; i += dist) {
+						actions.Add(new ActionMove((int)dist, b ? max : min));
+						b = !b;
+					}
+
+					sp.Overwrite(new Interaction(actions, false));
+				} else {
+					Trace.WriteLine($"InactiveState.Error: dist less than zero!");
+				}
 			}
 
 			hp = newhp.HasValue ? newhp.Value : hp;

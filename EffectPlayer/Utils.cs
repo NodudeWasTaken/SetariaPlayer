@@ -24,7 +24,7 @@ namespace SetariaPlayer.EffectPlayer
         }
         public static double Limit(double value, double min, double max)
         {
-            return Math.Max(Math.Min(value, max), min);
+            return Math.Clamp(value, min, max);
         }
 		public static int InterpolateHeight((long, int) point1, (long, int) point2, long duration) {
 			long t1 = point1.Item1;

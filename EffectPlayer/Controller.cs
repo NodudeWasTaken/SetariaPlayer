@@ -102,6 +102,7 @@ namespace SetariaPlayer.EffectPlayer
                 {
                     _player.SetInteraction(_main);
                 }
+                _owplayer.Stop();
                 _overwrite.interaction = null;
             }));
             _owplayer.SetInteraction(_overwrite);
