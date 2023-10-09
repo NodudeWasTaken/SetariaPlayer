@@ -24,12 +24,12 @@ using static Buttplug.ServerMessage.Types;
 
 namespace SetariaPlayer
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
-    public partial class MainWindow : Window
+	/// <summary>
+	/// Interaction logic for MainWindow.xaml
+	/// </summary>
+	public partial class MainWindow : Window
 	{
-		private string version = "Alpha Build 1.03";
+		private string version = "Alpha Build 1.06";
 		public static bool started = false;
 		private bool ready = false;
 		private ButtplugInt b;

@@ -148,7 +148,7 @@ namespace SetariaPlayer
 						b = !b;
 					}
 
-					sp.Overwrite(new Interaction(actions, false));
+					sp.Overwrite(new Interaction(actions, false, length));
 				} else {
 					Trace.WriteLine($"InactiveState.Error: dist less than zero!");
 				}
@@ -400,6 +400,7 @@ namespace SetariaPlayer
 			int shift = (int)(transition_time * 1000.0);
 			//TODO: Fix
 			shift = 0;
+			this.Resume();
 			sp.Play(Interaction.FromData(script));
 			sp.SetTimeScale(animation_speed);
 			curscript = script;

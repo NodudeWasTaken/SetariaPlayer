@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SetariaPlayer.EffectPlayer
@@ -55,9 +56,9 @@ namespace SetariaPlayer.EffectPlayer
 	class Controller
     {
         protected Player _player;
-        protected EnhancedInteraction _main = new EnhancedInteraction(new Interaction(new List<ActionMove>(), false));
+        protected EnhancedInteraction _main = new EnhancedInteraction(new Interaction(new List<ActionMove>(), false, 0));
         protected Player _owplayer;
-        protected EnhancedInteraction _overwrite = new EnhancedInteraction(new Interaction(new List<ActionMove>(), false));
+        protected EnhancedInteraction _overwrite = new EnhancedInteraction(new Interaction(new List<ActionMove>(), false, 0));
 		protected SlowmotionEffect slowmotion = new SlowmotionEffect();
         protected Task runner;
 
@@ -69,6 +70,7 @@ namespace SetariaPlayer.EffectPlayer
             runner = new Task(() => {
                 while (true) {
                     this.Loop();
+                    Thread.Sleep(1);
                 }
             });
             runner.Start();

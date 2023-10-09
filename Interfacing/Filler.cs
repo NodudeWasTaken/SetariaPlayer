@@ -15,7 +15,7 @@ namespace SetariaPlayer {
 			public FillerInt(Func<double> heightmod, Func<double> widthmod) : base(new List<ActionMove> {
 				new ActionMove(200, 25),
 				new ActionMove(400, 0)
-			}, true) {
+			}, true, 600) {
 				this.heightmod = heightmod;
 				this.widthmod = widthmod;
 			}

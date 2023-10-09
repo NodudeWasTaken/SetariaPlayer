@@ -35,10 +35,12 @@ namespace SetariaPlayer.EffectPlayer
 		public bool _loop;
 		protected ActionMove? _last;
 		protected int index = 0;
+        protected long _dur;
 
-        public Interaction(List<ActionMove> actions, bool loop) {
+        public Interaction(List<ActionMove> actions, bool loop, long dur) {
             _actions = actions;
             _loop = loop;
+			_dur = dur;
         }
         public Interaction(Interaction inter) {
             _actions = inter._actions;
@@ -91,7 +93,7 @@ namespace SetariaPlayer.EffectPlayer
                 (long, int) b = (moves.First().dur + a.Item1, moves.First().height);
 				moves.Add(new ActionMove(lastPointDuration, Utils.InterpolateHeight(a, b, lastPointDuration)));// data.Actions.First().Item2));
             }
-			return new Interaction(moves, data.Loop);
+			return new Interaction(moves, data.Loop, data.Duration());
         }
     }
 
@@ -102,6 +104,7 @@ namespace SetariaPlayer.EffectPlayer
         protected ActionMove? _action;
         protected long _played = 0L;
         protected long _paused = 0L;
+        protected long _drift = 0L;
         protected VibrationConvert _vibrate = new VibrationConvert();
 
         public Player(ButtplugInt client)
@@ -114,13 +117,22 @@ namespace SetariaPlayer.EffectPlayer
             _interaction = interaction;
             _action = null;
             _played = 0;
-            Interrupt();
+            _drift = 0;
+			Interrupt();
         }
 
         public void Pause() {
-            _paused = Utils.UnixTimeMS();
+			if (_paused > 0L) {
+				return;
+			}
+
+			_paused = Utils.UnixTimeMS();
         }
         public void Resume() {
+            if (_paused <= 0) {
+                return;
+            }
+
 			_played += Utils.UnixTimeMS() - _paused;
 			_paused = 0L;
 		}
@@ -135,44 +147,63 @@ namespace SetariaPlayer.EffectPlayer
 
         public void Loop(bool command = true)
         {
+            var acc = _action;
             if (_interaction == null ||
                 _paused != 0L ||
-                (_action != null && _played + _action.dur > Utils.UnixTimeMS())
+                (acc != null && _played + acc.dur > Utils.UnixTimeMS())
             ) {
                 return;
             }
+
+            if (acc != null) {
+                _drift += Utils.UnixTimeMS() - (_played + acc.dur);
+			}
 
             _action = _interaction.next();
             if (_action == null) {
                 return;
             }
 
-            double _posp = _action.height / 100.0;
+			double _posp = _action.height / 100.0;
 			_vibrate.Update((_action.dur, _posp));
             double intensity = _vibrate.Get();
             if (command) {
 				double pos = (_posp * (Config.cfg.strokeMax - Config.cfg.strokeMin)) + Config.cfg.strokeMin;
-                
-                // Infinity fix
-                pos = Math.Clamp(pos, 0.0, 1.0);
-                intensity = Math.Clamp(intensity, 0.0, 1.0);
+                long actionDuration = _action.dur;
 
-				// Use the Dispatcher to update the UI on the main thread
-				MainWindow.DumbPointerHack.Dispatcher.BeginInvoke(new Action(() =>
-				{
-					MainWindow.DumbPointerHack.UpdateStrokerHeight(pos);
-					MainWindow.DumbPointerHack.UpdateVibratorHeight(intensity);
-				}));
+				// Define a maximum reduction value to avoid negative or too small action durations
+				long maxReduction = Math.Min(_drift, actionDuration - 50); // You can adjust the threshold (0.1) as needed
 
-				_client.client.Devices.AsParallel().ForAll(device => {
-					if (device.AllowedMessages.ContainsKey(MessageAttributeType.LinearCmd)) {
-						device.SendLinearCmd((uint)_action.dur, pos);
-					}
-					if (device.AllowedMessages.ContainsKey(MessageAttributeType.VibrateCmd)) {
-						device.SendVibrateCmd(intensity);
-					}
-				});
-            }
+				// Reduce the action duration by the calculated maximum reduction
+				actionDuration -= maxReduction;
+
+				// Reduce the drift by the same amount as the reduction in action duration
+				_drift -= (long)maxReduction;
+
+				// Ensure that the action duration is not negative
+				actionDuration = Math.Max(actionDuration, 0);
+
+                if (actionDuration > 0) {
+				    // Infinity fix
+				    pos = Math.Clamp(pos, 0.0, 1.0);
+                    intensity = Math.Clamp(intensity, 0.0, 1.0);
+
+				    // Use the Dispatcher to update the UI on the main thread
+				    MainWindow.DumbPointerHack.Dispatcher.BeginInvoke(new Action(() => {
+					    MainWindow.DumbPointerHack.UpdateStrokerHeight(pos);
+					    MainWindow.DumbPointerHack.UpdateVibratorHeight(intensity);
+				    }));
+
+				    _client.client.Devices.AsParallel().ForAll(device => {
+					    if (device.AllowedMessages.ContainsKey(MessageAttributeType.LinearCmd)) {
+						    device.SendLinearCmd((uint)actionDuration, pos);
+					    }
+					    if (device.AllowedMessages.ContainsKey(MessageAttributeType.VibrateCmd)) {
+						    device.SendVibrateCmd(intensity);
+					    }
+				    });
+				}
+			}
 
             _played = Utils.UnixTimeMS();
         }
