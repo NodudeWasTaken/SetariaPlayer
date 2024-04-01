@@ -129,6 +129,8 @@ namespace SetariaPlayer.EffectPlayer
         public void Stop() { 
             _player.Stop();
 			_owplayer.Stop();
+            _main.interaction = null;
+			_overwrite.interaction = null;
 		}
     }
 }

@@ -163,13 +163,14 @@ namespace SetariaPlayer.EffectPlayer
             if (_action == null) {
                 return;
             }
+            ActionMove action = _action;
 
-			double _posp = _action.height / 100.0;
-			_vibrate.Update((_action.dur, _posp));
+			double _posp = action.height / 100.0;
+			_vibrate.Update((action.dur, _posp));
             double intensity = _vibrate.Get();
             if (command) {
 				double pos = (_posp * (Config.cfg.strokeMax - Config.cfg.strokeMin)) + Config.cfg.strokeMin;
-                long actionDuration = _action.dur;
+                long actionDuration = action.dur;
 
 				// Define a maximum reduction value to avoid negative or too small action durations
 				long maxReduction = Math.Min(_drift, actionDuration - 50); // You can adjust the threshold (0.1) as needed
@@ -182,6 +183,9 @@ namespace SetariaPlayer.EffectPlayer
 
 				// Ensure that the action duration is not negative
 				actionDuration = Math.Max(actionDuration, 0);
+
+                // TODO: Fix vibrations too short duration
+                // TODO: Still fix drift
 
                 if (actionDuration > 0) {
 				    // Infinity fix
