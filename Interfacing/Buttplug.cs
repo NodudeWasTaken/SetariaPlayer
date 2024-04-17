@@ -18,6 +18,35 @@ namespace SetariaPlayer
 		public void Start()
 		{
 			// Handle requests
+
+			//ButtplugFFILog.LogMessage += (aObj, aMsg) => { Trace.WriteLine($"LOG: {aMsg}"); };
+			//ButtplugFFILog.SetLogOptions(ButtplugLogLevel.Info, true);
+			client = new ButtplugClient("Setaria Plugin");
+			client.DeviceAdded += (obj, args) => {
+				var device = args.Device;
+
+				Trace.WriteLine($"Device Added: {device.Name}");
+				foreach (var msg in args.Device.AllowedMessages) {
+					Trace.WriteLine($"{msg.Key} {msg.Value}");
+					/*foreach (PropertyDescriptor descriptor in TypeDescriptor.GetProperties(msg.Value))
+					{
+						string name = descriptor.Name;
+						object value = descriptor.GetValue(obj);
+						Trace.WriteLine("{0}={1}", name, value);
+					}*/
+				}
+				//await device.SendVibrateCmd(1.0);
+			};
+			client.DeviceRemoved += (obj, args) => {
+				Trace.WriteLine($"Device removed: {args.Device.Name}");
+			};
+			client.ScanningFinished += (obj, args) => {
+				Trace.WriteLine("Scanning finished.");
+			};
+			client.ServerDisconnect += (obj, args) => {
+				Trace.WriteLine("Server disconnected.");
+			};
+
 			listenTask = HandleButtplug();
 		}
 		public void Refresh() {
@@ -56,38 +85,6 @@ namespace SetariaPlayer
 
 		private async Task HandleButtplug()
 		{
-			//ButtplugFFILog.LogMessage += (aObj, aMsg) => { Trace.WriteLine($"LOG: {aMsg}"); };
-			//ButtplugFFILog.SetLogOptions(ButtplugLogLevel.Info, true);
-			client = new ButtplugClient("Setaria Plugin");
-			client.DeviceAdded += (obj, args) =>
-			{
-				var device = args.Device;
-
-				Trace.WriteLine($"Device Added: {device.Name}");
-				foreach (var msg in args.Device.AllowedMessages)
-				{
-					Trace.WriteLine($"{msg.Key} {msg.Value}");
-					/*foreach (PropertyDescriptor descriptor in TypeDescriptor.GetProperties(msg.Value))
-					{
-						string name = descriptor.Name;
-						object value = descriptor.GetValue(obj);
-						Trace.WriteLine("{0}={1}", name, value);
-					}*/
-				}
-				//await device.SendVibrateCmd(1.0);
-			};
-			client.DeviceRemoved += (obj, args) =>
-			{
-				Trace.WriteLine($"Device removed: {args.Device.Name}");
-			};
-			client.ScanningFinished += (obj, args) =>
-			{
-				Trace.WriteLine("Scanning finished.");
-			};
-			client.ServerDisconnect += (obj, args) =>
-			{
-				Trace.WriteLine("Server disconnected.");
-			};
 			await HandleConnect();
 			await client.StartScanningAsync().ConfigureAwait(true);
 			Trace.WriteLine($"Is Scanning: {client.IsScanning}");

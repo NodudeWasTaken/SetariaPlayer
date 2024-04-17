@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -36,6 +37,35 @@ namespace SetariaPlayer.EffectPlayer
 			int interpolatedHeight = (int)(h1 + alpha * (h2 - h1));
 			return interpolatedHeight;
 		}
+		public static (long, int) LimitSpeed((long, int) currentAction, (long, int) previousAction, int maxSpeed) {
+			// Calculate the speed
+			double d = Math.Abs(currentAction.Item2 - previousAction.Item2);
+			double deltaTime = currentAction.Item1 - previousAction.Item1;
+			double speed = (d / deltaTime) * 1000;
 
+			// If speed exceeds the maximum allowed speed
+			if (speed > maxSpeed) {
+				// Adjust position to reduce speed
+				// Calculate the maximum allowed distance for the given time to limit speed
+				double maxDistance = maxSpeed * (deltaTime / 1000); // Convert deltaTime to seconds
+
+				// Calculate the direction of movement
+				int direction = currentAction.Item2 > previousAction.Item2 ? 1 : -1;
+
+				// Calculate the new position to ensure the speed limit is not exceeded
+				int newPos = previousAction.Item2 + (int)(maxDistance * direction);
+
+				// Update the position
+				currentAction.Item2 = newPos;
+
+				// Recalculate the speed with the adjusted position
+				d = Math.Abs(currentAction.Item2 - previousAction.Item2);
+				speed = (d / deltaTime) * 1000;
+			}
+
+			// Update the speed in the current action
+			// currentAction.Speed = speed;
+			return currentAction;
+		}
 	}
 }

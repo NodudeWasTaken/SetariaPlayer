@@ -29,7 +29,7 @@ namespace SetariaPlayer
 	/// </summary>
 	public partial class MainWindow : Window
 	{
-		private string version = "Alpha Build 1.08";
+		private string version = "Alpha Build 1.092";
 		public static bool started = false;
 		private bool ready = false;
 		private ButtplugInt b;
@@ -152,6 +152,7 @@ namespace SetariaPlayer
 			useIntiface.IsChecked = Config.cfg.intifaceBuiltin;
 			DamageImpact.Value = Config.cfg.damageImpact * 100;
 			FillerHPImpact.Value = Config.cfg.fillerModHPImpact * 100;
+			StrokeMaxAccel.Value = Config.cfg.strokeMaxAccel;
 
 			foreach (var f in Directory.GetFiles(".", "*.funscript"))
 			{
@@ -286,6 +287,11 @@ namespace SetariaPlayer
 		private void MinStrokeLength_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) {
 			UpdateUX(() => {
 				Config.cfg.strokeMin = MinStrokeLength.Value / 100;
+			});
+		}
+		private void StrokeMaxAccel_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) {
+			UpdateUX(() => {
+				Config.cfg.strokeMaxAccel = (int)StrokeMaxAccel.Value;
 			});
 		}
 

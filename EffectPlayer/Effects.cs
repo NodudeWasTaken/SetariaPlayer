@@ -15,7 +15,7 @@ namespace SetariaPlayer.EffectPlayer
 			}
 
 			ActionMove modifiedAction = new ActionMove(action);
-			modifiedAction.dur = (long)(action.dur * scale);
+			modifiedAction.dur = (long)(action.dur / scale);
 			return modifiedAction;
 		}
 	}

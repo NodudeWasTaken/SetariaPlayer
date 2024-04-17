@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualBasic;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -93,6 +94,13 @@ namespace SetariaPlayer.EffectPlayer
                 (long, int) b = (moves.First().dur + a.Item1, moves.First().height);
 				moves.Add(new ActionMove(lastPointDuration, Utils.InterpolateHeight(a, b, lastPointDuration)));// data.Actions.First().Item2));
             }
+            for (int i=1; i<moves.Count;i++) {
+                moves[i].height = Utils.LimitSpeed(
+                    (moves[i].dur, moves[i].height),
+					(0, moves[i-1].height),
+                    Config.cfg.strokeMaxAccel
+				).Item2;
+            }
 			return new Interaction(moves, data.Loop, data.Duration());
         }
     }
@@ -106,6 +114,7 @@ namespace SetariaPlayer.EffectPlayer
         protected long _paused = 0L;
         protected long _drift = 0L;
         protected VibrationConvert _vibrate = new VibrationConvert();
+        protected (long, double) oldact = (0,0);
 
         public Player(ButtplugInt client)
         {
@@ -188,8 +197,8 @@ namespace SetariaPlayer.EffectPlayer
                 // TODO: Still fix drift
 
                 if (actionDuration > 0) {
-				    // Infinity fix
-				    pos = Math.Clamp(pos, 0.0, 1.0);
+					// Infinity fix
+					pos = Math.Clamp(pos, 0.0, 1.0);
                     intensity = Math.Clamp(intensity, 0.0, 1.0);
 
 				    // Use the Dispatcher to update the UI on the main thread

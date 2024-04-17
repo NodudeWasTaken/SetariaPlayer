@@ -187,23 +187,33 @@
 				<TabItem Header="Stroker">
 					<Grid Background="White">
 						<Label Content="Max stroke height (%): " HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
-						<DockPanel VerticalAlignment="Top" Margin="147,12,200,0" Height="25" ToolTip="The maximum percentage to stroke up">
+						<DockPanel VerticalAlignment="Top" Margin="167,12,200,0" Height="25" ToolTip="The maximum percentage to stroke up">
 							<TextBox Text="{Binding ElementName=MaxStrokeLength, Path=Value, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Right" TextAlignment="Right" Width="30" />
 							<Slider x:Name="MaxStrokeLength" Width="Auto" DockPanel.Dock="Left"
-									Minimum="0" 
+									Minimum="1" 
 									Maximum="100" 
 									TickFrequency="1" 
 							TickPlacement="BottomRight" IsSnapToTickEnabled="True" AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0" ValueChanged="MaxStrokeLength_ValueChanged"/>
 						</DockPanel>
 
 						<Label Content="Min stroke height (%): " HorizontalAlignment="Left" Margin="10,39,0,0" VerticalAlignment="Top"/>
-						<DockPanel VerticalAlignment="Top" Margin="147,40,200,0" Height="25" ToolTip="The max percentage to stroke down">
+						<DockPanel VerticalAlignment="Top" Margin="167,40,200,0" Height="25" ToolTip="The max percentage to stroke down">
 							<TextBox Text="{Binding ElementName=MinStrokeLength, Path=Value, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Right" TextAlignment="Right" Width="30" />
 							<Slider x:Name="MinStrokeLength" Width="Auto" DockPanel.Dock="Left"
 									Minimum="0" 
 									Maximum="100" 
 									TickFrequency="1" 
 							TickPlacement="BottomRight" IsSnapToTickEnabled="True" AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0" ValueChanged="MinStrokeLength_ValueChanged"/>
+						</DockPanel>
+						
+						<Label Content="Max stroke speed (units/s): " HorizontalAlignment="Left" Margin="10,68,0,0" VerticalAlignment="Top"/>
+						<DockPanel VerticalAlignment="Top" Margin="167,68,200,0" Height="25" ToolTip="The max speed">
+							<TextBox Text="{Binding ElementName=StrokeMaxAccel, Path=Value, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Right" TextAlignment="Right" Width="30" />
+							<Slider x:Name="StrokeMaxAccel" Width="Auto" DockPanel.Dock="Left"
+									Minimum="1" 
+									Maximum="500" 
+									TickFrequency="5" 
+							TickPlacement="BottomRight" IsSnapToTickEnabled="True" AutoToolTipPlacement="TopLeft" AutoToolTipPrecision="0" ValueChanged="StrokeMaxAccel_ValueChanged"/>
 						</DockPanel>
 					</Grid>
 				</TabItem>

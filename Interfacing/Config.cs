@@ -24,7 +24,7 @@ namespace SetariaPlayer
 			public bool vibrationOnlyDown { get; set; } = true;
 			public double strokeMax { get; set; } = 1.0;
 			public double strokeMin { get; set; } = 0;
-			public double strokeAccelMax { get; set; } = 20; //TODO: Implement
+			public int strokeMaxAccel { get; set; } = 500;
 			public bool filler { get; set; } = false;
 			public int fillerDur { get; set; } = 300; // TODO: Per filler type then extend pattern based on...
 			public int fillerHeight { get; set; } = 15;
