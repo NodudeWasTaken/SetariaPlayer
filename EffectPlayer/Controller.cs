@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -68,9 +69,18 @@ namespace SetariaPlayer.EffectPlayer
             _owplayer = new Player(client);
             _main.AddEffect(slowmotion);
             runner = new Task(() => {
-                while (true) {
-                    this.Loop();
-                    Thread.Sleep(1);
+                try
+                {
+                    while (true)
+                    {
+                        this.Loop();
+                        Thread.Sleep(1);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Trace.WriteLine("Critical exception:");
+					Trace.WriteLine(ex);
                 }
             });
             runner.Start();

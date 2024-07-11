@@ -105,6 +105,7 @@ namespace SetariaPlayer
 				Trace.WriteLine("Intiface Connected!");
 			} catch (ButtplugConnectorException e) {
 				Trace.WriteLine("Failed to connect to intiface!");
+				Trace.WriteLine(e);
 				return;
 			}
 		}

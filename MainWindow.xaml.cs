@@ -29,7 +29,7 @@ namespace SetariaPlayer
 	/// </summary>
 	public partial class MainWindow : Window
 	{
-		private string version = "Alpha Build 1.093";
+		private string version = "Alpha Build 1.094";
 		public static bool started = false;
 		private bool ready = false;
 		private ButtplugInt b;
@@ -121,7 +121,9 @@ namespace SetariaPlayer
 				h.Start();
 			}
 			catch (Exception ex) {
+				Trace.WriteLine("Main init exception:");
 				Trace.WriteLine(ex);
+
 				throw;
 			}
 
@@ -302,8 +304,10 @@ namespace SetariaPlayer
 					await this.b.client.StartScanningAsync();
 				} catch (ButtplugConnectorException e) {
 					Trace.WriteLine("Failed to scan, is Buttplug connected?");
+					Trace.WriteLine(e);
 				} catch (ButtplugDeviceException e) {
 					Trace.WriteLine("Failed to scan, already scanning");
+					Trace.WriteLine(e);
 				}
 			}).Start();
 		}
@@ -387,7 +391,7 @@ namespace SetariaPlayer
 			try {
 				this.b.Refresh();
 			} catch(Exception ex) {
-				Trace.WriteLine(ex.ToString());
+				Trace.WriteLine(ex);
 			}
 
 		}
