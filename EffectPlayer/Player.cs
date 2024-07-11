@@ -18,7 +18,7 @@ namespace SetariaPlayer.EffectPlayer
         public int height;
         public ActionMove(long dur, int height) {
             this.dur = dur;
-            this.height = height;
+            this.height = Math.Max(Math.Min(height, 100), 0);
         }
         public ActionMove(ActionMove old) {
             this.dur = old.dur;
