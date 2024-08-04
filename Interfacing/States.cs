@@ -49,6 +49,8 @@ namespace SetariaPlayer
 		public float maxhp;
 		public float mp;
 		public Filler fi;
+		private long lastcall;
+		private int MIN_TIME = 80;
 
 		public InactiveState(ButtplugInt b, Controller sp, ScriptParser sr) : base(b, sp, sr) {
 			this.name = "Inactive";
@@ -100,24 +102,28 @@ namespace SetariaPlayer
 				}
 			}
 
-			if (r.Url.AbsolutePath.Equals("/game/melee"))
-				fi.Melee();
-			if (r.Url.AbsolutePath.Equals("/game/fire"))
-				fi.Fire();
-			if (r.Url.AbsolutePath.Equals("/game/fire_lazer"))
-				fi.Lazer();
-			if (r.Url.AbsolutePath.Equals("/game/fire_shotgun"))
-				fi.Lazer();
-			if (r.Url.AbsolutePath.Equals("/game/player_damage")) {
-				double damageProd = 1;
+			if (r.Url.AbsolutePath.Equals("/game/melee") && lastcall < Utils.UnixTimeMS()) {
+                lastcall = Utils.UnixTimeMS() + fi.Melee(); 
+			}
+			if (r.Url.AbsolutePath.Equals("/game/fire") && lastcall < Utils.UnixTimeMS()) {
+                lastcall = Utils.UnixTimeMS() + fi.Fire();
+			}
+			if (r.Url.AbsolutePath.Equals("/game/fire_lazer") && lastcall < Utils.UnixTimeMS()) {
+                lastcall = Utils.UnixTimeMS() + fi.Lazer();
+			}
+			if (r.Url.AbsolutePath.Equals("/game/fire_shotgun") && lastcall < Utils.UnixTimeMS()) {
+                lastcall = Utils.UnixTimeMS() + fi.Lazer();
+			}
+			if (r.Url.AbsolutePath.Equals("/game/player_damage") && lastcall < Utils.UnixTimeMS()) {
+                            double damageProd = 1;
 				if (damage.HasValue) {
 					// TODO: Config
 					damageProd += Config.cfg.damageImpact * damage.Value;
 				}
-				fi.Damage(damageProd);
+                lastcall = Utils.UnixTimeMS() + fi.Damage(damageProd);
 			}
-			if (r.Url.AbsolutePath.Equals("/game/custom_interval")) {
-				float dist = 500;
+			if (r.Url.AbsolutePath.Equals("/game/custom_interval") && lastcall < Utils.UnixTimeMS()) {
+                float dist = 500;
 				int length = 2000;
 				int min = 0;
 				int max = 25;
@@ -148,7 +154,7 @@ namespace SetariaPlayer
 						b = !b;
 					}
 
-					sp.Overwrite(new Interaction(actions, false, length));
+                    lastcall = Utils.UnixTimeMS() + sp.Overwrite(new Interaction(actions, false, length));
 				} else {
 					Trace.WriteLine($"InactiveState.Error: dist less than zero!");
 				}

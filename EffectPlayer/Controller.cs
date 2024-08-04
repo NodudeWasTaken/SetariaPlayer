@@ -106,9 +106,9 @@ namespace SetariaPlayer.EffectPlayer
             this.slowmotion.scale = scale;
         }
 
-		public void Overwrite(Interaction interaction)
+		public long Overwrite(Interaction interaction)
         {
-            _overwrite.SetInteraction(new OverwriteInteraction(interaction, () =>
+            var inter = new OverwriteInteraction(interaction, () =>
             {
                 if (_main.interaction != null)
                 {
@@ -116,8 +116,11 @@ namespace SetariaPlayer.EffectPlayer
                 }
                 _owplayer.Stop();
                 _overwrite.interaction = null;
-            }));
+            });
+            _overwrite.SetInteraction(inter);
             _owplayer.SetInteraction(_overwrite);
+
+            return inter.GetDuration();
         }
 
         public void Loop()
