@@ -142,19 +142,19 @@ namespace SetariaPlayer
 				}
 			}
 
-			if (r.Url.AbsolutePath.Equals("/game/melee") && lastcall < Utils.UnixTimeMS()) {
+			if (r.Url.AbsolutePath.Equals("/game/melee")) {
                 IterativeAction(Config.cfg.fillerAModMeleeHeight, 0, Config.cfg.fillerAModMeleeLength);
             }
 			if (r.Url.AbsolutePath.Equals("/game/fire")) {
 				IterativeAction(Config.cfg.fillerAModFireHeight, 0, Config.cfg.fillerAModFireLength);
             }
-			if (r.Url.AbsolutePath.Equals("/game/fire_lazer") && lastcall < Utils.UnixTimeMS()) {
+			if (r.Url.AbsolutePath.Equals("/game/fire_lazer")) {
                 IterativeAction(Config.cfg.fillerAModLazerHeight, 0, Config.cfg.fillerAModLazerLength);
             }
-			if (r.Url.AbsolutePath.Equals("/game/fire_shotgun") && lastcall < Utils.UnixTimeMS()) {
+			if (r.Url.AbsolutePath.Equals("/game/fire_shotgun")) {
                 IterativeAction(Config.cfg.fillerAModLazerHeight, 0, Config.cfg.fillerAModLazerLength);
             }
-			if (r.Url.AbsolutePath.Equals("/game/player_damage") && lastcall < Utils.UnixTimeMS()) {
+			if (r.Url.AbsolutePath.Equals("/game/player_damage")) {
                 double damageProd = 1;
 				if (damage.HasValue) {
 					// TODO: Config
