@@ -115,27 +115,19 @@ namespace SetariaPlayer {
 		}
 		public long Melee() {
 			this.last = Utils.UnixTimeMS() + Config.cfg.fillerAModFireLength;
-			var ms = getMeleeScript();
-            this.sp.Overwrite(ms);
-			return ms.GetDuration();
-		}
+			return this.sp.Overwrite(getMeleeScript());
+        }
 		public long Fire() {
 			this.last = Utils.UnixTimeMS() + Config.cfg.fillerAModFireLength;
-            var ms = getFireScript();
-            this.sp.Overwrite(ms);
-            return ms.GetDuration();
-        }
+            return this.sp.Overwrite(getFireScript());
+		}
 		public long Lazer() {
 			this.last = Utils.UnixTimeMS() + Config.cfg.fillerAModLazerLength;
-            var ms = getLazerScript();
-            this.sp.Overwrite(ms);
-            return ms.GetDuration();
+            return this.sp.Overwrite(getLazerScript());
         }
 		public long Damage(double damage_perc = 1.0) {
 			this.last = Utils.UnixTimeMS() + Config.cfg.fillerAModDamageLength;
-            var ms = getDamageScript(damage_perc);
-            this.sp.Overwrite(ms);
-            return ms.GetDuration();
+            return this.sp.Overwrite(getDamageScript(damage_perc));
         }
 	}
 }

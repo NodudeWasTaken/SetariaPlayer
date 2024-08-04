@@ -7,6 +7,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Documents;
 using static Buttplug.DeviceMessage.Types;
 using static Buttplug.ServerMessage.Types;
 
@@ -50,7 +51,6 @@ namespace SetariaPlayer
 		public float mp;
 		public Filler fi;
 		private long lastcall;
-		private int MIN_TIME = 80;
 
 		public InactiveState(ButtplugInt b, Controller sp, ScriptParser sr) : base(b, sp, sr) {
 			this.name = "Inactive";
@@ -74,6 +74,46 @@ namespace SetariaPlayer
 			}
 			//TODO: oDeathRoom and oCyclops
 		}
+
+		private int iterativeMean = 100;
+		private int iterativeIndex = 0;
+		private long iterativeLastCall = 0;
+
+		private void IterativeAction(int height, int minHeight=0, int _length=100)
+		{
+			// Long time since last, reset
+			if (iterativeLastCall + 500 < Utils.UnixTimeMS())
+			{
+				iterativeLastCall = Utils.UnixTimeMS() - _length;
+				iterativeMean = _length;
+				iterativeIndex = 0;
+			} else {
+				var _dist = Utils.UnixTimeMS() - iterativeLastCall;
+
+				var _calc = (double)iterativeMean + (1.0 / ((double)iterativeIndex + 1.0)) * ((double)_dist - (double)iterativeMean);
+				iterativeMean = (int)_calc;
+				iterativeLastCall = Utils.UnixTimeMS();
+			}
+
+            if (iterativeMean <= 70)
+            {
+                iterativeMean = 70;
+            }
+
+            if (lastcall < Utils.UnixTimeMS())
+            {
+                var actions = new List<ActionMove>()
+                {
+                    new ActionMove((int)0, height),
+                    new ActionMove((int)iterativeMean, minHeight),
+                    new ActionMove((int)(iterativeMean*2), height),
+                };
+
+                var __dd = sp.Overwrite(new Interaction(actions, false, iterativeMean));
+                lastcall = Utils.UnixTimeMS() + iterativeMean;
+            }
+        }
+
 		public override void Update(HttpListenerRequest r, ref State s) {
 			base.Update(r, ref s);
 			this.Update();
@@ -103,25 +143,26 @@ namespace SetariaPlayer
 			}
 
 			if (r.Url.AbsolutePath.Equals("/game/melee") && lastcall < Utils.UnixTimeMS()) {
-                lastcall = Utils.UnixTimeMS() + fi.Melee(); 
-			}
-			if (r.Url.AbsolutePath.Equals("/game/fire") && lastcall < Utils.UnixTimeMS()) {
-                lastcall = Utils.UnixTimeMS() + fi.Fire();
-			}
+                IterativeAction(Config.cfg.fillerAModMeleeHeight, 0, Config.cfg.fillerAModMeleeLength);
+            }
+			if (r.Url.AbsolutePath.Equals("/game/fire")) {
+				IterativeAction(Config.cfg.fillerAModFireHeight, 0, Config.cfg.fillerAModFireLength);
+            }
 			if (r.Url.AbsolutePath.Equals("/game/fire_lazer") && lastcall < Utils.UnixTimeMS()) {
-                lastcall = Utils.UnixTimeMS() + fi.Lazer();
-			}
+                IterativeAction(Config.cfg.fillerAModLazerHeight, 0, Config.cfg.fillerAModLazerLength);
+            }
 			if (r.Url.AbsolutePath.Equals("/game/fire_shotgun") && lastcall < Utils.UnixTimeMS()) {
-                lastcall = Utils.UnixTimeMS() + fi.Lazer();
-			}
+                IterativeAction(Config.cfg.fillerAModLazerHeight, 0, Config.cfg.fillerAModLazerLength);
+            }
 			if (r.Url.AbsolutePath.Equals("/game/player_damage") && lastcall < Utils.UnixTimeMS()) {
-                            double damageProd = 1;
+                double damageProd = 1;
 				if (damage.HasValue) {
 					// TODO: Config
 					damageProd += Config.cfg.damageImpact * damage.Value;
-				}
-                lastcall = Utils.UnixTimeMS() + fi.Damage(damageProd);
-			}
+                }
+                IterativeAction((int)(Config.cfg.fillerAModDamageHeight * damageProd), 0, Config.cfg.fillerAModDamageLength);
+                //lastcall = Utils.UnixTimeMS() + fi.Damage(damageProd);
+            }
 			if (r.Url.AbsolutePath.Equals("/game/custom_interval") && lastcall < Utils.UnixTimeMS()) {
                 float dist = 500;
 				int length = 2000;

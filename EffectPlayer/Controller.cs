@@ -19,8 +19,9 @@ namespace SetariaPlayer.EffectPlayer
 		}
 
 		public override ActionMove? next() {
-            if (interaction == null) { return null; }
-			ActionMove? action = interaction.next();
+            var _interaction = interaction;
+            if (_interaction == null) { return null; }
+			ActionMove? action = _interaction.next();
             if (action == null) { return null; }
 
 			foreach (var effect in effects) {

@@ -46,6 +46,7 @@ namespace SetariaPlayer.EffectPlayer
         public Interaction(Interaction inter) {
             _actions = inter._actions;
             _loop = inter._loop;
+            _dur = inter._dur;
         }
         public void SetLoop(bool loop) {
             _loop = loop;
