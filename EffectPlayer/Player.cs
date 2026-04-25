@@ -1,4 +1,6 @@
-﻿using Microsoft.VisualBasic;
+﻿using Buttplug.Client;
+using Buttplug.Core.Messages;
+using Microsoft.VisualBasic;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -6,7 +8,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Markup;
-using static Buttplug.ServerMessage.Types;
 
 namespace SetariaPlayer.EffectPlayer
 {
@@ -212,14 +213,14 @@ namespace SetariaPlayer.EffectPlayer
 				    bool posChanged = _lastSentPos < 0 || Math.Abs(pos - _lastSentPos) >= 0.01;
 				    bool canSendLinear = timeOk && posChanged;
 
-				    _client.client.Devices.AsParallel().ForAll(device => {
-					    if (canSendLinear && device.AllowedMessages.ContainsKey(MessageAttributeType.LinearCmd)) {
-						    device.SendLinearCmd((uint)actionDuration, pos);
+				    foreach (var device in _client.client.Devices) {
+					    if (canSendLinear && device.HasOutput(OutputType.HwPositionWithDuration)) {
+						    _ = device.RunOutputAsync(DeviceOutput.PositionWithDuration.Percent(pos, (uint)actionDuration));
 					    }
-					    if (device.AllowedMessages.ContainsKey(MessageAttributeType.VibrateCmd)) {
-						    device.SendVibrateCmd(intensity);
+					    if (device.HasOutput(OutputType.Vibrate)) {
+						    _ = device.RunOutputAsync(DeviceOutput.Vibrate.Percent(intensity));
 					    }
-				    });
+				    }
 
 				    if (canSendLinear) {
 					    // Block further LinearCmds until at least the action's own duration passes,
@@ -240,11 +241,15 @@ namespace SetariaPlayer.EffectPlayer
 				MainWindow.DumbPointerHack.UpdateVibratorHeight(0.0);
 			}));
 
-			_client.client.Devices.AsParallel().ForAll(device => {
-				if (device.AllowedMessages.ContainsKey(MessageAttributeType.VibrateCmd)) {
-                    device.SendStopDeviceCmd();
-                }
-            });
+			// Avoid device.StopAsync()/client.StopAllDevicesAsync(): Buttplug C# v5.0.0 still
+			foreach (var device in _client.client.Devices) {
+				if (device.HasOutput(OutputType.Vibrate)) {
+					_ = device.RunOutputAsync(DeviceOutput.Vibrate.Percent(0));
+				}
+				if (device.HasOutput(OutputType.HwPositionWithDuration)) {
+					_ = device.RunOutputAsync(DeviceOutput.PositionWithDuration.Percent(0, 200));
+				}
+			}
 
 			_interaction = null;
 			_action = null;

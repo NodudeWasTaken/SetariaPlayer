@@ -8,8 +8,8 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Documents;
-using static Buttplug.DeviceMessage.Types;
-using static Buttplug.ServerMessage.Types;
+using Buttplug.Client;
+using Buttplug.Core.Messages;
 
 namespace SetariaPlayer
 {
@@ -342,15 +342,14 @@ namespace SetariaPlayer
 
 				//Max update time is 1/10 a second
 				if (time + 100 < Utils.UnixTimeMS()) {
-					this.b.client.Devices.AsParallel().ForAll(device => {
-						if (device.AllowedMessages.ContainsKey(MessageAttributeType.LinearCmd)) {
+					foreach (var device in this.b.client.Devices) {
+						if (device.HasOutput(OutputType.HwPositionWithDuration)) {
 							Trace.WriteLine($"HFairy1 action {p}");
-							//TODO: We can probably calculate accceleration
-							device.SendLinearCmd(150, p);
-						} else if (device.AllowedMessages.ContainsKey(MessageAttributeType.VibrateCmd)) {
-							device.SendVibrateCmd(p);
+							_ = device.RunOutputAsync(DeviceOutput.PositionWithDuration.Percent(p, 150));
+						} else if (device.HasOutput(OutputType.Vibrate)) {
+							_ = device.RunOutputAsync(DeviceOutput.Vibrate.Percent(p));
 						}
-					});
+					}
 					time = Utils.UnixTimeMS();
 				}
 			}

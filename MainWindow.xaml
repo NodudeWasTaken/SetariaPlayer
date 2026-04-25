@@ -285,10 +285,9 @@
 					<Grid Background="White">
 						<TextBox x:Name="ConnectionURL" HorizontalAlignment="Left" Margin="55,49,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="172" KeyDown="ConnectionURL_OnKeyDown"/>
 						<Label Content="URL:" HorizontalAlignment="Left" Margin="12,45,0,0" VerticalAlignment="Top" Width="38" Height="26"/>
-						<TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="This is optional&#x0a;Buttplug's library has embedded compatibility with most devices" VerticalAlignment="Top"/>
+						<TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Requires intiface-central running separately." VerticalAlignment="Top"/>
 						<TextBlock HorizontalAlignment="Left" Margin="10,72,0,0" TextWrapping="Wrap" Text="This requires a restart. &#x0a;Default: ws://localhost:12345" VerticalAlignment="Top"/>
-						<CheckBox x:Name="useIntiface" Content="Use Builtin Intiface" HorizontalAlignment="Left" Margin="10,109,0,0" VerticalAlignment="Top" Checked="intifaceBuiltin_Checked_1" Unchecked="intifaceBuiltin_Checked_1"/>
-						<Button Content="Try reconnect" HorizontalAlignment="Left" Margin="10,129,0,0" VerticalAlignment="Top" Height="33" Width="85" Click="RefreshButton_Click"/>
+						<Button Content="Try reconnect" HorizontalAlignment="Left" Margin="10,109,0,0" VerticalAlignment="Top" Height="33" Width="85" Click="RefreshButton_Click"/>
 					</Grid>
 				</TabItem>
 

@@ -1,4 +1,6 @@
-﻿using Buttplug;
+﻿using Buttplug.Client;
+using Buttplug.Core;
+using Buttplug.Core.Messages;
 using SetariaPlayer.EffectPlayer;
 using System;
 using System.Collections.Generic;
@@ -20,8 +22,6 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 using System.Xml.Linq;
-using static Buttplug.ServerMessage.Types;
-
 namespace SetariaPlayer
 {
 	/// <summary>
@@ -29,7 +29,7 @@ namespace SetariaPlayer
 	/// </summary>
 	public partial class MainWindow : Window
 	{
-		private string version = "Alpha Build 1.097";
+		private string version = "Alpha Build 1.1";
 		public static bool started = false;
 		private bool ready = false;
 		private ButtplugInt b;
@@ -53,13 +53,13 @@ namespace SetariaPlayer
 		private string MessageTypes(ButtplugClientDevice d) {
 			List<string> l = new List<string>();
 
-			if (d.AllowedMessages.ContainsKey(MessageAttributeType.LinearCmd)){
+			if (d.HasOutput(OutputType.HwPositionWithDuration) || d.HasOutput(OutputType.Position)){
 				l.Add("Stroke");
 			}
-			if (d.AllowedMessages.ContainsKey(MessageAttributeType.VibrateCmd)){
+			if (d.HasOutput(OutputType.Vibrate)){
 				l.Add("Vibrate");
 			}
-			if (d.AllowedMessages.ContainsKey(MessageAttributeType.RotateCmd)) {
+			if (d.HasOutput(OutputType.Rotate)) {
 				l.Add("Rotate");
 			}
 			return l.Aggregate("", (current, next) => {
@@ -151,7 +151,6 @@ namespace SetariaPlayer
 			DamageLength.Value = Config.cfg.fillerAModDamageLength;
 			MeleeHeight.Value = Config.cfg.fillerAModMeleeHeight;
 			MeleeLength.Value = Config.cfg.fillerAModMeleeLength;
-			useIntiface.IsChecked = Config.cfg.intifaceBuiltin;
 			DamageImpact.Value = Config.cfg.damageImpact * 100;
 			FillerHPImpact.Value = Config.cfg.fillerModHPImpact * 100;
 			StrokeMaxAccel.Value = Config.cfg.strokeMaxAccel;
@@ -302,7 +301,7 @@ namespace SetariaPlayer
 				try {
 					await this.b.client.StopScanningAsync();
 					await this.b.client.StartScanningAsync();
-				} catch (ButtplugConnectorException e) {
+				} catch (ButtplugClientConnectorException e) {
 					Trace.WriteLine("Failed to scan, is Buttplug connected?");
 					Trace.WriteLine(e);
 				} catch (ButtplugDeviceException e) {
@@ -380,12 +379,6 @@ namespace SetariaPlayer
 			});
 		}
 
-
-		private void intifaceBuiltin_Checked_1(object sender, RoutedEventArgs e) {
-			UpdateUX(() => {
-				Config.cfg.intifaceBuiltin = useIntiface.IsChecked == true;
-			});
-		}
 
 		private void RefreshButton_Click(object sender, RoutedEventArgs e) {
 			try {

@@ -16,7 +16,6 @@ namespace SetariaPlayer
 
 		public class ConfigInt {
 			public string intifaceUrl { get; set; } = "ws://localhost:12345";
-			public bool intifaceBuiltin { get; set; } = true;
 			public string scriptPath { get; set; } = "rec.funscript";
 			public int vibrationBufferDuration { get; set; } = 5000;
 			public double vibrationCalcDiff { get; set; } = 0.15;
