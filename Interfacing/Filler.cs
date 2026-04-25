@@ -30,13 +30,13 @@ namespace SetariaPlayer {
 			}
 		}
 
-		private long? last = null;
+		private long last = 0; // 0 = unset
 		public double fillerHeightMod = 1.0;
 		public double fillerLengthMod = 1.0;
 		private FillerInt filler;
 		private Controller sp;
-		private Task watcher;
-		private bool running = false;
+		private Task? watcher;
+		private volatile bool running = false;
 		private Func<bool> shouldrun;
 
 		public Filler(Controller sp, Func<bool> shouldrun) {
@@ -45,19 +45,20 @@ namespace SetariaPlayer {
 			this.filler = new FillerInt(() => fillerHeightMod, () => fillerLengthMod);
 		}
 		public void Start() {
+			if (running) return;
 			if (!this.shouldrun()) {
 				return;
 			}
-			// BUG: Cannot disable if enabled live
 
 			running = true;
 			sp.Play(filler);
 
 			watcher = new Task(() => {
 				while (running) {
-					if (last != null && Utils.UnixTimeMS() > last) {
+					long lastVal = Interlocked.Read(ref last);
+					if (lastVal > 0 && Utils.UnixTimeMS() > lastVal) {
 						sp.Play(filler);
-						last = null;
+						Interlocked.Exchange(ref last, 0);
 					} else {
 						fillerHeightMod = 1.0;
 						fillerLengthMod = 1.0;
@@ -69,10 +70,10 @@ namespace SetariaPlayer {
 		}
 		public void Stop() {
 			if (running) {
-				last = null;
-				sp.Stop();
+				Interlocked.Exchange(ref last, 0);
 				running = false;
-				watcher.Wait();
+				watcher?.Wait();
+				sp.Stop();
 			}
 		}
 		public bool Running() {
@@ -114,19 +115,19 @@ namespace SetariaPlayer {
 				}));
 		}
 		public long Melee() {
-			this.last = Utils.UnixTimeMS() + Config.cfg.fillerAModFireLength;
+			Interlocked.Exchange(ref this.last, Utils.UnixTimeMS() + Config.cfg.fillerAModFireLength);
 			return this.sp.Overwrite(getMeleeScript());
         }
 		public long Fire() {
-			this.last = Utils.UnixTimeMS() + Config.cfg.fillerAModFireLength;
+			Interlocked.Exchange(ref this.last, Utils.UnixTimeMS() + Config.cfg.fillerAModFireLength);
             return this.sp.Overwrite(getFireScript());
 		}
 		public long Lazer() {
-			this.last = Utils.UnixTimeMS() + Config.cfg.fillerAModLazerLength;
+			Interlocked.Exchange(ref this.last, Utils.UnixTimeMS() + Config.cfg.fillerAModLazerLength);
             return this.sp.Overwrite(getLazerScript());
         }
 		public long Damage(double damage_perc = 1.0) {
-			this.last = Utils.UnixTimeMS() + Config.cfg.fillerAModDamageLength;
+			Interlocked.Exchange(ref this.last, Utils.UnixTimeMS() + Config.cfg.fillerAModDamageLength);
             return this.sp.Overwrite(getDamageScript(damage_perc));
         }
 	}

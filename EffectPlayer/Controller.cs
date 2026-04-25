@@ -28,6 +28,7 @@ namespace SetariaPlayer.EffectPlayer
 				action = effect.ApplyEffect(action);
 			}
 
+			_last = action;
 			return action;
 		}
 
@@ -36,6 +37,7 @@ namespace SetariaPlayer.EffectPlayer
 			this._actions = newInteraction._actions;
             this._loop = newInteraction._loop;
 			interaction = newInteraction;
+			this.reset();
 		}
 	}
 	class OverwriteInteraction : EnhancedInteraction {
@@ -57,6 +59,7 @@ namespace SetariaPlayer.EffectPlayer
 
 	class Controller
     {
+        protected readonly object _lock = new object();
         protected Player _player;
         protected EnhancedInteraction _main = new EnhancedInteraction(new Interaction(new List<ActionMove>(), false, 0));
         protected Player _owplayer;
@@ -70,18 +73,18 @@ namespace SetariaPlayer.EffectPlayer
             _owplayer = new Player(client);
             _main.AddEffect(slowmotion);
             runner = new Task(() => {
-                try
+                while (true)
                 {
-                    while (true)
+                    try
                     {
                         this.Loop();
-                        Thread.Sleep(1);
                     }
-                }
-                catch (Exception ex)
-                {
-                    Trace.WriteLine("Critical exception:");
-					Trace.WriteLine(ex);
+                    catch (Exception ex)
+                    {
+                        Trace.WriteLine("Loop exception:");
+                        Trace.WriteLine(ex);
+                    }
+                    Thread.Sleep(1);
                 }
             });
             runner.Start();
@@ -89,9 +92,12 @@ namespace SetariaPlayer.EffectPlayer
 
         public void Play(Interaction interaction)
         {
-            _main.SetInteraction(interaction);
-            _player.SetInteraction(_main);
-            _overwrite.interaction = null;
+            lock (_lock)
+            {
+                _main.SetInteraction(interaction);
+                _player.SetInteraction(_main);
+                _overwrite.interaction = null;
+            }
 		}
 
         // Legacy
@@ -109,42 +115,58 @@ namespace SetariaPlayer.EffectPlayer
 
 		public long Overwrite(Interaction interaction)
         {
-            var inter = new OverwriteInteraction(interaction, () =>
+            lock (_lock)
             {
-                if (_main.interaction != null)
+                var inter = new OverwriteInteraction(interaction, () =>
                 {
-                    _player.SetInteraction(_main);
-                }
-                _owplayer.Stop();
-                _overwrite.interaction = null;
-            });
-            _overwrite.SetInteraction(inter);
-            _owplayer.SetInteraction(_overwrite);
+                    // Callback fires from inside Loop (same thread, re-entrant lock).
+                    if (_main.interaction != null)
+                    {
+                        _player.SetInteraction(_main);
+                    }
+                    _owplayer.Stop();
+                    _overwrite.interaction = null;
+                });
+                _overwrite.SetInteraction(inter);
+                _owplayer.SetInteraction(_overwrite);
 
-            return inter.GetDuration();
+                return inter.GetDuration();
+            }
         }
 
         public void Loop()
         {
-            _player.Loop(_overwrite.interaction == null);
-            _owplayer.Loop(_overwrite.interaction != null);
+            lock (_lock)
+            {
+                _player.Loop(_overwrite.interaction == null);
+                _owplayer.Loop(_overwrite.interaction != null);
+            }
         }
 
         public void Pause() {
-            _player.Pause();
-            _owplayer.Pause();
+            lock (_lock)
+            {
+                _player.Pause();
+                _owplayer.Pause();
+            }
         }
 
         public void Resume() {
-            _player.Resume();
-            _owplayer.Resume();
+            lock (_lock)
+            {
+                _player.Resume();
+                _owplayer.Resume();
+            }
         }
 
-        public void Stop() { 
-            _player.Stop();
-			_owplayer.Stop();
-            _main.interaction = null;
-			_overwrite.interaction = null;
+        public void Stop() {
+            lock (_lock)
+            {
+                _player.Stop();
+                _owplayer.Stop();
+                _main.interaction = null;
+                _overwrite.interaction = null;
+            }
 		}
     }
 }

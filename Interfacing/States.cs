@@ -75,42 +75,66 @@ namespace SetariaPlayer
 			//TODO: oDeathRoom and oCyclops
 		}
 
-		private int iterativeMean = 100;
-		private int iterativeIndex = 0;
-		private long iterativeLastCall = 0;
-
-		private void IterativeAction(int height, int minHeight=0, int _length=100)
+		private class IterativeState
 		{
-			// Long time since last, reset
-			if (iterativeLastCall + 500 < Utils.UnixTimeMS())
-			{
-				iterativeLastCall = Utils.UnixTimeMS() - _length;
-				iterativeMean = _length;
-				iterativeIndex = 0;
-			} else {
-				var _dist = Utils.UnixTimeMS() - iterativeLastCall;
+			public int mean = 100;
+			public int index = 0;
+			public long lastCall = 0;
+		}
+		private Dictionary<string, IterativeState> iterativeStates = new Dictionary<string, IterativeState>();
 
-				var _calc = (double)iterativeMean + (1.0 / ((double)iterativeIndex + 1.0)) * ((double)_dist - (double)iterativeMean);
-				iterativeMean = (int)_calc;
-				iterativeLastCall = Utils.UnixTimeMS();
+		private void IterativeAction(string key, int height, int minHeight=0, int _length=100)
+		{
+			if (!iterativeStates.TryGetValue(key, out var st))
+			{
+				st = new IterativeState { mean = _length };
+				iterativeStates[key] = st;
 			}
 
-            if (iterativeMean <= 70)
+			// Long time since last call of THIS action type, reset its cadence
+			if (st.lastCall + 500 < Utils.UnixTimeMS())
+			{
+				st.mean = _length;
+				st.index = 0;
+			} else {
+				var _dist = Utils.UnixTimeMS() - st.lastCall;
+
+				var _calc = (double)st.mean + (1.0 / ((double)st.index + 1.0)) * ((double)_dist - (double)st.mean);
+				st.mean = (int)_calc;
+				if (st.index < 10) st.index++;
+			}
+			st.lastCall = Utils.UnixTimeMS();
+
+            if (st.mean <= 70)
             {
-                iterativeMean = 70;
+                st.mean = 70;
             }
 
+            // Shared overwrite gate across all types to avoid double-overwriting mid-pattern
             if (lastcall < Utils.UnixTimeMS())
             {
+                // Player.Loop skips actions with dur <= 50, so segments must exceed that.
+                int kickDur = Math.Max(51, st.mean / 3);
+                int returnDur = Math.Max(51, st.mean - kickDur);
+                long totalDur = kickDur + returnDur;
+
+                // Handy-class devices can't accept new LinearCmds faster than ~5Hz without
+                // queueing and stalling. Pad the return phase to enforce a ~200ms minimum.
+                const int MIN_PATTERN_MS = 200;
+                if (totalDur < MIN_PATTERN_MS)
+                {
+                    returnDur = MIN_PATTERN_MS - kickDur;
+                    totalDur = MIN_PATTERN_MS;
+                }
+
                 var actions = new List<ActionMove>()
                 {
-                    new ActionMove((int)0, height),
-                    new ActionMove((int)iterativeMean, minHeight),
-                    new ActionMove((int)(iterativeMean*2), height),
+                    new ActionMove(kickDur, height),
+                    new ActionMove(returnDur, minHeight),
                 };
 
-                var __dd = sp.Overwrite(new Interaction(actions, false, iterativeMean));
-                lastcall = Utils.UnixTimeMS() + iterativeMean;
+                sp.Overwrite(new Interaction(actions, false, totalDur));
+                lastcall = Utils.UnixTimeMS() + totalDur;
             }
         }
 
@@ -143,16 +167,16 @@ namespace SetariaPlayer
 			}
 
 			if (r.Url.AbsolutePath.Equals("/game/melee")) {
-                IterativeAction(Config.cfg.fillerAModMeleeHeight, 0, Config.cfg.fillerAModMeleeLength);
+                IterativeAction("melee", Config.cfg.fillerAModMeleeHeight, 0, Config.cfg.fillerAModMeleeLength);
             }
 			if (r.Url.AbsolutePath.Equals("/game/fire")) {
-				IterativeAction(Config.cfg.fillerAModFireHeight, 0, Config.cfg.fillerAModFireLength);
+				IterativeAction("fire", Config.cfg.fillerAModFireHeight, 0, Config.cfg.fillerAModFireLength);
             }
 			if (r.Url.AbsolutePath.Equals("/game/fire_lazer")) {
-                IterativeAction(Config.cfg.fillerAModLazerHeight, 0, Config.cfg.fillerAModLazerLength);
+                IterativeAction("lazer", Config.cfg.fillerAModLazerHeight, 0, Config.cfg.fillerAModLazerLength);
             }
 			if (r.Url.AbsolutePath.Equals("/game/fire_shotgun")) {
-                IterativeAction(Config.cfg.fillerAModLazerHeight, 0, Config.cfg.fillerAModLazerLength);
+                IterativeAction("shotgun", Config.cfg.fillerAModLazerHeight, 0, Config.cfg.fillerAModLazerLength);
             }
 			if (r.Url.AbsolutePath.Equals("/game/player_damage")) {
                 double damageProd = 1;
@@ -160,8 +184,7 @@ namespace SetariaPlayer
 					// TODO: Config
 					damageProd += Config.cfg.damageImpact * damage.Value;
                 }
-                IterativeAction((int)(Config.cfg.fillerAModDamageHeight * damageProd), 0, Config.cfg.fillerAModDamageLength);
-                //lastcall = Utils.UnixTimeMS() + fi.Damage(damageProd);
+                IterativeAction("damage", (int)(Config.cfg.fillerAModDamageHeight * damageProd), 0, Config.cfg.fillerAModDamageLength);
             }
 			if (r.Url.AbsolutePath.Equals("/game/custom_interval") && lastcall < Utils.UnixTimeMS()) {
                 float dist = 500;
@@ -384,9 +407,6 @@ namespace SetariaPlayer
 
 			string mob = r.QueryString["anim_name"];
 			string animation_scene = r.QueryString["anim_scene"];
-			float transition_time = 0;
-			if (r.QueryString.AllKeys.Contains("anim_dur"))
-				transition_time = float.Parse(r.QueryString["anim_dur"], CultureInfo.InvariantCulture);
 			float animation_speed = float.Parse(r.QueryString["anim_speed"], CultureInfo.InvariantCulture);
 			/*
 	Var enemy_id  =302
@@ -431,10 +451,6 @@ namespace SetariaPlayer
 				return;
 			}
 
-			//If this wasn't a scene-switch, dont delay
-			if (mob != lastmob) {
-				transition_time = 0;
-			}
 			if (lastmob != "") {
 				sp.Stop();
 			}
@@ -444,9 +460,6 @@ namespace SetariaPlayer
 				Trace.WriteLine($"Device name: {d.Name}");
 			}
 
-			int shift = (int)(transition_time * 1000.0);
-			//TODO: Fix
-			//shift = 0;
 			this.Resume();
 			sp.Play(Interaction.FromData(script));
 			sp.SetTimeScale(animation_speed);

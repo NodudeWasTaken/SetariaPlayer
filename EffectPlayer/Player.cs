@@ -84,6 +84,9 @@ namespace SetariaPlayer.EffectPlayer
 
         public static Interaction FromData(Data data) {
             List<ActionMove> moves = new List<ActionMove>();
+            if (data.Actions.Count == 0) {
+                return new Interaction(moves, data.Loop, data.Duration());
+            }
 			(long, int)? last = null;
 			foreach (var action in data.Actions) {
                 long dur = action.Item1;
@@ -112,14 +115,23 @@ namespace SetariaPlayer.EffectPlayer
 
     class Player
     {
+        // Minimum gap between consecutive LinearCmd sends. Newer Handy firmware
+        // queues LinearCmd aggressively; sending faster than ~6-7Hz causes queue
+        // stalls where the device appears frozen and then jumps. Vibrate commands
+        // are not throttled here since they stream continuously by design.
+        private const long MIN_LINEAR_INTERVAL_MS = 150;
+
         protected ButtplugInt _client;
         protected Interaction? _interaction;
         protected ActionMove? _action;
         protected long _played = 0L;
         protected long _paused = 0L;
-        protected long _drift = 0L;
+        // Timestamp at which the device is expected to finish the previously issued
+        // LinearCmd. New sends are skipped until now >= this (but the MIN_INTERVAL
+        // floor still applies so we don't flood on very short actions).
+        protected long _nextLinearSendAllowedMs = 0L;
+        protected double _lastSentPos = -1.0;
         protected VibrationConvert _vibrate = new VibrationConvert();
-        protected (long, double) oldact = (0,0);
 
         public Player(ButtplugInt client)
         {
@@ -131,7 +143,6 @@ namespace SetariaPlayer.EffectPlayer
             _interaction = interaction;
             _action = null;
             _played = 0;
-            _drift = 0;
 			Interrupt();
         }
 
@@ -161,7 +172,6 @@ namespace SetariaPlayer.EffectPlayer
 
         public void Loop(bool command = true)
         {
-            var acc = _action;
             if (_interaction == null ||
                 _paused != 0L ||
                _played > Utils.UnixTimeMS()
@@ -180,12 +190,7 @@ namespace SetariaPlayer.EffectPlayer
             double intensity = _vibrate.Get();
             if (command) {
 				double pos = (_posp * (Config.cfg.strokeMax - Config.cfg.strokeMin)) + Config.cfg.strokeMin;
-                long actionDuration = action.dur;
-
-				// Ensure that the action duration is not negative
-				actionDuration = Math.Max(actionDuration, 0);
-
-                // TODO: Still fix drift
+                long actionDuration = Math.Max(action.dur, 0);
 
                 if (actionDuration > 50) {
 					// Infinity fix
@@ -198,14 +203,30 @@ namespace SetariaPlayer.EffectPlayer
 					    MainWindow.DumbPointerHack.UpdateVibratorHeight(intensity);
 				    }));
 
+				    long now = Utils.UnixTimeMS();
+				    // Three conditions must all be met to send a LinearCmd:
+				    //  (a) device is expected to have finished the prior command (queue isn't full)
+				    //  (b) the position actually changed meaningfully (don't waste slots on no-ops)
+				    // The first send (_nextLinearSendAllowedMs == 0) bypasses (a).
+				    bool timeOk = _nextLinearSendAllowedMs == 0 || now >= _nextLinearSendAllowedMs;
+				    bool posChanged = _lastSentPos < 0 || Math.Abs(pos - _lastSentPos) >= 0.01;
+				    bool canSendLinear = timeOk && posChanged;
+
 				    _client.client.Devices.AsParallel().ForAll(device => {
-					    if (device.AllowedMessages.ContainsKey(MessageAttributeType.LinearCmd)) {
+					    if (canSendLinear && device.AllowedMessages.ContainsKey(MessageAttributeType.LinearCmd)) {
 						    device.SendLinearCmd((uint)actionDuration, pos);
 					    }
 					    if (device.AllowedMessages.ContainsKey(MessageAttributeType.VibrateCmd)) {
 						    device.SendVibrateCmd(intensity);
 					    }
 				    });
+
+				    if (canSendLinear) {
+					    // Block further LinearCmds until at least the action's own duration passes,
+					    // or MIN_LINEAR_INTERVAL_MS — whichever is larger.
+					    _nextLinearSendAllowedMs = now + Math.Max(actionDuration, MIN_LINEAR_INTERVAL_MS);
+					    _lastSentPos = pos;
+				    }
 
                     _played = Utils.UnixTimeMS() + actionDuration;
                 }

@@ -30,13 +30,13 @@ namespace SetariaPlayer
 			public int fillerHeight { get; set; } = 15;
 			public double fillerModHPImpact { get; set; } = 0.2;
 			public int fillerAModMeleeLength { get; set; } = 120;
-			public int fillerAModMeleeHeight { get; set; } = 25;
+			public int fillerAModMeleeHeight { get; set; } = 55;
 			public int fillerAModFireLength { get; set; } = 140;
-			public int fillerAModFireHeight { get; set; } = 10;
+			public int fillerAModFireHeight { get; set; } = 45;
 			public int fillerAModLazerLength { get; set; } = 120;
-			public int fillerAModLazerHeight { get; set; } = 10;
+			public int fillerAModLazerHeight { get; set; } = 40;
 			public int fillerAModDamageLength { get; set; } = 200;
-			public int fillerAModDamageHeight { get; set; } = 60;
+			public int fillerAModDamageHeight { get; set; } = 75;
 			public double damageImpact { get; set; } = 2.5;
 			public void save() {
 				Trace.WriteLine("Config save!");
